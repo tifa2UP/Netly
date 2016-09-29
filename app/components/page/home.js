@@ -22,6 +22,8 @@ var Status = React.createClass({
 		firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
 		hashHistory.push("/");
 
+		this.refs.body.value = "";
+
 		console.log("in handlePost");
 	},
 
@@ -77,7 +79,7 @@ var Status = React.createClass({
 				<input type="text" ref="body" placeholder="What are you thinking about?" onKeyPress={this.handleKeyPress} className="form-control"/><br />
 				<center><button className="btn btn-primary" onClick={this.handlePost}>Post</button></center><br />	
 				{reversedPost.map((post,index) => (
-        			<li key={index}>On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, {this.getNameOfUser(post.user_id)} <blockquote>"{post.body}"</blockquote></li>
+        			<li key={index}>On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, {this.getNameOfUser(post.user_id)} said <blockquote>"{post.body}"</blockquote></li>
    				))}
 			</div>
 		);
