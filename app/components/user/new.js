@@ -4,6 +4,8 @@ var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
 
 var SignUpForm = React.createClass({
+
+	//initially, no submission errors
 	getInitialState: function(){
 		return{hasError: false};
 	},
@@ -11,12 +13,14 @@ var SignUpForm = React.createClass({
 	handleSignUp: function(){
 		var that = this;
 
+		//gets the data from the form fields
 		var firstName = this.refs.firstName.value;
 		var lastName = this.refs.lastName.value;
 		var email = this.refs.email.value;
 		var password = this.refs.password.value;
 		var password_confirmation = this.refs.password_confirmation.value;
 
+		//creates the user on firebase
 		firebase.auth().createUserWithEmailAndPassword(email, password == password_confirmation ? password : "nil").catch(function(error) {
 			if(error){
 				that.setState({hasError: true});
@@ -24,6 +28,7 @@ var SignUpForm = React.createClass({
 			}
 		});
 
+		//if successfully logged in, add the user child to the database with the name and email.
 		firebase.auth().onAuthStateChanged(function(user) {
   			if (user) {
   				console.log("Signed up!");
@@ -39,6 +44,7 @@ var SignUpForm = React.createClass({
 		});
 	},
 
+	//if "Enter" was pressed, act as Sign Up was clicked
 	handleKeyPress: function(e){
 		if(e.key == 'Enter'){
 			try{

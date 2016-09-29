@@ -4,10 +4,13 @@ var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
 
 var LogInForm = React.createClass({
+
+	//initially, there are no submission errors
 	getInitialState: function(){
 		return{hasError: false};
 	},
 
+	//logs the user in with the firebase method and reroutes to the home page
 	handleLogIn: function(){
 
 		var that = this;
@@ -18,12 +21,14 @@ var LogInForm = React.createClass({
   			var errorCode = error.code;
   			var errorMessage = error.message;
 
+  			//sets hasError and the errorMsg if an error occured to show in the alerts
   			if(error){
   				that.setState({hasError: true});
   				that.setState({errorMsg: "Invalid email or password combination."});
   			}
 		});
 
+		//if successfully logged in, reroute to home
 		firebase.auth().onAuthStateChanged(function(user) {
   			if (user) {
   				console.log("Logged in!");
@@ -34,6 +39,7 @@ var LogInForm = React.createClass({
 		});
 	},
 
+	//if user pressed "Enter" while filling out his/her info, act as if Login was clicked
 	handleKeyPress: function(e){
 		if(e.key == 'Enter'){
 			this.handleLogIn();

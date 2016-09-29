@@ -4,40 +4,41 @@ var firebase = require('firebase');
 var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
 
-var Status = React.createClass({
+var Home = React.createClass({
+
+	//initializes the postArray
 	getInitialState: function(){
-		console.log("in initialize");
 		return {postArray: []};
 	},
 
+	//adds the new post to the database upon clicking Post
 	handlePost: function(){
-		var postData = {
-			user_id: firebase.auth().currentUser.uid,
-			body: this.refs.body.value,
-			created_at: firebase.database.ServerValue.TIMESTAMP
-		};
+		if(this.refs.body.value){
+			var postData = {
+				user_id: firebase.auth().currentUser.uid,
+				body: this.refs.body.value,
+				created_at: firebase.database.ServerValue.TIMESTAMP
+			};
+		
+			var postRefKey = firebase.database().ref().child('posts').push().key;
+			firebase.database().ref('posts/' + postRefKey).set(postData);
+			firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
+			hashHistory.push("/");
 
-		var postRefKey = firebase.database().ref().child('posts').push().key;
-		firebase.database().ref('posts/' + postRefKey).set(postData);
-		firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
-		hashHistory.push("/");
-
-		this.refs.body.value = "";
-
-		console.log("in handlePost");
+			this.refs.body.value = "";
+		}
 	},
 
+	//loading all posts into the state's postArray
 	componentWillMount: function(){
 		var recentPostsRef = firebase.database().ref().child('posts');
 		recentPostsRef.on("child_added", snap => {
 			var post = snap.val();
 			this.state.postArray.push(post);
 		});
-
-		console.log("in componentWillMount");
-		console.log(this.state.postArray.length);
 	},
 
+	//just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"
 	handleKeyPress: function(e){
 		if(e.key == 'Enter'){
 			try{
@@ -47,6 +48,7 @@ var Status = React.createClass({
 		}
 	},
 
+	//gets the name of the user from the user id
 	getNameOfUser: function(id){
 		var name;
 
@@ -54,15 +56,12 @@ var Status = React.createClass({
 		userRef.on("value", snap => {
 			var data = snap.val();
 			name = data.first + " " + data.last;
-			console.log(name);
 		});
 
 		return name;
 	},
 
 	render: function(){
-		console.log("in render");
-
 		//reverse the order so it goes from last post added to the earliest post added
 		var reversedPost = Array.prototype.slice.call(this.state.postArray);
 		reversedPost.reverse();
@@ -86,4 +85,4 @@ var Status = React.createClass({
 	}
 });
 
-module.exports = Status;
+module.exports = Home;
