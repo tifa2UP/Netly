@@ -35,6 +35,7 @@ var Home = React.createClass({
 		recentPostsRef.on("child_added", snap => {
 			var post = snap.val();
 			this.state.postArray.push(post);
+			hashHistory.push('/');
 		});
 	},
 
