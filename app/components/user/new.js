@@ -14,19 +14,31 @@ var SignUpForm = React.createClass({
 		var that = this;
 
 		//gets the data from the form fields
-		var firstName = this.refs.firstName.value;
-		var lastName = this.refs.lastName.value;
-		var email = this.refs.email.value;
-		var password = this.refs.password.value;
-		var password_confirmation = this.refs.password_confirmation.value;
+		var recruiter;
+		if(this.state.recruiter){
+			recruiter = this.state.recruiter;
+		}else{
+			recruiter = false;
+		}
+		
+		if(this.refs.firstName.value && this.refs.lastName.value){
+			var firstName = this.refs.firstName.value;
+			var lastName = this.refs.lastName.value;
+			var email = this.refs.email.value;
+			var password = this.refs.password.value;
+			var password_confirmation = this.refs.password_confirmation.value;
 
-		//creates the user on firebase
-		firebase.auth().createUserWithEmailAndPassword(email, password == password_confirmation ? password : "nil").catch(function(error) {
-			if(error){
-				that.setState({hasError: true});
-				that.setState({errorMsg: "Please enter a valid email address with a password of at least 6 characters."});
-			}
-		});
+			//creates the user on firebase
+			firebase.auth().createUserWithEmailAndPassword(email, password == password_confirmation ? password : "nil").catch(function(error) {
+				if(error){
+					that.setState({hasError: true});
+					that.setState({errorMsg: "Please enter a valid email address with a password of at least 6 characters."});
+				}
+			});
+		}else{
+			that.setState({hasError: true});
+			that.setState({errorMsg: "First or last name field cannot be empty."})
+		}
 
 		//if successfully logged in, add the user child to the database with the name and email.
 		firebase.auth().onAuthStateChanged(function(user) {
@@ -35,7 +47,8 @@ var SignUpForm = React.createClass({
   				var userData = {
   					email: email,
   					first: firstName,
-  					last: lastName
+  					last: lastName,
+  					recruiter: recruiter
   				};
 
   				firebase.database().ref('users/' + firebase.auth().currentUser.uid).set(userData);
@@ -54,6 +67,10 @@ var SignUpForm = React.createClass({
 		}
 	},
 
+	accountChange: function(e){
+		this.setState({recruiter: e.target.value});
+	},
+
 	render: function(){
 		return (
 			<div>
@@ -67,11 +84,16 @@ var SignUpForm = React.createClass({
 
 				<div className="col-md-4">
 					<center><h1>Sign Up</h1>
+
+						<input type="radio" name="recruiter" value="false" onChange={this.accountChange}/>Job Seeker
+						<input type="radio" name="recruiter" value="true" onChange={this.accountChange} />Recruiter
+						<br />
 						<input type="text" ref="firstName" placeholder="First Name" className="form-control" onKeyPress={this.handleKeyPress} /><br /> 
 						<input type="text" ref="lastName" placeholder="Last Name" className="form-control" onKeyPress={this.handleKeyPress} /><br />
 						<input type="email" ref="email" placeholder="Email Address" className="form-control" onKeyPress={this.handleKeyPress} /><br />
 						<input type="password" ref="password" placeholder="Password" className="form-control" onKeyPress={this.handleKeyPress} /><br />
 						<input type="password" ref="password_confirmation" placeholder="Password Confirmation" className="form-control" onKeyPress={this.handleKeyPress} /><br />
+						
 						<button onClick={this.handleSignUp} className="btn btn-primary">Create Account</button><br />
 						Have an account? <Link to="/login">Login!</Link></center>
 				</div>
