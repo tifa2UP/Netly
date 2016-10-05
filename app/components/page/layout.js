@@ -8,7 +8,8 @@ var Layout = React.createClass({
     //sets the initial logged in state
     getInitialState: function() {
         return {
-            isLoggedIn: (null != firebase.auth().currentUser)
+            isLoggedIn: (null != firebase.auth().currentUser),
+            recruiter: false
         }
     },
 
@@ -20,7 +21,11 @@ var Layout = React.createClass({
             userRef.on("value", snap => {
                 var user = snap.val();
                 this.setState({name: user.first + " " + user.last});
+                this.setState({recruiter: user.recruiter});
             });
+            if(!this.state.isLoggedIn){
+                this.setState({recruiter: false});
+            }
         });
     },
 
@@ -28,22 +33,30 @@ var Layout = React.createClass({
         var loginOrOut;
         var profile;
         var signUp;
+        var navClassName;
 
         //if the user is logged in, show the logout and profile link
         if(this.state.isLoggedIn) {
             loginOrOut = <li><Link to="/logout" className="navbar-brand">Logout</Link></li>;
             profile = <li><Link to="/" className="navbar-brand">{this.state.name}</Link></li>
             signUp = null;
+            if(this.state.recruiter == true){
+                navClassName = "navbar navbar-inverse navbar-static-top";
+            }else{
+                navClassName = "navbar navbar-default navbar-static-top";
+            }
         //if the user is not logged in, show the login and signup links
         } else {
             loginOrOut = <li><Link to="/login" className="navbar-brand">Login</Link></li>;
             profile = null;
             signUp = <li><Link to="/signup" className="navbar-brand">Sign Up</Link></li>;
+            navClassName = "navbar navbar-default navbar-static-top";
         }
 
         return (
             <span>
-                <nav className="navbar navbar-inverse navbar-static-top">
+                <nav className={navClassName}>
+
                     <div className="container">
                         <div className="navbar-header">
                             <Link to="/" className="navbar-brand">

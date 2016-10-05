@@ -14,12 +14,7 @@ var SignUpForm = React.createClass({
 		var that = this;
 
 		//gets the data from the form fields
-		var recruiter;
-		if(this.state.recruiter){
-			recruiter = this.state.recruiter;
-		}else{
-			recruiter = false;
-		}
+		var recruiter = this.state.recruiter == "true" ? true : false;
 		
 		if(this.refs.firstName.value && this.refs.lastName.value){
 			var firstName = this.refs.firstName.value;
