@@ -16,6 +16,7 @@ var Home = React.createClass({
 		if(this.refs.body.value){
 			var postData = {
 				user_id: firebase.auth().currentUser.uid,
+				user_name: firebase.auth().currentUser.displayName,
 				body: this.refs.body.value,
 				created_at: firebase.database.ServerValue.TIMESTAMP
 			};
@@ -23,8 +24,11 @@ var Home = React.createClass({
 			var postRefKey = firebase.database().ref().child('posts').push().key;
 			firebase.database().ref('posts/' + postRefKey).set(postData);
 			firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
+
+			//refreshes pages after submission
 			hashHistory.push("/");
 
+			//emptys the post text field
 			this.refs.body.value = "";
 		}
 	},
@@ -35,6 +39,7 @@ var Home = React.createClass({
 		recentPostsRef.on("child_added", snap => {
 			var post = snap.val();
 			this.state.postArray.push(post);
+			//refreshes page when the posts are pushed into the array
 			hashHistory.push('/');
 		});
 	},
@@ -47,19 +52,6 @@ var Home = React.createClass({
 			}
 			catch(e){};
 		}
-	},
-
-	//gets the name of the user from the user id
-	getNameOfUser: function(id){
-		var name;
-
-		var userRef = firebase.database().ref('users/' + id);
-		userRef.on("value", snap => {
-			var data = snap.val();
-			name = data.first + " " + data.last;
-		});
-
-		return name;
 	},
 
 	render: function(){
@@ -79,7 +71,9 @@ var Home = React.createClass({
 				<input type="text" ref="body" placeholder="What are you thinking about?" onKeyPress={this.handleKeyPress} className="form-control"/><br />
 				<center><button className="btn btn-primary" onClick={this.handlePost}>Post</button></center><br />	
 				{reversedPost.map((post,index) => (
-        			<li key={index}>On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, {this.getNameOfUser(post.user_id)} said <blockquote>"{post.body}"</blockquote></li>
+        			<div key={index}>
+        				On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, {post.user_name} said <blockquote>"{post.body}"</blockquote>
+        			</div>
    				))}
 			</div>
 		);

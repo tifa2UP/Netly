@@ -16,11 +16,11 @@ var Layout = React.createClass({
     //checks for login/logout changes and sets the logged in state accordingly, also gets the user's name
     componentWillMount: function() {
         firebase.auth().onAuthStateChanged((user) => {
-            this.setState({ isLoggedIn: (null != user)})
+            this.setState({isLoggedIn: (null != user)});
+            this.setState({name: user.displayName});
             userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
             userRef.on("value", snap => {
                 var user = snap.val();
-                this.setState({name: user.first + " " + user.last});
                 this.setState({recruiter: user.recruiter});
             });
             if(!this.state.isLoggedIn){

@@ -15,14 +15,13 @@ var SignUpForm = React.createClass({
 
 		//gets the data from the form fields
 		var recruiter = this.state.recruiter == "true" ? true : false;
+		var firstName = this.refs.firstName.value;
+		var lastName = this.refs.lastName.value;
+		var email = this.refs.email.value;
+		var password = this.refs.password.value;
+		var password_confirmation = this.refs.password_confirmation.value;
 		
-		if(this.refs.firstName.value && this.refs.lastName.value){
-			var firstName = this.refs.firstName.value;
-			var lastName = this.refs.lastName.value;
-			var email = this.refs.email.value;
-			var password = this.refs.password.value;
-			var password_confirmation = this.refs.password_confirmation.value;
-
+		if(firstName && lastName){
 			//creates the user on firebase
 			firebase.auth().createUserWithEmailAndPassword(email, password == password_confirmation ? password : "nil").catch(function(error) {
 				if(error){
@@ -47,6 +46,16 @@ var SignUpForm = React.createClass({
   				};
 
   				firebase.database().ref('users/' + firebase.auth().currentUser.uid).set(userData);
+
+  				//update display name for user
+				user.updateProfile({
+					displayName: firstName + " " + lastName,
+				}).then(function(){
+					console.log("success");
+				},function(error){
+					console.log("failure");
+				});
+
 				hashHistory.push("/");
   			}
 		});
