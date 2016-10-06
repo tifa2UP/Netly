@@ -13,7 +13,10 @@ var Home = React.createClass({
 
 	//adds the new post to the database upon clicking Post
 	handlePost: function(){
+
+		//only saves data if the post field isn't empty
 		if(this.refs.body.value){
+			//gathers the data from the post submission
 			var postData = {
 				user_id: firebase.auth().currentUser.uid,
 				user_name: firebase.auth().currentUser.displayName,
@@ -21,8 +24,11 @@ var Home = React.createClass({
 				created_at: firebase.database.ServerValue.TIMESTAMP
 			};
 		
-			var postRefKey = firebase.database().ref().child('posts').push().key;
+			//generate new post reference key
+			var postRefKey = firebase.database().ref().child('posts').push().key; 
+			//sets the postData to the post child with the postRefKey
 			firebase.database().ref('posts/' + postRefKey).set(postData);
+			//sets the postData to the user-posts child with the currentUserId & the postRefKey
 			firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
 
 			//refreshes pages after submission
@@ -35,11 +41,14 @@ var Home = React.createClass({
 
 	//loading all posts into the state's postArray
 	componentWillMount: function(){
-		var recentPostsRef = firebase.database().ref().child('posts');
-		recentPostsRef.on("child_added", snap => {
+
+		//gets the post reference
+		var postsRef = firebase.database().ref().child('posts');
+		//for each child added to post, push to postArray
+		postsRef.on("child_added", snap => {
 			var post = snap.val();
 			this.state.postArray.push(post);
-			//refreshes page when the posts are pushed into the array
+			//refreshes page when the posts are pushed into the array, so it shows without manually refreshing
 			hashHistory.push('/');
 		});
 	},
@@ -55,7 +64,7 @@ var Home = React.createClass({
 	},
 
 	render: function(){
-		//reverse the order so it goes from last post added to the earliest post added
+		//reverse the order so that the newest posts are at the top of the array
 		var reversedPost = Array.prototype.slice.call(this.state.postArray);
 		reversedPost.reverse();
 
@@ -72,7 +81,8 @@ var Home = React.createClass({
 				<center><button className="btn btn-primary" onClick={this.handlePost}>Post</button></center><br />	
 				{reversedPost.map((post,index) => (
         			<div key={index}>
-        				On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, {post.user_name} said <blockquote>"{post.body}"</blockquote>
+        				On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, {post.user_name} said 
+        				<blockquote>"{post.body}"</blockquote>
         			</div>
    				))}
 			</div>

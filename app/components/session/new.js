@@ -46,13 +46,28 @@ var LogInForm = React.createClass({
 		}
 	},
 
+	//creates a div alert-danger with the error message
+	errorMessage: function(){
+		return <div className="alert alert-danger"><strong>Error! </strong>{this.state.errorMsg}</div>;
+	},
+
+	//creates an empty div if no error message
+	noErrorMessage: function(){
+		return <div></div>;
+	},
+
 	render: function(){
+		//gets the appropriate error alert div depending on whether or not the form has an error
+		var errorAlert;
+		if(this.state.hasError){
+			errorAlert = this.errorMessage();
+		}else{
+			errorAlert = this.noErrorMessage();
+		}
+
 		return (
 			<div>
-				{(this.state.hasError
-        			?	<div className="alert alert-danger"><strong>Error! </strong>{this.state.errorMsg}</div>
-      				: 	<div></div>
-    			)}
+				{errorAlert}
 				<div className="col-md-4">
 				</div>
 

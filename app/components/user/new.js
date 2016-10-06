@@ -71,24 +71,41 @@ var SignUpForm = React.createClass({
 		}
 	},
 
+	//sets the recruiter state true or false depending on the radio button
 	accountChange: function(e){
 		this.setState({recruiter: e.target.value});
 	},
 
+	//creates a div alert-danger with the error message
+	errorMessage: function(){
+		return <div className="alert alert-danger"><strong>Error! </strong>{this.state.errorMsg}</div>;
+	},
+
+	//creates an empty div if no error message
+	noErrorMessage: function(){
+		return <div></div>;
+	},
+
 	render: function(){
+		//gets the appropriate error alert div depending on whether or not the form has an error
+		var errorAlert;
+		if(this.state.hasError){
+			errorAlert = this.errorMessage();
+		}else{
+			errorAlert = this.noErrorMessage();
+		}
+
 		return (
 			<div>
-				{(this.state.hasError
-        			?	<div className="alert alert-danger"><strong>Error! </strong>{this.state.errorMsg}</div>
-      				: 	<div></div>
-    			)}
+				{errorAlert}
 
 				<div className="col-md-4">
 				</div>
 
 				<div className="col-md-4">
-					<center><h1>Sign Up</h1>
-
+					<center>
+						<h1>Sign Up</h1>
+						
 						<input type="radio" name="recruiter" value="false" onChange={this.accountChange}/>Job Seeker
 						<input type="radio" name="recruiter" value="true" onChange={this.accountChange} />Recruiter
 						<br />
@@ -99,7 +116,8 @@ var SignUpForm = React.createClass({
 						<input type="password" ref="password_confirmation" placeholder="Password Confirmation" className="form-control" onKeyPress={this.handleKeyPress} /><br />
 						
 						<button onClick={this.handleSignUp} className="btn btn-primary">Create Account</button><br />
-						Have an account? <Link to="/login">Login!</Link></center>
+						Have an account? <Link to="/login">Login!</Link>
+					</center>
 				</div>
 				<div className="col-md-4">
 				</div>
