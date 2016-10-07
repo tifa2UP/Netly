@@ -7,7 +7,7 @@ var UpdatePassword = React.createClass({
 
 	//initially, no submission errors
 	getInitialState: function(){
-		return{hasError: false, succeeded: false};
+		return{hasError: false, succeeded: false, errorMsg: "", successMsg: ""};
 	},
 
 	handleUpdatePassword: function(){
@@ -18,13 +18,9 @@ var UpdatePassword = React.createClass({
 		if(new_password && new_password_confirmation && new_password == new_password_confirmation){
 			var user = firebase.auth().currentUser;
 			user.updatePassword(new_password).then(function(){
-				that.setState({succeeded: true});
-				that.setState({hasError: false});
-				console.log("success");
-				that.setState({successMsg: "Your password has been successfully updated!"});
+				hashHistory.push('/');
 			}, function(error){
 				that.setState({hasError: true});
-				console.log("error");
 				that.setState({errorMsg: "An error occured!"});
 			});
 		}else{
@@ -42,16 +38,6 @@ var UpdatePassword = React.createClass({
 
 	//creates an empty div if no error message
 	noErrorMessage: function(){
-		return <div></div>;
-	},
-
-	//creates a div alert-danger with the error message
-	successMsg: function(){
-		return <div className="alert alert-success"><strong>Success! </strong>{this.state.successMsg}</div>;
-	},
-
-	//creates an empty div if no error message
-	noSuccessMsg: function(){
 		return <div></div>;
 	},
 
@@ -74,16 +60,9 @@ var UpdatePassword = React.createClass({
 			errorAlert = this.noErrorMessage();
 		}
 
-		if(this.state.succeeded){
-			success = this.successMsg();
-		}else{
-			success = this.noSuccessMsg();
-		}
-
 		return (
 			<div>
 				{errorAlert}
-				{success}
 
 				<div className="col-md-4">
 				</div>

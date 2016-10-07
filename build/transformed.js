@@ -28363,7 +28363,7 @@
 
 		//initially, no submission errors
 		getInitialState: function () {
-			return { hasError: false, succeeded: false };
+			return { hasError: false, succeeded: false, errorMsg: "", successMsg: "" };
 		},
 
 		handleUpdatePassword: function () {
@@ -28374,13 +28374,9 @@
 			if (new_password && new_password_confirmation && new_password == new_password_confirmation) {
 				var user = firebase.auth().currentUser;
 				user.updatePassword(new_password).then(function () {
-					that.setState({ succeeded: true });
-					that.setState({ hasError: false });
-					console.log("success");
-					that.setState({ successMsg: "Your password has been successfully updated!" });
+					hashHistory.push('/');
 				}, function (error) {
 					that.setState({ hasError: true });
-					console.log("error");
 					that.setState({ errorMsg: "An error occured!" });
 				});
 			} else {
@@ -28410,25 +28406,6 @@
 			return React.createElement('div', null);
 		},
 
-		//creates a div alert-danger with the error message
-		successMsg: function () {
-			return React.createElement(
-				'div',
-				{ className: 'alert alert-success' },
-				React.createElement(
-					'strong',
-					null,
-					'Success! '
-				),
-				this.state.successMsg
-			);
-		},
-
-		//creates an empty div if no error message
-		noSuccessMsg: function () {
-			return React.createElement('div', null);
-		},
-
 		//if "Enter" was pressed, act as Sign Up was clicked
 		handleKeyPress: function (e) {
 			if (e.key == 'Enter') {
@@ -28447,17 +28424,10 @@
 				errorAlert = this.noErrorMessage();
 			}
 
-			if (this.state.succeeded) {
-				success = this.successMsg();
-			} else {
-				success = this.noSuccessMsg();
-			}
-
 			return React.createElement(
 				'div',
 				null,
 				errorAlert,
-				success,
 				React.createElement('div', { className: 'col-md-4' }),
 				React.createElement(
 					'div',
