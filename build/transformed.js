@@ -27743,8 +27743,9 @@
 	var Home = __webpack_require__(243);
 	var Logout = __webpack_require__(244);
 	var Layout = __webpack_require__(245);
+	var UpdatePassword = __webpack_require__(246);
 
-	var requireAuth = __webpack_require__(246);
+	var requireAuth = __webpack_require__(247);
 
 	var routes = React.createElement(
 		Router,
@@ -27755,7 +27756,8 @@
 			React.createElement(IndexRoute, { component: Home, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'login', component: SessionUser }),
 			React.createElement(Route, { path: 'signup', component: NewUser }),
-			React.createElement(Route, { path: 'logout', component: Logout })
+			React.createElement(Route, { path: 'logout', component: Logout }),
+			React.createElement(Route, { path: 'updatePassword', component: UpdatePassword })
 		)
 	);
 
@@ -28240,6 +28242,7 @@
 	        var profile;
 	        var signUp;
 	        var navClassName;
+	        var updatePassword;
 
 	        //if the user is logged in, show the logout and profile link
 	        if (this.state.isLoggedIn) {
@@ -28262,6 +28265,15 @@
 	                )
 	            );
 	            signUp = null;
+	            updatePassword = React.createElement(
+	                'li',
+	                null,
+	                React.createElement(
+	                    Link,
+	                    { to: '/updatePassword', className: 'navbar-brand' },
+	                    'Update Password'
+	                )
+	            );
 
 	            //if the user is not logged in, show the login and signup links
 	        } else {
@@ -28284,6 +28296,7 @@
 	                    'Sign Up'
 	                )
 	            );
+	            updatePassword = null;
 	        }
 
 	        //if recruiter -> black navbar, else job seeker -> default navbar
@@ -28319,7 +28332,8 @@
 	                        profile,
 	                        ' ',
 	                        loginOrOut,
-	                        ' '
+	                        ' ',
+	                        updatePassword
 	                    )
 	                )
 	            ),
@@ -28336,6 +28350,147 @@
 
 /***/ },
 /* 246 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var UpdatePassword = React.createClass({
+		displayName: 'UpdatePassword',
+
+
+		//initially, no submission errors
+		getInitialState: function () {
+			return { hasError: false, succeeded: false };
+		},
+
+		handleUpdatePassword: function () {
+			var new_password = this.refs.new_password.value;
+			var new_password_confirmation = this.refs.new_password_confirmation.value;
+			var that = this;
+
+			if (new_password && new_password_confirmation && new_password == new_password_confirmation) {
+				var user = firebase.auth().currentUser;
+				user.updatePassword(new_password).then(function () {
+					that.setState({ succeeded: true });
+					that.setState({ hasError: false });
+					console.log("success");
+					that.setState({ successMsg: "Your password has been successfully updated!" });
+				}, function (error) {
+					that.setState({ hasError: true });
+					console.log("error");
+					that.setState({ errorMsg: "An error occured!" });
+				});
+			} else {
+				this.setState({ hasError: true });
+				this.setState({ errorMsg: "Passwords do not match." });
+			}
+			this.refs.new_password.value = "";
+			this.refs.new_password_confirmation.value = "";
+		},
+
+		//creates a div alert-danger with the error message
+		errorMessage: function () {
+			return React.createElement(
+				'div',
+				{ className: 'alert alert-danger' },
+				React.createElement(
+					'strong',
+					null,
+					'Error! '
+				),
+				this.state.errorMsg
+			);
+		},
+
+		//creates an empty div if no error message
+		noErrorMessage: function () {
+			return React.createElement('div', null);
+		},
+
+		//creates a div alert-danger with the error message
+		successMsg: function () {
+			return React.createElement(
+				'div',
+				{ className: 'alert alert-success' },
+				React.createElement(
+					'strong',
+					null,
+					'Success! '
+				),
+				this.state.successMsg
+			);
+		},
+
+		//creates an empty div if no error message
+		noSuccessMsg: function () {
+			return React.createElement('div', null);
+		},
+
+		//if "Enter" was pressed, act as Sign Up was clicked
+		handleKeyPress: function (e) {
+			if (e.key == 'Enter') {
+				try {
+					this.handleUpdatePassword();
+				} catch (e) {};
+			}
+		},
+
+		render: function () {
+			//gets the appropriate error alert div depending on whether or not the form has an error
+			var errorAlert;
+			if (this.state.hasError) {
+				errorAlert = this.errorMessage();
+			} else {
+				errorAlert = this.noErrorMessage();
+			}
+
+			if (this.state.succeeded) {
+				success = this.successMsg();
+			} else {
+				success = this.noSuccessMsg();
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				errorAlert,
+				success,
+				React.createElement('div', { className: 'col-md-4' }),
+				React.createElement(
+					'div',
+					{ className: 'col-md-4' },
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'h1',
+							null,
+							'Update Password'
+						),
+						React.createElement('input', { type: 'password', ref: 'new_password', placeholder: 'New Password', className: 'form-control', onKeyPress: this.handleKeyPress }),
+						React.createElement('br', null),
+						React.createElement('input', { type: 'password', ref: 'new_password_confirmation', placeholder: 'Confirm New Password', className: 'form-control', onKeyPress: this.handleKeyPress }),
+						React.createElement('br', null),
+						React.createElement(
+							'button',
+							{ onClick: this.handleUpdatePassword, className: 'btn btn-primary' },
+							'Update Password'
+						),
+						React.createElement('br', null)
+					)
+				),
+				React.createElement('div', { className: 'col-md-4' })
+			);
+		}
+	});
+
+	module.exports = UpdatePassword;
+
+/***/ },
+/* 247 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);
