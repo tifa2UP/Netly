@@ -61,6 +61,7 @@
 		storageBucket: "",
 		messagingSenderId: "579173148287"
 	};
+
 	firebase.initializeApp(config);
 
 	ReactDOM.render(routes, document.getElementById('app'));
@@ -27740,10 +27741,10 @@
 	var NewUser = __webpack_require__(241);
 	var SessionUser = __webpack_require__(242);
 	var Home = __webpack_require__(243);
-	var Logout = __webpack_require__(245);
-	var Layout = __webpack_require__(246);
+	var Logout = __webpack_require__(244);
+	var Layout = __webpack_require__(245);
 
-	var requireAuth = __webpack_require__(247);
+	var requireAuth = __webpack_require__(246);
 
 	var routes = React.createElement(
 		Router,
@@ -27772,6 +27773,8 @@
 	var SignUpForm = React.createClass({
 		displayName: 'SignUpForm',
 
+
+		//initially, no submission errors
 		getInitialState: function () {
 			return { hasError: false };
 		},
@@ -27779,34 +27782,55 @@
 		handleSignUp: function () {
 			var that = this;
 
+			//gets the data from the form fields
+			var recruiter = this.state.recruiter == "true" ? true : false;
 			var firstName = this.refs.firstName.value;
 			var lastName = this.refs.lastName.value;
 			var email = this.refs.email.value;
 			var password = this.refs.password.value;
 			var password_confirmation = this.refs.password_confirmation.value;
 
-			firebase.auth().createUserWithEmailAndPassword(email, password == password_confirmation ? password : "nil").catch(function (error) {
-				if (error) {
-					that.setState({ hasError: true });
-					that.setState({ errorMsg: "Please enter a valid email address with a password of at least 6 characters." });
-				}
-			});
+			if (firstName && lastName) {
+				//creates the user on firebase
+				firebase.auth().createUserWithEmailAndPassword(email, password == password_confirmation ? password : "nil").catch(function (error) {
+					if (error) {
+						that.setState({ hasError: true });
+						that.setState({ errorMsg: "Please enter a valid email address with a password of at least 6 characters." });
+					}
+				});
+			} else {
+				that.setState({ hasError: true });
+				that.setState({ errorMsg: "First or last name field cannot be empty." });
+			}
 
+			//if successfully logged in, add the user child to the database with the name and email.
 			firebase.auth().onAuthStateChanged(function (user) {
 				if (user) {
 					console.log("Signed up!");
 					var userData = {
 						email: email,
 						first: firstName,
-						last: lastName
+						last: lastName,
+						recruiter: recruiter
 					};
 
 					firebase.database().ref('users/' + firebase.auth().currentUser.uid).set(userData);
+
+					//update display name for user
+					user.updateProfile({
+						displayName: firstName + " " + lastName
+					}).then(function () {
+						console.log("success");
+					}, function (error) {
+						console.log("failure");
+					});
+
 					hashHistory.push("/");
 				}
 			});
 		},
 
+		//if "Enter" was pressed, act as Sign Up was clicked
 		handleKeyPress: function (e) {
 			if (e.key == 'Enter') {
 				try {
@@ -27815,20 +27839,43 @@
 			}
 		},
 
+		//sets the recruiter state true or false depending on the radio button
+		accountChange: function (e) {
+			this.setState({ recruiter: e.target.value });
+		},
+
+		//creates a div alert-danger with the error message
+		errorMessage: function () {
+			return React.createElement(
+				'div',
+				{ className: 'alert alert-danger' },
+				React.createElement(
+					'strong',
+					null,
+					'Error! '
+				),
+				this.state.errorMsg
+			);
+		},
+
+		//creates an empty div if no error message
+		noErrorMessage: function () {
+			return React.createElement('div', null);
+		},
+
 		render: function () {
+			//gets the appropriate error alert div depending on whether or not the form has an error
+			var errorAlert;
+			if (this.state.hasError) {
+				errorAlert = this.errorMessage();
+			} else {
+				errorAlert = this.noErrorMessage();
+			}
+
 			return React.createElement(
 				'div',
 				null,
-				this.state.hasError ? React.createElement(
-					'div',
-					{ className: 'alert alert-danger' },
-					React.createElement(
-						'strong',
-						null,
-						'Error! '
-					),
-					this.state.errorMsg
-				) : React.createElement('div', null),
+				errorAlert,
 				React.createElement('div', { className: 'col-md-4' }),
 				React.createElement(
 					'div',
@@ -27841,6 +27888,11 @@
 							null,
 							'Sign Up'
 						),
+						React.createElement('input', { type: 'radio', name: 'recruiter', value: 'false', onChange: this.accountChange }),
+						'Job Seeker',
+						React.createElement('input', { type: 'radio', name: 'recruiter', value: 'true', onChange: this.accountChange }),
+						'Recruiter',
+						React.createElement('br', null),
 						React.createElement('input', { type: 'text', ref: 'firstName', placeholder: 'First Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
 						React.createElement('br', null),
 						React.createElement('input', { type: 'text', ref: 'lastName', placeholder: 'Last Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
@@ -27884,10 +27936,13 @@
 	var LogInForm = React.createClass({
 		displayName: 'LogInForm',
 
+
+		//initially, there are no submission errors
 		getInitialState: function () {
 			return { hasError: false };
 		},
 
+		//logs the user in with the firebase method and reroutes to the home page
 		handleLogIn: function () {
 
 			var that = this;
@@ -27898,12 +27953,14 @@
 				var errorCode = error.code;
 				var errorMessage = error.message;
 
+				//sets hasError and the errorMsg if an error occured to show in the alerts
 				if (error) {
 					that.setState({ hasError: true });
 					that.setState({ errorMsg: "Invalid email or password combination." });
 				}
 			});
 
+			//if successfully logged in, reroute to home
 			firebase.auth().onAuthStateChanged(function (user) {
 				if (user) {
 					console.log("Logged in!");
@@ -27914,26 +27971,45 @@
 			});
 		},
 
+		//if user pressed "Enter" while filling out his/her info, act as if Login was clicked
 		handleKeyPress: function (e) {
 			if (e.key == 'Enter') {
 				this.handleLogIn();
 			}
 		},
 
+		//creates a div alert-danger with the error message
+		errorMessage: function () {
+			return React.createElement(
+				'div',
+				{ className: 'alert alert-danger' },
+				React.createElement(
+					'strong',
+					null,
+					'Error! '
+				),
+				this.state.errorMsg
+			);
+		},
+
+		//creates an empty div if no error message
+		noErrorMessage: function () {
+			return React.createElement('div', null);
+		},
+
 		render: function () {
+			//gets the appropriate error alert div depending on whether or not the form has an error
+			var errorAlert;
+			if (this.state.hasError) {
+				errorAlert = this.errorMessage();
+			} else {
+				errorAlert = this.noErrorMessage();
+			}
+
 			return React.createElement(
 				'div',
 				null,
-				this.state.hasError ? React.createElement(
-					'div',
-					{ className: 'alert alert-danger' },
-					React.createElement(
-						'strong',
-						null,
-						'Error! '
-					),
-					this.state.errorMsg
-				) : React.createElement('div', null),
+				errorAlert,
 				React.createElement('div', { className: 'col-md-4' }),
 				React.createElement(
 					'div',
@@ -27980,25 +28056,59 @@
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
-	var Feed = __webpack_require__(244);
 
-	var Status = React.createClass({
-		displayName: 'Status',
+	var Home = React.createClass({
+		displayName: 'Home',
 
-		handlePost: function () {
-			var postData = {
-				user_id: firebase.auth().currentUser.uid,
-				body: this.refs.body.value,
-				created_at: firebase.database.ServerValue.TIMESTAMP
-			};
 
-			var postRefKey = firebase.database().ref().child('posts').push().key;
-			firebase.database().ref('posts/' + postRefKey).set(postData);
-			firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
-
-			hashHistory.push("/");
+		//initializes the postArray
+		getInitialState: function () {
+			return { postArray: [] };
 		},
 
+		//adds the new post to the database upon clicking Post
+		handlePost: function () {
+
+			//only saves data if the post field isn't empty
+			if (this.refs.body.value) {
+				//gathers the data from the post submission
+				var postData = {
+					user_id: firebase.auth().currentUser.uid,
+					user_name: firebase.auth().currentUser.displayName,
+					body: this.refs.body.value,
+					created_at: firebase.database.ServerValue.TIMESTAMP
+				};
+
+				//generate new post reference key
+				var postRefKey = firebase.database().ref().child('posts').push().key;
+				//sets the postData to the post child with the postRefKey
+				firebase.database().ref('posts/' + postRefKey).set(postData);
+				//sets the postData to the user-posts child with the currentUserId & the postRefKey
+				firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
+
+				//refreshes pages after submission
+				hashHistory.push("/");
+
+				//emptys the post text field
+				this.refs.body.value = "";
+			}
+		},
+
+		//loading all posts into the state's postArray
+		componentWillMount: function () {
+
+			//gets the post reference
+			var postsRef = firebase.database().ref().child('posts');
+			//for each child added to post, push to postArray
+			postsRef.on("child_added", snap => {
+				var post = snap.val();
+				this.state.postArray.push(post);
+				//refreshes page when the posts are pushed into the array, so it shows without manually refreshing
+				hashHistory.push('/');
+			});
+		},
+
+		//just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"
 		handleKeyPress: function (e) {
 			if (e.key == 'Enter') {
 				try {
@@ -28007,30 +28117,16 @@
 			}
 		},
 
-		componentWillMount: function () {
-			var postArray = [];
-			var recentPostsRef = firebase.database().ref().child('posts');
-			recentPostsRef.on("child_added", snap => {
-				var post = snap.val();
-				if (post.user_id == firebase.auth().currentUser.uid) {
-					console.log(post.body);
-					postArray.push(post);
-				}
-			});
-			console.log(postArray);
-			this.setState({ array: postArray });
-
-			this.setState({ array2: ['me', 'you', 'she'] });
-		},
-
 		render: function () {
-			var postArray = [];
-			var recentPostsRef = firebase.database().ref().child('posts');
-			recentPostsRef.on("child_added", snap => {
-				var post = snap.val();
-				console.log(post.body);
-				postArray.push(post);
-			});
+			//reverse the order so that the newest posts are at the top of the array
+			var reversedPost = Array.prototype.slice.call(this.state.postArray);
+			reversedPost.reverse();
+
+			//customize date for rendering
+			var dateTimeCustomization = {
+				weekday: "long", year: "numeric", month: "short",
+				day: "numeric", hour: "2-digit", minute: "2-digit"
+			};
 
 			return React.createElement(
 				'div',
@@ -28052,59 +28148,30 @@
 					)
 				),
 				React.createElement('br', null),
-				postArray.map((post, index) => React.createElement(
-					'li',
+				reversedPost.map((post, index) => React.createElement(
+					'div',
 					{ key: index },
-					post.user_id,
-					' => ',
-					post.body,
-					' @ ',
-					post.created_at
+					'On ',
+					new Date(post.created_at).toLocaleTimeString("en-US", dateTimeCustomization),
+					', ',
+					post.user_name,
+					' said',
+					React.createElement(
+						'blockquote',
+						null,
+						'"',
+						post.body,
+						'"'
+					)
 				))
 			);
 		}
 	});
 
-	module.exports = Status;
+	module.exports = Home;
 
 /***/ },
 /* 244 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var ReactDOM = __webpack_require__(34);
-	var firebase = __webpack_require__(172);
-	var Link = __webpack_require__(177).Link;
-	var hashHistory = __webpack_require__(177).hashHistory;
-
-	var Feed = React.createClass({
-		displayName: 'Feed',
-
-		render: function () {
-			console.log(this.props);
-
-			return React.createElement(
-				'div',
-				null,
-				React.createElement(
-					'h1',
-					null,
-					this.props.uid
-				),
-				React.createElement(
-					'p',
-					null,
-					this.props.body
-				),
-				React.createElement('br', null)
-			);
-		}
-	});
-
-	module.exports = Feed;
-
-/***/ },
-/* 245 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28114,6 +28181,8 @@
 	var Logout = React.createClass({
 		displayName: 'Logout',
 
+
+		//sign out from firebase, reroute to login page
 		componentDidMount() {
 			firebase.auth().signOut();
 			hashHistory.push('/login');
@@ -28131,7 +28200,7 @@
 	module.exports = Logout;
 
 /***/ },
-/* 246 */
+/* 245 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28139,21 +28208,29 @@
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
 
-	var NavBar = React.createClass({
-	    displayName: 'NavBar',
+	var Layout = React.createClass({
+	    displayName: 'Layout',
 
+
+	    //sets the initial logged in state
 	    getInitialState: function () {
 	        return {
-	            isLoggedIn: null != firebase.auth().currentUser
+	            isLoggedIn: null != firebase.auth().currentUser,
+	            recruiter: false
 	        };
 	    },
+
+	    //checks for login/logout changes and sets the logged in state accordingly, also gets the user's name
 	    componentWillMount: function () {
 	        firebase.auth().onAuthStateChanged(user => {
 	            this.setState({ isLoggedIn: null != user });
+	            this.setState({ recruiter: this.state.isLoggedIn == false ? false : null });
+	            this.setState({ name: user.displayName });
+
 	            userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
 	            userRef.on("value", snap => {
 	                var user = snap.val();
-	                this.setState({ name: user.first + " " + user.last });
+	                this.setState({ recruiter: user == null || !user.recruiter ? false : true });
 	            });
 	        });
 	    },
@@ -28162,7 +28239,9 @@
 	        var loginOrOut;
 	        var profile;
 	        var signUp;
+	        var navClassName;
 
+	        //if the user is logged in, show the logout and profile link
 	        if (this.state.isLoggedIn) {
 	            loginOrOut = React.createElement(
 	                'li',
@@ -28183,6 +28262,8 @@
 	                )
 	            );
 	            signUp = null;
+
+	            //if the user is not logged in, show the login and signup links
 	        } else {
 	            loginOrOut = React.createElement(
 	                'li',
@@ -28205,12 +28286,19 @@
 	            );
 	        }
 
+	        //if recruiter -> black navbar, else job seeker -> default navbar
+	        if (this.state.recruiter == true) {
+	            navClassName = "navbar navbar-inverse navbar-static-top";
+	        } else {
+	            navClassName = "navbar navbar-default navbar-static-top";
+	        }
+
 	        return React.createElement(
 	            'span',
 	            null,
 	            React.createElement(
 	                'nav',
-	                { className: 'navbar navbar-inverse navbar-static-top' },
+	                { className: navClassName },
 	                React.createElement(
 	                    'div',
 	                    { className: 'container' },
@@ -28227,8 +28315,11 @@
 	                        'ul',
 	                        { className: 'nav navbar-nav pull-right' },
 	                        signUp,
+	                        ' ',
 	                        profile,
-	                        loginOrOut
+	                        ' ',
+	                        loginOrOut,
+	                        ' '
 	                    )
 	                )
 	            ),
@@ -28241,10 +28332,10 @@
 	    }
 	});
 
-	module.exports = NavBar;
+	module.exports = Layout;
 
 /***/ },
-/* 247 */
+/* 246 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);
