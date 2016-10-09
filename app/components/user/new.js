@@ -99,7 +99,7 @@ var SignUpForm = React.createClass({
 
 				<div className="col-md-4">
 					<center>
-						<h1>Sign Up</h1>
+						<h1>Sign Up</h1><br />
 						
 						<input type="radio" name="recruiter" value="false" onChange={this.accountChange}/>Job Seeker
 						<input type="radio" name="recruiter" value="true" onChange={this.accountChange} />Recruiter

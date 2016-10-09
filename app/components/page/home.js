@@ -76,7 +76,7 @@ var Home = React.createClass({
 
 		return (
 			<div>
-				<h1>Connection Feed</h1>
+				<h1>Connection Feed</h1><br />
 				<input type="text" ref="body" placeholder="What are you thinking about?" onKeyPress={this.handleKeyPress} className="form-control"/><br />
 				<center><button className="btn btn-primary" onClick={this.handlePost}>Post</button></center><br />	
 				{reversedPost.map((post,index) => (

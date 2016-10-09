@@ -73,7 +73,8 @@ var LogInForm = React.createClass({
 
 				<div className="col-md-4">
 					<center>
-						<h1>Log In</h1>
+						<h1>Log In</h1><br />
+						
 						<input type="email" ref="email" placeholder="Email Address" className="form-control" onKeyPress={this.handleKeyPress}/><br />
 						<input type="password" ref="password" placeholder="Password" className="form-control" onKeyPress={this.handleKeyPress}/><br />
 						<button className="btn btn-primary" onClick={this.handleLogIn}>Login</button><br />

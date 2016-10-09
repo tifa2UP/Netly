@@ -13,46 +13,39 @@ var DeleteAccount = React.createClass({
 	handleDestroy: function(){
 		var user = firebase.auth().currentUser;
 
-		//removes the user from auth
-		user.delete().then(function(){
+		if(confirm("Are you sure you want to delete your account?")){
 
-			//removes the posts that belong to the current user
-			var postsRef = firebase.database().ref().child('posts').orderByChild('user_id').equalTo(user.uid);
-			postsRef.on('child_added', snap =>{
-				var post = snap.ref.remove();
+			user.delete().then(function(){
+
+				//removes the posts that belong to the current user
+				var postsRef = firebase.database().ref().child('posts').orderByChild('user_id').equalTo(user.uid);
+				postsRef.on('child_added', snap =>{
+					var post = snap.ref.remove();
+				});
+
+				//removes the user-posts from that user
+				var userPostsRef = firebase.database().ref('/user-posts/' + user.uid);
+				userPostsRef.remove();
+
+				//removes the user from the database
+				var userRef = firebase.database().ref('users/' + user.uid);
+				userRef.remove();
+
+				//redirects to home after success
+				hashHistory.push('/');
+
+			}, function(error){
+				console.log(error);
 			});
-
-			//removes the user-posts from that user
-			var userPostsRef = firebase.database().ref('/user-posts/' + user.uid);
-			userPostsRef.remove();
-
-			//removes the user from the database
-			var userRef = firebase.database().ref('users/' + user.uid);
-			userRef.remove();
-
-			//redirects to home after success
-			hashHistory.push('/');
-
-		}, function(error){
-			console.log(error);
-		});
+		}
 	},
 
 	render: function(){
 		return (
 			<div>
-				<div className="col-md-4">
-				</div>
-
-				<div className="col-md-4">
-					<center>
-						<h1>Delete Account</h1>
+				<h3 style={{color:'red'}}>Danger Zone</h3>
 						
-						<button onClick={this.handleDestroy} className="btn btn-danger">Delete Account</button><br />
-					</center>
-				</div>
-				<div className="col-md-4">
-				</div>
+				<button onClick={this.handleDestroy} className="btn btn-danger">Delete Account</button><br />
 			</div>
 		);
 	}

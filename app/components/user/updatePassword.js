@@ -63,22 +63,10 @@ var UpdatePassword = React.createClass({
 		return (
 			<div>
 				{errorAlert}
-
-				<div className="col-md-4">
-				</div>
-
-				<div className="col-md-4">
-					<center>
-						<h1>Update Password</h1>
+				<input type="password" ref="new_password" placeholder="New Password" className="form-control" onKeyPress={this.handleKeyPress}/><br />
+				<input type="password" ref="new_password_confirmation" placeholder="Confirm New Password" className="form-control" onKeyPress={this.handleKeyPress}/><br />
 						
-						<input type="password" ref="new_password" placeholder="New Password" className="form-control" onKeyPress={this.handleKeyPress}/><br />
-						<input type="password" ref="new_password_confirmation" placeholder="Confirm New Password" className="form-control" onKeyPress={this.handleKeyPress}/><br />
-						
-						<button onClick={this.handleUpdatePassword} className="btn btn-primary">Update Password</button><br />
-					</center>
-				</div>
-				<div className="col-md-4">
-				</div>
+				<button onClick={this.handleUpdatePassword} className="btn btn-primary">Update Password</button><br />
 			</div>
 		);
 	}
