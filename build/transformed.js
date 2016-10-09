@@ -27961,7 +27961,6 @@
 			//if successfully logged in, reroute to home
 			firebase.auth().onAuthStateChanged(function (user) {
 				if (user) {
-					console.log("Logged in!");
 					hashHistory.push("/");
 				} else {
 					hashHistory.push("/login");
@@ -28260,7 +28259,8 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/', className: 'navbar-brand' },
-	                    this.state.name
+	                    this.state.name ? this.state.name : "Profile",
+	                    ' '
 	                )
 	            );
 	            signUp = null;
