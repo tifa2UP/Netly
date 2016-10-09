@@ -37,7 +37,6 @@ var SignUpForm = React.createClass({
 		//if successfully logged in, add the user child to the database with the name and email.
 		firebase.auth().onAuthStateChanged(function(user) {
   			if (user) {
-  				console.log("Signed up!");
   				var userData = {
   					email: email,
   					first: firstName,
@@ -50,10 +49,6 @@ var SignUpForm = React.createClass({
   				//update display name for user
 				user.updateProfile({
 					displayName: firstName + " " + lastName,
-				}).then(function(){
-					console.log("success");
-				},function(error){
-					console.log("failure");
 				});
 
 				hashHistory.push("/");
