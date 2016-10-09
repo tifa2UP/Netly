@@ -34,6 +34,7 @@ var Layout = React.createClass({
         var signUp;
         var navClassName;
         var updatePassword;
+        var deleteAccount;
 
         //if the user is logged in, show the logout and profile link
         if(this.state.isLoggedIn) {
@@ -41,6 +42,7 @@ var Layout = React.createClass({
             profile = <li><Link to="/" className="navbar-brand">{this.state.name}</Link></li>;
             signUp = null;
             updatePassword = <li><Link to="/updatePassword" className="navbar-brand">Update Password</Link></li>;
+            deleteAccount = <li><Link to="/deleteAccount" className="navbar-brand">Delete Account</Link></li>;
 
         //if the user is not logged in, show the login and signup links
         } else {
@@ -48,6 +50,7 @@ var Layout = React.createClass({
             profile = null;
             signUp = <li><Link to="/signup" className="navbar-brand">Sign Up</Link></li>;
             updatePassword = null;
+            deleteAccount = null;
         }
 
         //if recruiter -> black navbar, else job seeker -> default navbar
@@ -72,6 +75,7 @@ var Layout = React.createClass({
                             {profile} {/*shows only if user is logged in*/}
                             {loginOrOut} {/*shows login or logout link depending on logged in state*/}
                             {updatePassword}
+                            {deleteAccount}
                         </ul>
                     </div>
                 </nav>

@@ -27744,8 +27744,9 @@
 	var Logout = __webpack_require__(244);
 	var Layout = __webpack_require__(245);
 	var UpdatePassword = __webpack_require__(246);
+	var DeleteAccount = __webpack_require__(247);
 
-	var requireAuth = __webpack_require__(247);
+	var requireAuth = __webpack_require__(248);
 
 	var routes = React.createElement(
 		Router,
@@ -27757,7 +27758,8 @@
 			React.createElement(Route, { path: 'login', component: SessionUser }),
 			React.createElement(Route, { path: 'signup', component: NewUser }),
 			React.createElement(Route, { path: 'logout', component: Logout }),
-			React.createElement(Route, { path: 'updatePassword', component: UpdatePassword })
+			React.createElement(Route, { path: 'updatePassword', component: UpdatePassword, onEnter: requireAuth }),
+			React.createElement(Route, { path: 'deleteAccount', component: DeleteAccount, onEnter: requireAuth })
 		)
 	);
 
@@ -28243,6 +28245,7 @@
 	        var signUp;
 	        var navClassName;
 	        var updatePassword;
+	        var deleteAccount;
 
 	        //if the user is logged in, show the logout and profile link
 	        if (this.state.isLoggedIn) {
@@ -28274,6 +28277,15 @@
 	                    'Update Password'
 	                )
 	            );
+	            deleteAccount = React.createElement(
+	                'li',
+	                null,
+	                React.createElement(
+	                    Link,
+	                    { to: '/deleteAccount', className: 'navbar-brand' },
+	                    'Delete Account'
+	                )
+	            );
 
 	            //if the user is not logged in, show the login and signup links
 	        } else {
@@ -28297,6 +28309,7 @@
 	                )
 	            );
 	            updatePassword = null;
+	            deleteAccount = null;
 	        }
 
 	        //if recruiter -> black navbar, else job seeker -> default navbar
@@ -28333,7 +28346,8 @@
 	                        ' ',
 	                        loginOrOut,
 	                        ' ',
-	                        updatePassword
+	                        updatePassword,
+	                        deleteAccount
 	                    )
 	                )
 	            ),
@@ -28461,6 +28475,82 @@
 
 /***/ },
 /* 247 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var DeleteAccount = React.createClass({
+		displayName: 'DeleteAccount',
+
+
+		//initially, no submission errors
+		getInitialState: function () {
+			return { hasError: false, succeeded: false, errorMsg: "", successMsg: "" };
+		},
+
+		handleDestroy: function () {
+			var user = firebase.auth().currentUser;
+
+			//removes the user from auth
+			user.delete().then(function () {
+
+				//removes the posts that belong to the current user
+				var postsRef = firebase.database().ref().child('posts').orderByChild('user_id').equalTo(user.uid);
+				postsRef.on('child_added', snap => {
+					var post = snap.ref.remove();
+				});
+
+				//removes the user-posts from that user
+				var userPostsRef = firebase.database().ref('/user-posts/' + user.uid);
+				userPostsRef.remove();
+
+				//removes the user from the database
+				var userRef = firebase.database().ref('users/' + user.uid);
+				userRef.remove();
+
+				//redirects to home after success
+				hashHistory.push('/');
+			}, function (error) {
+				console.log(error);
+			});
+		},
+
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement('div', { className: 'col-md-4' }),
+				React.createElement(
+					'div',
+					{ className: 'col-md-4' },
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'h1',
+							null,
+							'Delete Account'
+						),
+						React.createElement(
+							'button',
+							{ onClick: this.handleDestroy, className: 'btn btn-danger' },
+							'Delete Account'
+						),
+						React.createElement('br', null)
+					)
+				),
+				React.createElement('div', { className: 'col-md-4' })
+			);
+		}
+	});
+
+	module.exports = DeleteAccount;
+
+/***/ },
+/* 248 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);

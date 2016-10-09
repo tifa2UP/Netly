@@ -10,6 +10,7 @@ var Home = require('../components/page/home.js');
 var Logout = require('../components/session/destroy.js');
 var Layout = require('../components/page/layout.js');
 var UpdatePassword = require('../components/user/updatePassword.js');
+var DeleteAccount = require('../components/user/destroy.js')
 
 var requireAuth = require('./require_auth.js')
 
@@ -20,7 +21,8 @@ var routes = (
 			<Route path="login" component={SessionUser}/>
 			<Route path="signup" component={NewUser}/>
 			<Route path="logout" component={Logout}/>
-			<Route path="updatePassword" component={UpdatePassword}/>
+			<Route path="updatePassword" component={UpdatePassword} onEnter={requireAuth}/>
+			<Route path="deleteAccount" component={DeleteAccount} onEnter={requireAuth}/>
 		</Route>
 	</Router>
 );
