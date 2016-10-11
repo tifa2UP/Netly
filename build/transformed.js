@@ -28074,7 +28074,8 @@
 					user_id: firebase.auth().currentUser.uid,
 					user_name: firebase.auth().currentUser.displayName,
 					body: this.refs.body.value,
-					created_at: firebase.database.ServerValue.TIMESTAMP
+					created_at: firebase.database.ServerValue.TIMESTAMP,
+					likes: 0
 				};
 
 				//generate new post reference key
@@ -28092,15 +28093,60 @@
 			}
 		},
 
+		//likes the post if the user hasn't liked it yet, unlikes it if already liked
+		handleLike: function (post) {
+
+			//gets the ref of the user-likes to see if user has liked this post yet
+			var ref = firebase.database().ref('/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
+			ref.once('value', snap => {
+
+				//check if this data exists, and if it does, check if the user liked it
+				if (snap.val() && snap.val().liked) {
+					//if user already liked this post, unlike it
+					var likeUpdate = {};
+					likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = { liked: false };
+					firebase.database().ref().update(likeUpdate);
+
+					//decrementing likes of post
+					post.likes -= 1;
+				} else {
+					//if user hasn't yet liked this post, like it
+					var likeUpdate = {};
+					likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = { liked: true };
+					firebase.database().ref().update(likeUpdate);
+
+					//incrementing likes of post
+					post.likes += 1;
+				}
+				//updates all the data in the posts ref and user-post ref
+				var updates = {};
+				updates['/posts/' + post.post_id] = post;
+				updates['/user-posts/' + post.user_id + '/' + post.post_id] = post;
+				firebase.database().ref().update(updates);
+
+				//refreshes the page after like
+				hashHistory.push("/");
+			});
+		},
+
 		//loading all posts into the state's postArray
 		componentWillMount: function () {
-
 			//gets the post reference
 			var postsRef = firebase.database().ref().child('posts');
 			//for each child added to post, push to postArray
 			postsRef.on("child_added", snap => {
 				var post = snap.val();
-				this.state.postArray.push(post);
+				//this.state.postArray.push(post);
+				var newPostWithId = {
+					user_id: post.user_id,
+					user_name: post.user_name,
+					body: post.body,
+					created_at: post.created_at,
+					likes: post.likes,
+					post_id: snap.ref.path.o[1]
+				};
+				this.state.postArray.push(newPostWithId);
+
 				//refreshes page when the posts are pushed into the array, so it shows without manually refreshing
 				hashHistory.push('/');
 			});
@@ -28160,7 +28206,15 @@
 						null,
 						'"',
 						post.body,
-						'"'
+						'"',
+						React.createElement('br', null),
+						React.createElement(
+							'button',
+							{ className: 'btn btn-default', onClick: this.handleLike.bind(null, post) },
+							'Like (',
+							post.likes,
+							')'
+						)
 					)
 				))
 			);
