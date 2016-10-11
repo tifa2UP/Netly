@@ -16,6 +16,14 @@ var config = {
 	messagingSenderId: "579173148287"
 };
 
+var selingConfigTester = {
+    apiKey: "AIzaSyAv-1nDt8s6spRqzcywfxotxiVQLqoGLnE",
+    authDomain: "pronet-7debd.firebaseapp.com",
+    databaseURL: "https://pronet-7debd.firebaseio.com",
+    storageBucket: "",
+    messagingSenderId: "437166099419"
+ };
+
 firebase.initializeApp(config);
 
 ReactDOM.render(routes, document.getElementById('app'));
