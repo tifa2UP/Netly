@@ -11,24 +11,27 @@ var UpdatePassword = React.createClass({
 	},
 
 	handleUpdatePassword: function(){
-		var new_password = this.refs.new_password.value;
-		var new_password_confirmation = this.refs.new_password_confirmation.value;
-		var that = this;
 
-		if(new_password && new_password_confirmation && new_password == new_password_confirmation){
-			var user = firebase.auth().currentUser;
-			user.updatePassword(new_password).then(function(){
-				hashHistory.push('/');
-			}, function(error){
+		if(this.props.handleReauthenticate()){
+			var new_password = this.refs.new_password.value;
+			var new_password_confirmation = this.refs.new_password_confirmation.value;
+			var that = this;
+
+			if(new_password && new_password_confirmation && new_password == new_password_confirmation){
+				var user = firebase.auth().currentUser;
+				user.updatePassword(new_password).then(function(){
+					hashHistory.push('/');
+				}, function(error){
+					that.setState({hasError: true});
+					that.setState({errorMsg: "An error occured!"});
+				});
+			}else{
 				that.setState({hasError: true});
-				that.setState({errorMsg: "An error occured!"});
-			});
-		}else{
-			this.setState({hasError: true});
-			this.setState({errorMsg: "Passwords do not match."});
+				that.setState({errorMsg: "Passwords do not match."});
+			}
+			this.refs.new_password.value = "";
+			this.refs.new_password_confirmation.value = "";
 		}
-		this.refs.new_password.value = "";
-		this.refs.new_password_confirmation.value = "";
 	},
 
 	//creates a div alert-danger with the error message

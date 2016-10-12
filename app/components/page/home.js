@@ -43,40 +43,42 @@ var Home = React.createClass({
 	//likes the post if the user hasn't liked it yet, unlikes it if already liked
 	handleLike: function(post){
 		//gets the ref of the user-likes to see if user has liked this post yet
-		var ref = firebase.database().ref('/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
-		ref.once('value', snap =>{
+		if(post.user_id != firebase.auth().currentUser.uid){
+			var ref = firebase.database().ref('/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
+			ref.once('value', snap =>{
 
-			//check if this data exists, and if it does, check if the user liked it
-			if(snap.val() && snap.val().liked){
-				//if user already liked this post, unlike it
-				var likeUpdate = {};
-				likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = {liked: false}
-				firebase.database().ref().update(likeUpdate);
+				//check if this data exists, and if it does, check if the user liked it
+				if(snap.val() && snap.val().liked){
+					
+					//if user already liked this post, remove the user-likes reference
+					var userLikesRef = firebase.database().ref('user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
+					userLikesRef.remove();
 
-				//decrementing likes of post
-				post.likes-=1;
-			}else{
-				//if user hasn't yet liked this post, like it
-				var likeUpdate = {};
-				likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = {liked: true}
-				firebase.database().ref().update(likeUpdate);
+					//decrementing likes of post
+					post.likes-=1;
+				}else{
+					//if user hasn't yet liked this post, like it
+					var likeUpdate = {};
+					likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = {liked: true}
+					firebase.database().ref().update(likeUpdate);
 
-				//incrementing likes of post
-				post.likes+=1;
-			}
+					//incrementing likes of post
+					post.likes+=1;
+				}
 
-			var anotherPost = JSON.parse(JSON.stringify(post)); //copies contents of post into anotherPost
-			delete anotherPost.post_id; //remove the post_id property in anotherPost -- we don't want to create an unnecessary post_id property in the post database
+				var anotherPost = JSON.parse(JSON.stringify(post)); //copies contents of post into anotherPost
+				delete anotherPost.post_id; //remove the post_id property in anotherPost -- we don't want to create an unnecessary post_id property in the post database
 
-			//updates all the data in the posts ref and user-post ref
-			var updates = {};
-			updates['/posts/' + post.post_id] = anotherPost;
-			updates['/user-posts/' + post.user_id + '/' + post.post_id] = anotherPost;
-			firebase.database().ref().update(updates);
+				//updates all the data in the posts ref and user-post ref
+				var updates = {};
+				updates['/posts/' + post.post_id] = anotherPost;
+				updates['/user-posts/' + post.user_id + '/' + post.post_id] = anotherPost;
+				firebase.database().ref().update(updates);
 
-			//refreshes the page after like
-			hashHistory.push("/");
-		});
+				//refreshes the page after like
+				hashHistory.push("/");
+			});
+		}
 	},
 
 	//loading all posts into the state's postArray

@@ -55,11 +55,19 @@
 	var routes = __webpack_require__(240);
 
 	var config = {
-		apiKey: "AIzaSyCVVsLbLodfKpwKvEJB2ASCc-TB5gzkwNw",
-		authDomain: "testingproject-cd660.firebaseapp.com",
-		databaseURL: "https://testingproject-cd660.firebaseio.com",
-		storageBucket: "",
-		messagingSenderId: "579173148287"
+	  apiKey: "AIzaSyCVVsLbLodfKpwKvEJB2ASCc-TB5gzkwNw",
+	  authDomain: "testingproject-cd660.firebaseapp.com",
+	  databaseURL: "https://testingproject-cd660.firebaseio.com",
+	  storageBucket: "",
+	  messagingSenderId: "579173148287"
+	};
+
+	var selingConfigTester = {
+	  apiKey: "AIzaSyAv-1nDt8s6spRqzcywfxotxiVQLqoGLnE",
+	  authDomain: "pronet-7debd.firebaseapp.com",
+	  databaseURL: "https://pronet-7debd.firebaseio.com",
+	  storageBucket: "",
+	  messagingSenderId: "437166099419"
 	};
 
 	firebase.initializeApp(config);
@@ -28095,7 +28103,6 @@
 
 		//likes the post if the user hasn't liked it yet, unlikes it if already liked
 		handleLike: function (post) {
-
 			//gets the ref of the user-likes to see if user has liked this post yet
 			var ref = firebase.database().ref('/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
 			ref.once('value', snap => {
@@ -28118,10 +28125,14 @@
 					//incrementing likes of post
 					post.likes += 1;
 				}
+
+				var anotherPost = JSON.parse(JSON.stringify(post)); //copies contents of post into anotherPost
+				delete anotherPost.post_id; //remove the post_id property in anotherPost -- we don't want to create an unnecessary post_id property in the post database
+
 				//updates all the data in the posts ref and user-post ref
 				var updates = {};
-				updates['/posts/' + post.post_id] = post;
-				updates['/user-posts/' + post.user_id + '/' + post.post_id] = post;
+				updates['/posts/' + post.post_id] = anotherPost;
+				updates['/user-posts/' + post.user_id + '/' + post.post_id] = anotherPost;
 				firebase.database().ref().update(updates);
 
 				//refreshes the page after like

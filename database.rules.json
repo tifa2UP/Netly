@@ -1,6 +1,9 @@
 {
   "rules": {
     ".read": "auth != null",
-    ".write": "auth != null"
+    ".write": "auth != null",
+    "post":{
+    	".indexOn": "user_id"
+    }
   }
 }
