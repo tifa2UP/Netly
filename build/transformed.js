@@ -28104,40 +28104,42 @@
 		//likes the post if the user hasn't liked it yet, unlikes it if already liked
 		handleLike: function (post) {
 			//gets the ref of the user-likes to see if user has liked this post yet
-			var ref = firebase.database().ref('/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
-			ref.once('value', snap => {
+			if (post.user_id != firebase.auth().currentUser.uid) {
+				var ref = firebase.database().ref('/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
+				ref.once('value', snap => {
 
-				//check if this data exists, and if it does, check if the user liked it
-				if (snap.val() && snap.val().liked) {
-					//if user already liked this post, unlike it
-					var likeUpdate = {};
-					likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = { liked: false };
-					firebase.database().ref().update(likeUpdate);
+					//check if this data exists, and if it does, check if the user liked it
+					if (snap.val() && snap.val().liked) {
 
-					//decrementing likes of post
-					post.likes -= 1;
-				} else {
-					//if user hasn't yet liked this post, like it
-					var likeUpdate = {};
-					likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = { liked: true };
-					firebase.database().ref().update(likeUpdate);
+						//if user already liked this post, remove the user-likes reference
+						var userLikesRef = firebase.database().ref('user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
+						userLikesRef.remove();
 
-					//incrementing likes of post
-					post.likes += 1;
-				}
+						//decrementing likes of post
+						post.likes -= 1;
+					} else {
+						//if user hasn't yet liked this post, like it
+						var likeUpdate = {};
+						likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = { liked: true };
+						firebase.database().ref().update(likeUpdate);
 
-				var anotherPost = JSON.parse(JSON.stringify(post)); //copies contents of post into anotherPost
-				delete anotherPost.post_id; //remove the post_id property in anotherPost -- we don't want to create an unnecessary post_id property in the post database
+						//incrementing likes of post
+						post.likes += 1;
+					}
 
-				//updates all the data in the posts ref and user-post ref
-				var updates = {};
-				updates['/posts/' + post.post_id] = anotherPost;
-				updates['/user-posts/' + post.user_id + '/' + post.post_id] = anotherPost;
-				firebase.database().ref().update(updates);
+					var anotherPost = JSON.parse(JSON.stringify(post)); //copies contents of post into anotherPost
+					delete anotherPost.post_id; //remove the post_id property in anotherPost -- we don't want to create an unnecessary post_id property in the post database
 
-				//refreshes the page after like
-				hashHistory.push("/");
-			});
+					//updates all the data in the posts ref and user-post ref
+					var updates = {};
+					updates['/posts/' + post.post_id] = anotherPost;
+					updates['/user-posts/' + post.user_id + '/' + post.post_id] = anotherPost;
+					firebase.database().ref().update(updates);
+
+					//refreshes the page after like
+					hashHistory.push("/");
+				});
+			}
 		},
 
 		//loading all posts into the state's postArray
@@ -28426,10 +28428,96 @@
 	var AccountSettings = React.createClass({
 		displayName: 'AccountSettings',
 
+
+		//initially, no submission errors
+		getInitialState: function () {
+			return { hasError: false, errorMsg: "", verified: false };
+		},
+
+		handleReauthenticate: function () {
+			return this.state.verified;
+		},
+
+		handleTypeChanges: function (e) {
+			this.setState({ hasError: false });
+			this.setState({ errorMsg: "" });
+		},
+
+		verifyPassword: function (e) {
+			var that = this;
+
+			if (this.refs.current_password.value) {
+				var user = firebase.auth().currentUser;
+				var credential = firebase.auth.EmailAuthProvider.credential(user.email, this.refs.current_password.value);
+				user.reauthenticate(credential).then(function () {
+					that.setState({ hasError: false });
+					that.setState({ errorMsg: "" });
+					that.setState({ verified: true });
+					that.setState({ verificationMessage: "Your password has been verified!" });
+				}, function (error) {
+					that.setState({ hasError: true });
+					that.setState({ errorMsg: "Your current password is incorrect." });
+					that.setState({ verified: false });
+				});
+			} else {
+				this.setState({ hasError: true });
+				this.setState({ errorMsg: "Please enter your current password" });
+				this.setState({ verified: false });
+			}
+		},
+
+		//creates a div alert-danger with the error message
+		errorMessage: function () {
+			return React.createElement(
+				'div',
+				{ className: 'alert alert-danger' },
+				React.createElement(
+					'strong',
+					null,
+					'Error! '
+				),
+				this.state.errorMsg
+			);
+		},
+
+		//creates an empty div if no error message
+		noErrorMessage: function () {
+			return React.createElement(
+				'div',
+				{ className: 'alert alert-danger' },
+				'Please verify your current password.'
+			);
+		},
+
+		successMessage: function () {
+			return React.createElement(
+				'div',
+				{ className: 'alert alert-success' },
+				React.createElement(
+					'strong',
+					null,
+					'Success! '
+				),
+				this.state.verificationMessage
+			);
+		},
+
 		render: function () {
+
+			//gets the appropriate error alert div depending on whether or not the form has an error
+			var alert;
+			if (this.state.hasError) {
+				alert = this.errorMessage();
+			} else if (this.state.verified) {
+				alert = this.successMessage();
+			} else {
+				alert = this.noErrorMessage();
+			}
+
 			return React.createElement(
 				'div',
 				null,
+				alert,
 				React.createElement('div', { className: 'col-md-4' }),
 				React.createElement(
 					'div',
@@ -28443,9 +28531,18 @@
 							'Account Settings'
 						),
 						React.createElement('br', null),
-						React.createElement(UpdatePassword, null),
+						React.createElement('input', { type: 'password', ref: 'current_password', placeholder: 'Current Password', className: 'form-control', onChange: this.handleTypeChanges }),
 						React.createElement('br', null),
-						React.createElement(DeleteAccount, null)
+						React.createElement(
+							'button',
+							{ onClick: this.verifyPassword, className: 'btn btn-success' },
+							'Verify Password'
+						),
+						React.createElement('br', null),
+						React.createElement('br', null),
+						React.createElement(UpdatePassword, { handleReauthenticate: this.handleReauthenticate }),
+						React.createElement('br', null),
+						React.createElement(DeleteAccount, { handleReauthenticate: this.handleReauthenticate })
 					)
 				),
 				React.createElement('div', { className: 'col-md-4' })
@@ -28474,11 +28571,35 @@
 		},
 
 		handleDestroy: function () {
-			var user = firebase.auth().currentUser;
 
-			if (confirm("Are you sure you want to delete your account?")) {
+			if (this.props.handleReauthenticate()) {
 
-				user.delete().then(function () {
+				var user = firebase.auth().currentUser;
+
+				if (confirm("Are you sure you want to delete your account?")) {
+
+					//TODO: user gets deleted before we unliked the posts... figure it out!
+					//removes the user-likes from that user
+					var userLikesRef = firebase.database().ref('/user-likes/' + user.uid);
+					//finds the posts that the user liked
+
+					userLikesRef.on('child_added', snap => {
+						var post_id = snap.ref.path.o[2];
+
+						var postLikedRef = firebase.database().ref('posts/' + post_id);
+						//decrement the likes of the user-likes posts
+						postLikedRef.once('value', snap => {
+							var post = snap.val();
+							post.likes -= 1;
+							var updates = {};
+							updates['/posts/' + post_id] = post;
+							updates['/user-posts/' + post.user_id + '/' + post_id] = post;
+							firebase.database().ref().update(updates);
+						});
+					});
+					setTimeout(function () {
+						userLikesRef.remove();
+					}.bind(this), 1000);
 
 					//removes the posts that belong to the current user
 					var postsRef = firebase.database().ref().child('posts').orderByChild('user_id').equalTo(user.uid);
@@ -28494,11 +28615,15 @@
 					var userRef = firebase.database().ref('users/' + user.uid);
 					userRef.remove();
 
-					//redirects to home after success
-					hashHistory.push('/');
-				}, function (error) {
-					console.log(error);
-				});
+					setTimeout(function () {
+						user.delete().then(function () {
+							//redirects to home after success
+							hashHistory.push('/');
+						}, function (error) {
+							console.log(error);
+						});
+					}.bind(this), 2000);
+				}
 			}
 		},
 
@@ -28542,24 +28667,27 @@
 		},
 
 		handleUpdatePassword: function () {
-			var new_password = this.refs.new_password.value;
-			var new_password_confirmation = this.refs.new_password_confirmation.value;
-			var that = this;
 
-			if (new_password && new_password_confirmation && new_password == new_password_confirmation) {
-				var user = firebase.auth().currentUser;
-				user.updatePassword(new_password).then(function () {
-					hashHistory.push('/');
-				}, function (error) {
+			if (this.props.handleReauthenticate()) {
+				var new_password = this.refs.new_password.value;
+				var new_password_confirmation = this.refs.new_password_confirmation.value;
+				var that = this;
+
+				if (new_password && new_password_confirmation && new_password == new_password_confirmation) {
+					var user = firebase.auth().currentUser;
+					user.updatePassword(new_password).then(function () {
+						hashHistory.push('/');
+					}, function (error) {
+						that.setState({ hasError: true });
+						that.setState({ errorMsg: "An error occured!" });
+					});
+				} else {
 					that.setState({ hasError: true });
-					that.setState({ errorMsg: "An error occured!" });
-				});
-			} else {
-				this.setState({ hasError: true });
-				this.setState({ errorMsg: "Passwords do not match." });
+					that.setState({ errorMsg: "Passwords do not match." });
+				}
+				this.refs.new_password.value = "";
+				this.refs.new_password_confirmation.value = "";
 			}
-			this.refs.new_password.value = "";
-			this.refs.new_password_confirmation.value = "";
 		},
 
 		//creates a div alert-danger with the error message
