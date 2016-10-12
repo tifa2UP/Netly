@@ -55,19 +55,19 @@
 	var routes = __webpack_require__(240);
 
 	var config = {
-	  apiKey: "AIzaSyCVVsLbLodfKpwKvEJB2ASCc-TB5gzkwNw",
-	  authDomain: "testingproject-cd660.firebaseapp.com",
-	  databaseURL: "https://testingproject-cd660.firebaseio.com",
-	  storageBucket: "",
-	  messagingSenderId: "579173148287"
+	   apiKey: "AIzaSyCVVsLbLodfKpwKvEJB2ASCc-TB5gzkwNw",
+	   authDomain: "testingproject-cd660.firebaseapp.com",
+	   databaseURL: "https://testingproject-cd660.firebaseio.com",
+	   storageBucket: "testingproject-cd660.appspot.com",
+	   messagingSenderId: "579173148287"
 	};
 
 	var selingConfigTester = {
-	  apiKey: "AIzaSyAv-1nDt8s6spRqzcywfxotxiVQLqoGLnE",
-	  authDomain: "pronet-7debd.firebaseapp.com",
-	  databaseURL: "https://pronet-7debd.firebaseio.com",
-	  storageBucket: "",
-	  messagingSenderId: "437166099419"
+	   apiKey: "AIzaSyAv-1nDt8s6spRqzcywfxotxiVQLqoGLnE",
+	   authDomain: "pronet-7debd.firebaseapp.com",
+	   databaseURL: "https://pronet-7debd.firebaseio.com",
+	   storageBucket: "pronet-7debd.appspot.com",
+	   messagingSenderId: "437166099419"
 	};
 
 	firebase.initializeApp(config);
@@ -27752,8 +27752,9 @@
 	var Logout = __webpack_require__(244);
 	var Layout = __webpack_require__(245);
 	var AccountSettings = __webpack_require__(246);
+	var Profile = __webpack_require__(249);
 
-	var requireAuth = __webpack_require__(249);
+	var requireAuth = __webpack_require__(250);
 
 	var routes = React.createElement(
 		Router,
@@ -27765,7 +27766,8 @@
 			React.createElement(Route, { path: 'login', component: SessionUser }),
 			React.createElement(Route, { path: 'signup', component: NewUser }),
 			React.createElement(Route, { path: 'logout', component: Logout }),
-			React.createElement(Route, { path: 'accountSettings', component: AccountSettings, onEnter: requireAuth })
+			React.createElement(Route, { path: 'accountSettings', component: AccountSettings, onEnter: requireAuth }),
+			React.createElement(Route, { path: 'profile', component: Profile, onEnter: requireAuth })
 		)
 	);
 
@@ -28325,7 +28327,7 @@
 	                null,
 	                React.createElement(
 	                    Link,
-	                    { to: '/', className: 'navbar-brand' },
+	                    { to: '/profile', className: 'navbar-brand' },
 	                    this.state.name ? this.state.name : "Profile",
 	                    ' '
 	                )
@@ -28749,6 +28751,37 @@
 
 /***/ },
 /* 249 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var Profile = React.createClass({
+		displayName: 'Profile',
+
+		getInitialState: function () {
+			return { user: firebase.auth().currentUser };
+		},
+
+		componentWillMount: function () {
+			this.setState({ user: firebase.auth().currentUser });
+		},
+
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				'Hello'
+			);
+		}
+	});
+
+	module.exports = Profile;
+
+/***/ },
+/* 250 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);
