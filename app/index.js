@@ -10,17 +10,17 @@ var routes = require('./config/routes.js');
 
 var config = {
 	apiKey: "AIzaSyCVVsLbLodfKpwKvEJB2ASCc-TB5gzkwNw",
-	authDomain: "testingproject-cd660.firebaseapp.com",
-	databaseURL: "https://testingproject-cd660.firebaseio.com",
-	storageBucket: "",
-	messagingSenderId: "579173148287"
+    authDomain: "testingproject-cd660.firebaseapp.com",
+    databaseURL: "https://testingproject-cd660.firebaseio.com",
+    storageBucket: "testingproject-cd660.appspot.com",
+    messagingSenderId: "579173148287"
 };
 
 var selingConfigTester = {
     apiKey: "AIzaSyAv-1nDt8s6spRqzcywfxotxiVQLqoGLnE",
     authDomain: "pronet-7debd.firebaseapp.com",
     databaseURL: "https://pronet-7debd.firebaseio.com",
-    storageBucket: "",
+    storageBucket: "pronet-7debd.appspot.com",
     messagingSenderId: "437166099419"
  };
 
