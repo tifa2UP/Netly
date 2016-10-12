@@ -10,6 +10,7 @@ var Home = require('../components/page/home.js');
 var Logout = require('../components/session/destroy.js');
 var Layout = require('../components/page/layout.js');
 var AccountSettings = require('../components/user/accountSettings.js')
+var Profile = require('../components/profileInformation/profile.js')
 
 var requireAuth = require('./require_auth.js')
 
@@ -21,6 +22,7 @@ var routes = (
 			<Route path="signup" component={NewUser}/>
 			<Route path="logout" component={Logout}/>
 			<Route path="accountSettings" component={AccountSettings} onEnter={requireAuth}/>
+			<Route path="profile" component={Profile} onEnter={requireAuth} />
 		</Route>
 	</Router>
 );
