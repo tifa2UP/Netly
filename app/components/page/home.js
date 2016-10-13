@@ -132,7 +132,7 @@ var Home = React.createClass({
 				<center><button className="btn btn-primary" onClick={this.handlePost}>Post</button></center><br />	
 				{reversedPost.map((post,index) => (
         			<div key={index}>
-        				On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, {post.user_name} said 
+        				On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, <Link to={"/users/"+post.user_id}>{post.user_name}</Link> said 
         				<blockquote>
         					"{post.body}"<br />
         					<button className="btn btn-default" onClick={this.handleLike.bind(null, post)}>Like ({post.likes})</button>

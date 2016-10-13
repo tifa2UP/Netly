@@ -19,6 +19,7 @@ var Layout = React.createClass({
             this.setState({isLoggedIn: (null != user)});
             this.setState({recruiter: this.state.isLoggedIn == false ? false : null});
             this.setState({name: user.displayName});
+            this.setState({user_id: user.uid});
 
             userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
             userRef.on("value", snap => {
@@ -39,7 +40,7 @@ var Layout = React.createClass({
         //if the user is logged in, show the logout and profile link
         if(this.state.isLoggedIn) {
             loginOrOut = <li><Link to="/logout" className="navbar-brand">Logout</Link></li>;
-            profile = <li><Link to="/profile" className="navbar-brand">{this.state.name ? this.state.name : "Profile" } </Link></li>;
+            profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand">{this.state.name ? this.state.name : "Profile" } </Link></li>;
             signUp = null;
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand">Account Settings</Link></li>;
 

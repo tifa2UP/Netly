@@ -5,16 +5,21 @@ var hashHistory = require('react-router').hashHistory;
 
 var Profile = React.createClass({
 	getInitialState: function(){
-		return {user: firebase.auth().currentUser};
+		return {user_name: "", recruiter: false};
 	},
 
 	componentWillMount: function(){
-		this.setState({user: firebase.auth().currentUser});
+		var userRef = firebase.database().ref().child('users/'+this.props.params.id);
+		userRef.once("value", snap=>{
+			var user = snap.val();
+			this.setState({user_name: user.first + " " + user.last});
+			this.setState({recruiter: user.recruiter});
+		});
 	},
 
 	render: function(){
 		return (
-			<div>Hello</div>
+			<div><h1>{this.state.user_name}</h1></div>
 		);
 	}
 });

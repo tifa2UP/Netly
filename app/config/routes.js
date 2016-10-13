@@ -22,7 +22,7 @@ var routes = (
 			<Route path="signup" component={NewUser}/>
 			<Route path="logout" component={Logout}/>
 			<Route path="accountSettings" component={AccountSettings} onEnter={requireAuth}/>
-			<Route path="profile" component={Profile} onEnter={requireAuth} />
+			<Route path="users/:id" component={Profile} onEnter={requireAuth} />
 		</Route>
 	</Router>
 );
