@@ -27767,7 +27767,7 @@
 			React.createElement(Route, { path: 'signup', component: NewUser }),
 			React.createElement(Route, { path: 'logout', component: Logout }),
 			React.createElement(Route, { path: 'accountSettings', component: AccountSettings, onEnter: requireAuth }),
-			React.createElement(Route, { path: 'profile', component: Profile, onEnter: requireAuth })
+			React.createElement(Route, { path: 'users/:id', component: Profile, onEnter: requireAuth })
 		)
 	);
 
@@ -28214,7 +28214,11 @@
 					'On ',
 					new Date(post.created_at).toLocaleTimeString("en-US", dateTimeCustomization),
 					', ',
-					post.user_name,
+					React.createElement(
+						Link,
+						{ to: "/users/" + post.user_id },
+						post.user_name
+					),
 					' said',
 					React.createElement(
 						'blockquote',
@@ -28294,6 +28298,7 @@
 	            this.setState({ isLoggedIn: null != user });
 	            this.setState({ recruiter: this.state.isLoggedIn == false ? false : null });
 	            this.setState({ name: user.displayName });
+	            this.setState({ user_id: user.uid });
 
 	            userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
 	            userRef.on("value", snap => {
@@ -28327,7 +28332,7 @@
 	                null,
 	                React.createElement(
 	                    Link,
-	                    { to: '/profile', className: 'navbar-brand' },
+	                    { to: "/users/" + this.state.user_id, className: 'navbar-brand' },
 	                    this.state.name ? this.state.name : "Profile",
 	                    ' '
 	                )
@@ -28762,18 +28767,27 @@
 		displayName: 'Profile',
 
 		getInitialState: function () {
-			return { user: firebase.auth().currentUser };
+			return { user_name: "", recruiter: false };
 		},
 
 		componentWillMount: function () {
-			this.setState({ user: firebase.auth().currentUser });
+			var userRef = firebase.database().ref().child('users/' + this.props.params.id);
+			userRef.once("value", snap => {
+				var user = snap.val();
+				this.setState({ user_name: user.first + " " + user.last });
+				this.setState({ recruiter: user.recruiter });
+			});
 		},
 
 		render: function () {
 			return React.createElement(
 				'div',
 				null,
-				'Hello'
+				React.createElement(
+					'h1',
+					null,
+					this.state.user_name
+				)
 			);
 		}
 	});
