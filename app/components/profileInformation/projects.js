@@ -16,14 +16,11 @@ var Projects = React.createClass({
         var userRef = firebase.database().ref().child('users/'+this.props.user_id);
         userRef.on("value", snap => {
         	var user = snap.val();
-        	console.log("User is null" + user);
 			if(user.projects){
 				this.setState({projects: user.projects});
 			}else{
 				this.setState({projects: ""});
 			}
-
-			//console.log(this.state.projects);
         });
 	},
 
@@ -43,7 +40,6 @@ var Projects = React.createClass({
   				first: user.first,
   				last: user.last,
   				recruiter: user.recruiter,
-
   				projects: newProjects
 			};
 			var updates = {};
@@ -59,7 +55,6 @@ var Projects = React.createClass({
 	defaultProjects: function(){
 		var editButton;
 		if(this.state.isCurrentUser){
-			console.log("got in here");
 			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}>Edit</button>;
 		}else{
 			editButton = <div></div>;
