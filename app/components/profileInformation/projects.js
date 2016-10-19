@@ -40,6 +40,12 @@ var Projects = React.createClass({
   				first: user.first,
   				last: user.last,
   				recruiter: user.recruiter,
+  				summary: user.summary,
+  				experience: user.experience,
+  				skills: user.skills,
+  				recruiter: user.recruiter,
+  				interests: user.interests,
+  				education: user.education,
   				projects: newProjects
 			};
 			var updates = {};
