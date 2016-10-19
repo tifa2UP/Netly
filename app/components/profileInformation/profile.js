@@ -20,7 +20,7 @@ var Profile = React.createClass({
 
 	render: function(){
 		return (
-				<div><h1>{this.state.user_name + "  profile"}</h1> <Projects /></div>
+				<div><h1>{this.state.user_name + "  profile"}</h1> <Projects user_id = {this.props.params.id}/></div>
 		);
 	}
 });
