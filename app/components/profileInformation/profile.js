@@ -2,6 +2,7 @@ var React = require('react');
 var firebase = require('firebase');
 var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
+var Projects = require('./projects.js');
 
 var Profile = React.createClass({
 	getInitialState: function(){
@@ -19,7 +20,7 @@ var Profile = React.createClass({
 
 	render: function(){
 		return (
-			<div><h1>{this.state.user_name}</h1></div>
+				<div><h1>{this.state.user_name + "  profile"}</h1> <Projects /></div>
 		);
 	}
 });
