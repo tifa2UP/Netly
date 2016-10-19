@@ -24,6 +24,6 @@ var selingConfigTester = {
     messagingSenderId: "437166099419"
  };
 
-firebase.initializeApp(config);
+firebase.initializeApp(selingConfigTester);
 
 ReactDOM.render(routes, document.getElementById('app'));
