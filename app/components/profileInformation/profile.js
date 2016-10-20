@@ -4,6 +4,9 @@ var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
 var Summary = require('./summary.js');
 var Education = require('./education.js');
+var Projects = require('./projects.js');
+var Interests = require('./interests.js');
+var Experience = require('./experience.js');
 
 var Profile = React.createClass({
 	getInitialState: function(){
@@ -23,8 +26,11 @@ var Profile = React.createClass({
 		return (
 			<div>
 				<h1>{this.state.user_name}</h1>
-				{/*<Summary user_id={this.props.params.id}/>*/}
+				<Summary user_id={this.props.params.id}/>
+				<Projects user_id={this.props.params.id}/>
 				<Education user_id={this.props.params.id}/>
+				<Interests user_id={this.props.params.id}/>
+				<Experience user_id={this.props.params.id}/>
 			</div>
 		);
 	}

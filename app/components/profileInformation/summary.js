@@ -41,7 +41,11 @@ var Summary = React.createClass({
   				last: user.last,
   				recruiter: user.recruiter,
   				summary: newSummary,
-  				education: user.education
+  				education: user.education,
+  				projects: user.projects,
+  				skills: user.skills,
+  				experience: user.experience,
+  				interests: user.interests
 			};
 			var updates = {};
 			updates['users/' + this.props.user_id] = userInfo;

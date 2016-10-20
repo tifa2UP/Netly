@@ -41,7 +41,11 @@ var Education = React.createClass({
   				last: user.last,
   				recruiter: user.recruiter,
   				summary: user.summary,
-  				education: newEducation
+  				education: newEducation,
+  				projects: user.projects,
+  				skills: user.skills,
+  				experience: user.experience,
+  				interests: user.interests
 			};
 			var updates = {};
 			updates['users/' + this.props.user_id] = userInfo;
