@@ -60,7 +60,7 @@ var Summary = React.createClass({
 	defaultSummary: function(){
 		var editButton;
 		if(this.state.isCurrentUser){
-			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}>Edit</button>;
+			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil"></span></button>;
 		}else{
 			editButton = <div></div>;
 		}
