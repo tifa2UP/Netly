@@ -7,6 +7,7 @@ var Education = require('./education.js');
 var Projects = require('./projects.js');
 var Interests = require('./interests.js');
 var Experience = require('./experience.js');
+var Skills = require('./skills.js');
 
 var Profile = React.createClass({
 	getInitialState: function(){
@@ -25,12 +26,14 @@ var Profile = React.createClass({
 	render: function(){
 		return (
 			<div>
-				<h1>{this.state.user_name}</h1>
+				<center><h1>{this.state.user_name}</h1></center>
+				<br />
 				<Summary user_id={this.props.params.id}/>
 				<Projects user_id={this.props.params.id}/>
 				<Education user_id={this.props.params.id}/>
 				<Interests user_id={this.props.params.id}/>
 				<Experience user_id={this.props.params.id}/>
+				<Skills user_id={this.props.params.id}/>
 			</div>
 		);
 	}

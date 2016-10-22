@@ -67,9 +67,8 @@ var Projects = React.createClass({
 
 		return(
 			<div>
+				<h3>Projects {editButton}</h3>
 				<pre>{this.state.projects}</pre>
-				<br/>
-				{editButton}
 			</div>
 		);
 	},
@@ -77,6 +76,7 @@ var Projects = React.createClass({
 	editingProjects: function(){
 		return(
 			<div>
+				<h3>Projects</h3>
 				<textarea rows="6" style={{width: '100%'}} ref="newProjects" defaultValue={this.state.projects} />
 				<br/>
 				<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
@@ -95,8 +95,8 @@ var Projects = React.createClass({
 
 		return (
 			<div>
-				<h3>Projects</h3>
 				{partToShow}
+				<br />
 			</div>
 
 		);

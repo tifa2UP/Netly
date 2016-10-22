@@ -67,9 +67,8 @@ var Education = React.createClass({
 
 		return(
 			<div>
+				<h3>Education {editButton}</h3>
 				<pre>{this.state.education}</pre>
-				<br/>
-				{editButton}
 			</div>
 		);
 	},
@@ -77,6 +76,7 @@ var Education = React.createClass({
 	editingEducation: function(){
 		return(
 			<div>
+				<h3>Education</h3>
 				<textarea rows="6" style={{width: '100%'}} ref="newEducation" defaultValue={this.state.education} />
 				<br/>
 				<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
@@ -95,8 +95,8 @@ var Education = React.createClass({
 
 		return (
 			<div>
-				<h3>Education</h3>
 				{partToShow}
+				<br />
 			</div>
 
 		);

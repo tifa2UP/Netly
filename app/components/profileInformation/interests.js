@@ -67,9 +67,8 @@ var Interests = React.createClass({
 
 		return(
 			<div>
+				<h3>Interests {editButton}</h3>
 				<pre>{this.state.interests}</pre>
-				<br/>
-				{editButton}
 			</div>
 		);
 	},
@@ -77,6 +76,7 @@ var Interests = React.createClass({
 	editingInterests: function(){
 		return(
 			<div>
+				<h3>Interests</h3>
 				<textarea rows="6" style={{width: '100%'}} ref="newInterests" defaultValue={this.state.interests} />
 				<br/>
 				<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
@@ -95,8 +95,8 @@ var Interests = React.createClass({
 
 		return (
 			<div>
-				<h3>Interests</h3>
 				{partToShow}
+				<br />
 			</div>
 
 		);

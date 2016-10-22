@@ -69,9 +69,8 @@ var Experience = React.createClass({
 
 		return(
 			<div>
+				<h3>Experience {editButton}</h3>
 				<pre>{this.state.experience}</pre>
-				<br/>
-				{editButton}
 			</div>
 		);
 	},
@@ -79,6 +78,7 @@ var Experience = React.createClass({
 	editingExperience: function(){
 		return(
 			<div>
+				<h3>Experience</h3>
 				<textarea rows="6" style={{width: '100%'}} ref="newExperience" defaultValue={this.state.experience} />
 				<br/>
 				<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
@@ -97,8 +97,8 @@ var Experience = React.createClass({
 
 		return (
 			<div>
-				<h3>Experience</h3>
 				{partToShow}
+				<br />
 			</div>
 
 		);

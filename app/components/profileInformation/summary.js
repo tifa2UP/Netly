@@ -67,9 +67,8 @@ var Summary = React.createClass({
 
 		return(
 			<div>
+				<h3>Summary {editButton}</h3>
 				<pre>{this.state.summary}</pre>
-				<br/>
-				{editButton}
 			</div>
 		);
 	},
@@ -77,6 +76,7 @@ var Summary = React.createClass({
 	editingSummary: function(){
 		return(
 			<div>
+				<h3>Summary</h3>
 				<textarea rows="6" style={{width: '100%'}} ref="newSummary" defaultValue={this.state.summary} />
 				<br/>
 				<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
@@ -95,8 +95,8 @@ var Summary = React.createClass({
 
 		return (
 			<div>
-				<h3>Summary</h3>
 				{partToShow}
+				<br />
 			</div>
 
 		);
