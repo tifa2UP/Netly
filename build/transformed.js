@@ -27754,7 +27754,7 @@
 	var AccountSettings = __webpack_require__(246);
 	var Profile = __webpack_require__(249);
 
-	var requireAuth = __webpack_require__(255);
+	var requireAuth = __webpack_require__(256);
 
 	var routes = React.createElement(
 		Router,
@@ -28260,7 +28260,8 @@
 						React.createElement(
 							'button',
 							{ className: 'btn btn-default', onClick: this.handleLike.bind(null, post) },
-							'Like (',
+							React.createElement('span', { className: 'glyphicon glyphicon-thumbs-up' }),
+							' (',
 							post.likes,
 							')'
 						)
@@ -28579,7 +28580,8 @@
 						React.createElement('br', null),
 						React.createElement(UpdatePassword, { handleReauthenticate: this.handleReauthenticate }),
 						React.createElement('br', null),
-						React.createElement(DeleteAccount, { handleReauthenticate: this.handleReauthenticate })
+						React.createElement(DeleteAccount, { handleReauthenticate: this.handleReauthenticate }),
+						React.createElement('br', null)
 					)
 				),
 				React.createElement('div', { className: 'col-md-4' })
@@ -28797,6 +28799,7 @@
 	var Projects = __webpack_require__(252);
 	var Interests = __webpack_require__(253);
 	var Experience = __webpack_require__(254);
+	var Skills = __webpack_require__(255);
 
 	var Profile = React.createClass({
 		displayName: 'Profile',
@@ -28819,15 +28822,21 @@
 				'div',
 				null,
 				React.createElement(
-					'h1',
+					'center',
 					null,
-					this.state.user_name
+					React.createElement(
+						'h1',
+						null,
+						this.state.user_name
+					)
 				),
+				React.createElement('br', null),
 				React.createElement(Summary, { user_id: this.props.params.id }),
 				React.createElement(Projects, { user_id: this.props.params.id }),
 				React.createElement(Education, { user_id: this.props.params.id }),
 				React.createElement(Interests, { user_id: this.props.params.id }),
-				React.createElement(Experience, { user_id: this.props.params.id })
+				React.createElement(Experience, { user_id: this.props.params.id }),
+				React.createElement(Skills, { user_id: this.props.params.id })
 			);
 		}
 	});
@@ -28905,7 +28914,7 @@
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					'Edit'
+					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
 				);
 			} else {
 				editButton = React.createElement('div', null);
@@ -28915,12 +28924,16 @@
 				'div',
 				null,
 				React.createElement(
+					'h3',
+					null,
+					'Summary ',
+					editButton
+				),
+				React.createElement(
 					'pre',
 					null,
 					this.state.summary
-				),
-				React.createElement('br', null),
-				editButton
+				)
 			);
 		},
 
@@ -28928,6 +28941,11 @@
 			return React.createElement(
 				'div',
 				null,
+				React.createElement(
+					'h3',
+					null,
+					'Summary'
+				),
 				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newSummary', defaultValue: this.state.summary }),
 				React.createElement('br', null),
 				React.createElement(
@@ -28954,12 +28972,8 @@
 			return React.createElement(
 				'div',
 				null,
-				React.createElement(
-					'h3',
-					null,
-					'Summary'
-				),
-				partToShow
+				partToShow,
+				React.createElement('br', null)
 			);
 		}
 	});
@@ -29037,7 +29051,7 @@
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					'Edit'
+					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
 				);
 			} else {
 				editButton = React.createElement('div', null);
@@ -29047,12 +29061,16 @@
 				'div',
 				null,
 				React.createElement(
+					'h3',
+					null,
+					'Education ',
+					editButton
+				),
+				React.createElement(
 					'pre',
 					null,
 					this.state.education
-				),
-				React.createElement('br', null),
-				editButton
+				)
 			);
 		},
 
@@ -29060,6 +29078,11 @@
 			return React.createElement(
 				'div',
 				null,
+				React.createElement(
+					'h3',
+					null,
+					'Education'
+				),
 				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newEducation', defaultValue: this.state.education }),
 				React.createElement('br', null),
 				React.createElement(
@@ -29086,12 +29109,8 @@
 			return React.createElement(
 				'div',
 				null,
-				React.createElement(
-					'h3',
-					null,
-					'Education'
-				),
-				partToShow
+				partToShow,
+				React.createElement('br', null)
 			);
 		}
 	});
@@ -29169,7 +29188,7 @@
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					'Edit'
+					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
 				);
 			} else {
 				editButton = React.createElement('div', null);
@@ -29179,12 +29198,16 @@
 				'div',
 				null,
 				React.createElement(
+					'h3',
+					null,
+					'Projects ',
+					editButton
+				),
+				React.createElement(
 					'pre',
 					null,
 					this.state.projects
-				),
-				React.createElement('br', null),
-				editButton
+				)
 			);
 		},
 
@@ -29192,6 +29215,11 @@
 			return React.createElement(
 				'div',
 				null,
+				React.createElement(
+					'h3',
+					null,
+					'Projects'
+				),
 				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newProjects', defaultValue: this.state.projects }),
 				React.createElement('br', null),
 				React.createElement(
@@ -29218,12 +29246,8 @@
 			return React.createElement(
 				'div',
 				null,
-				React.createElement(
-					'h3',
-					null,
-					'Projects'
-				),
-				partToShow
+				partToShow,
+				React.createElement('br', null)
 			);
 		}
 	});
@@ -29301,7 +29325,7 @@
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					'Edit'
+					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
 				);
 			} else {
 				editButton = React.createElement('div', null);
@@ -29311,12 +29335,16 @@
 				'div',
 				null,
 				React.createElement(
+					'h3',
+					null,
+					'Interests ',
+					editButton
+				),
+				React.createElement(
 					'pre',
 					null,
 					this.state.interests
-				),
-				React.createElement('br', null),
-				editButton
+				)
 			);
 		},
 
@@ -29324,6 +29352,11 @@
 			return React.createElement(
 				'div',
 				null,
+				React.createElement(
+					'h3',
+					null,
+					'Interests'
+				),
 				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newInterests', defaultValue: this.state.interests }),
 				React.createElement('br', null),
 				React.createElement(
@@ -29350,12 +29383,8 @@
 			return React.createElement(
 				'div',
 				null,
-				React.createElement(
-					'h3',
-					null,
-					'Interests'
-				),
-				partToShow
+				partToShow,
+				React.createElement('br', null)
 			);
 		}
 	});
@@ -29435,7 +29464,7 @@
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					'Edit'
+					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
 				);
 			} else {
 				editButton = React.createElement('div', null);
@@ -29445,12 +29474,16 @@
 				'div',
 				null,
 				React.createElement(
+					'h3',
+					null,
+					'Experience ',
+					editButton
+				),
+				React.createElement(
 					'pre',
 					null,
 					this.state.experience
-				),
-				React.createElement('br', null),
-				editButton
+				)
 			);
 		},
 
@@ -29458,6 +29491,11 @@
 			return React.createElement(
 				'div',
 				null,
+				React.createElement(
+					'h3',
+					null,
+					'Experience'
+				),
 				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newExperience', defaultValue: this.state.experience }),
 				React.createElement('br', null),
 				React.createElement(
@@ -29484,12 +29522,8 @@
 			return React.createElement(
 				'div',
 				null,
-				React.createElement(
-					'h3',
-					null,
-					'Experience'
-				),
-				partToShow
+				partToShow,
+				React.createElement('br', null)
 			);
 		}
 	});
@@ -29498,6 +29532,139 @@
 
 /***/ },
 /* 255 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var Skills = React.createClass({
+		displayName: 'Skills',
+
+		getInitialState: function () {
+			return { isCurrentUser: false, editing: false };
+		},
+		componentWillMount: function () {
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.user_id });
+			});
+			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			userRef.on("value", snap => {
+				var user = snap.val();
+				if (user.skills) {
+					this.setState({ skills: user.skills });
+				} else {
+					this.setState({ skills: "" });
+				}
+			});
+		},
+		handleClickEdit: function () {
+			this.setState({ editing: true });
+		},
+
+		handleClickSave: function () {
+			this.setState({ editing: false });
+			var newSkills = this.refs.newSkills.value;
+
+			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			userRef.once("value", snap => {
+				var user = snap.val();
+				var userInfo = {
+					email: user.email,
+					first: user.first,
+					last: user.last,
+					recruiter: user.recruiter,
+					summary: user.summary,
+					experience: user.experience,
+					recruiter: user.recruiter,
+					interests: user.interests,
+					education: user.education,
+					projects: user.projects,
+					skills: newSkills
+				};
+				var updates = {};
+				updates['users/' + this.props.user_id] = userInfo;
+				firebase.database().ref().update(updates);
+			});
+		},
+
+		handleClickCancel: function () {
+			this.setState({ editing: false });
+		},
+		defaultSkills: function () {
+			var editButton;
+			if (this.state.isCurrentUser) {
+				editButton = React.createElement(
+					'button',
+					{ className: 'btn btn-default', onClick: this.handleClickEdit },
+					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+				);
+			} else {
+				editButton = React.createElement('div', null);
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'h3',
+					null,
+					'Skills ',
+					editButton
+				),
+				React.createElement(
+					'pre',
+					null,
+					this.state.skills
+				)
+			);
+		},
+		editingSkills: function () {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'h3',
+					null,
+					'Skills'
+				),
+				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newSkills', defaultValue: this.state.skills }),
+				React.createElement('br', null),
+				React.createElement(
+					'button',
+					{ className: 'btn btn-primary', onClick: this.handleClickSave },
+					'Save'
+				),
+				React.createElement(
+					'button',
+					{ className: 'btn btn-default', onClick: this.handleClickCancel },
+					'Cancel'
+				)
+			);
+		},
+
+		render: function () {
+			var partToShow;
+			if (this.state.editing) {
+				partToShow = this.editingSkills();
+			} else {
+				partToShow = this.defaultSkills();
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				partToShow,
+				React.createElement('br', null)
+			);
+		}
+	});
+
+	module.exports = Skills;
+
+/***/ },
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);

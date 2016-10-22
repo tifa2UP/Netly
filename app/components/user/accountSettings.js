@@ -84,7 +84,7 @@ var AccountSettings = React.createClass({
 						<button onClick={this.verifyPassword} className="btn btn-success">Verify Password</button><br />
 						<br/>
 						<UpdatePassword handleReauthenticate={this.handleReauthenticate} /><br />
-						<DeleteAccount handleReauthenticate={this.handleReauthenticate} />
+						<DeleteAccount handleReauthenticate={this.handleReauthenticate} /><br />
 					</center>
 				</div>
 				<div className="col-md-4">

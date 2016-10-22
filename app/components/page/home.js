@@ -159,7 +159,7 @@ var Home = React.createClass({
         				On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, <Link to={"/users/"+post.user_id}>{post.user_name}</Link> said 
         				<blockquote>
         					"{post.body}"<br />
-        					<button className="btn btn-default" onClick={this.handleLike.bind(null, post)}>Like ({post.likes})</button>
+        					<button className="btn btn-default" onClick={this.handleLike.bind(null, post)}><span className="glyphicon glyphicon-thumbs-up"></span> ({post.likes})</button>
         				</blockquote>
         			</div>
    				))}
