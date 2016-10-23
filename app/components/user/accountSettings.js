@@ -79,7 +79,7 @@ var AccountSettings = React.createClass({
 				<div className="col-md-4">
 					<center>
 						<h1>Account Settings</h1><br />
-
+						
 						<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.handleTypeChanges}/><br />
 						<button onClick={this.verifyPassword} className="btn btn-success">Verify Password</button><br />
 						<br/>

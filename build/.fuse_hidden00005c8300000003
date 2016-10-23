@@ -27754,7 +27754,7 @@
 	var AccountSettings = __webpack_require__(246);
 	var Profile = __webpack_require__(249);
 
-	var requireAuth = __webpack_require__(257);
+	var requireAuth = __webpack_require__(256);
 
 	var routes = React.createElement(
 		Router,
@@ -28101,6 +28101,9 @@
 				//sets the postData to the user-posts child with the currentUserId & the postRefKey
 				firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
 
+				//refreshes pages after submission
+				hashHistory.push("/");
+
 				//emptys the post text field
 				this.refs.body.value = "";
 			}
@@ -28140,6 +28143,9 @@
 					updates['/posts/' + post.post_id] = anotherPost;
 					updates['/user-posts/' + post.user_id + '/' + post.post_id] = anotherPost;
 					firebase.database().ref().update(updates);
+
+					//refreshes the page after like
+					hashHistory.push("/");
 				});
 			}
 		},
@@ -28186,7 +28192,6 @@
 				}
 
 				this.state.postArray.splice(index, 1, updatedPost);
-
 				//refreshes page when the posts are pushed into the array, so it shows without manually refreshing
 				hashHistory.push('/');
 			});
@@ -28350,17 +28355,17 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/logout', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-off' })
+	                    'Logout'
 	                )
 	            );
-	            //profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand">{this.state.name ? this.state.name : "Profile" } </Link></li>;
 	            profile = React.createElement(
 	                'li',
 	                null,
 	                React.createElement(
 	                    Link,
 	                    { to: "/users/" + this.state.user_id, className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-user' })
+	                    this.state.name ? this.state.name : "Profile",
+	                    ' '
 	                )
 	            );
 	            signUp = null;
@@ -28370,7 +28375,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/accountSettings', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-cog' })
+	                    'Account Settings'
 	                )
 	            );
 
@@ -28420,7 +28425,7 @@
 	                        React.createElement(
 	                            Link,
 	                            { to: '/', className: 'navbar-brand' },
-	                            React.createElement('span', { className: 'glyphicon glyphicon-home' })
+	                            'SJSUConnect'
 	                        )
 	                    ),
 	                    React.createElement(
@@ -28430,9 +28435,9 @@
 	                        ' ',
 	                        profile,
 	                        ' ',
-	                        accountSettings,
 	                        loginOrOut,
-	                        ' '
+	                        ' ',
+	                        accountSettings
 	                    )
 	                )
 	            ),
@@ -28795,22 +28800,15 @@
 	var Interests = __webpack_require__(253);
 	var Experience = __webpack_require__(254);
 	var Skills = __webpack_require__(255);
-	var ProfileImage = __webpack_require__(256);
 
 	var Profile = React.createClass({
 		displayName: 'Profile',
 
 		getInitialState: function () {
-			return { user_name: "", recruiter: false, path: "", isCurrentUser: false };
+			return { user_name: "", recruiter: false };
 		},
 
 		componentWillMount: function () {
-			var that = this;
-
-			firebase.auth().onAuthStateChanged(user => {
-				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.params.id });
-			});
-
 			var userRef = firebase.database().ref().child('users/' + this.props.params.id);
 			userRef.once("value", snap => {
 				var user = snap.val();
@@ -28830,17 +28828,15 @@
 						'h1',
 						null,
 						this.state.user_name
-					),
-					React.createElement('img', { src: this.state.path }),
-					React.createElement(ProfileImage, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser })
+					)
 				),
 				React.createElement('br', null),
-				React.createElement(Summary, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Projects, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Education, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Interests, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Experience, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Skills, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser })
+				React.createElement(Summary, { user_id: this.props.params.id }),
+				React.createElement(Projects, { user_id: this.props.params.id }),
+				React.createElement(Education, { user_id: this.props.params.id }),
+				React.createElement(Interests, { user_id: this.props.params.id }),
+				React.createElement(Experience, { user_id: this.props.params.id }),
+				React.createElement(Skills, { user_id: this.props.params.id })
 			);
 		}
 	});
@@ -28864,6 +28860,10 @@
 		},
 
 		componentWillMount: function () {
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.user_id });
+			});
+
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
@@ -28910,7 +28910,7 @@
 
 		defaultSummary: function () {
 			var editButton;
-			if (this.props.isCurrentUser) {
+			if (this.state.isCurrentUser) {
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
@@ -28997,6 +28997,10 @@
 		},
 
 		componentWillMount: function () {
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.user_id });
+			});
+
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
@@ -29043,7 +29047,7 @@
 
 		defaultEducation: function () {
 			var editButton;
-			if (this.props.isCurrentUser) {
+			if (this.state.isCurrentUser) {
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
@@ -29130,6 +29134,10 @@
 		},
 
 		componentWillMount: function () {
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.user_id });
+			});
+
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
@@ -29176,7 +29184,7 @@
 
 		defaultProjects: function () {
 			var editButton;
-			if (this.props.isCurrentUser) {
+			if (this.state.isCurrentUser) {
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
@@ -29263,6 +29271,10 @@
 		},
 
 		componentWillMount: function () {
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.user_id });
+			});
+
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
@@ -29309,7 +29321,7 @@
 
 		defaultInterests: function () {
 			var editButton;
-			if (this.props.isCurrentUser) {
+			if (this.state.isCurrentUser) {
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
@@ -29397,6 +29409,10 @@
 		},
 
 		componentWillMount: function () {
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.user_id });
+			});
+
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
@@ -29444,7 +29460,7 @@
 
 		defaultExperience: function () {
 			var editButton;
-			if (this.props.isCurrentUser) {
+			if (this.state.isCurrentUser) {
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
@@ -29530,6 +29546,9 @@
 			return { isCurrentUser: false, editing: false };
 		},
 		componentWillMount: function () {
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.user_id });
+			});
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
@@ -29575,7 +29594,7 @@
 		},
 		defaultSkills: function () {
 			var editButton;
-			if (this.props.isCurrentUser) {
+			if (this.state.isCurrentUser) {
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
@@ -29646,88 +29665,6 @@
 
 /***/ },
 /* 256 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var ReactDOM = __webpack_require__(34);
-	var firebase = __webpack_require__(172);
-	var Link = __webpack_require__(177).Link;
-	var hashHistory = __webpack_require__(177).hashHistory;
-
-	var UploadImage = React.createClass({
-	    displayName: 'UploadImage',
-
-	    getInitialState: function () {
-	        return { imgRef: "" };
-	    },
-
-	    handleUploadImage: function (e) {
-	        var that = this;
-
-	        var imageFile = e.target.files[0];
-	        var userProfileImageRef = firebase.storage().ref().child('images/users/' + this.props.user_id + '/profilepic.jpg');
-	        userProfileImageRef.put(imageFile).then(function (snapshot) {
-	            var userData = {};
-	            for (var i in that.state.userData) {
-	                userData[i] = that.state.userData[i];
-	            }
-	            userData.hasProfileImage = true;
-	            userData.imageFileName = imageFile.name;
-	            var updates = {};
-	            updates['users/' + that.props.user_id] = userData;
-	            firebase.database().ref().update(updates);
-	        });
-	    },
-
-	    componentWillMount: function () {
-	        var that = this;
-
-	        var userRef = firebase.database().ref().child('users/' + this.props.user_id);
-	        userRef.on("value", snap => {
-	            var user = snap.val();
-	            this.setState({ userData: user });
-	            if (user.hasProfileImage) {
-	                var userImageRef = firebase.storage().ref().child('images/users/' + this.props.user_id + '/profilepic.jpg');
-	                userImageRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgRef: url });
-	                }).catch(function (error) {
-	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                    defaultRef.getDownloadURL().then(function (url) {
-	                        that.setState({ imgRef: url });
-	                    });
-	                });
-	            } else {
-	                var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                defaultRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgRef: url });
-	                });
-	            }
-	        });
-	    },
-
-	    render: function () {
-	        var showUpload;
-	        if (this.props.isCurrentUser) {
-	            showUpload = React.createElement('input', { type: 'file', accept: 'image/*', onChange: this.handleUploadImage });
-	        } else {
-	            showUpload = React.createElement('div', null);
-	        }
-
-	        return React.createElement(
-	            'div',
-	            null,
-	            React.createElement('img', { src: this.state.imgRef, className: 'img-circle', alt: '', width: '200', height: '200', style: { objectFit: 'cover' } }),
-	            React.createElement('br', null),
-	            showUpload,
-	            React.createElement('br', null)
-	        );
-	    }
-	});
-
-	module.exports = UploadImage;
-
-/***/ },
-/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);

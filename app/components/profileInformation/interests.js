@@ -9,10 +9,6 @@ var Interests = React.createClass({
 	},
 
 	componentWillMount: function(){
-		firebase.auth().onAuthStateChanged((user) => {
-            this.setState({isCurrentUser: firebase.auth().currentUser.uid == this.props.user_id});
-        });
-
         var userRef = firebase.database().ref().child('users/'+this.props.user_id);
         userRef.on("value", snap => {
         	var user = snap.val();
@@ -59,7 +55,7 @@ var Interests = React.createClass({
 
 	defaultInterests: function(){
 		var editButton;
-		if(this.state.isCurrentUser){
+		if(this.props.isCurrentUser){
 			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil"></span></button>;
 		}else{
 			editButton = <div></div>;

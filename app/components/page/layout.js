@@ -39,10 +39,11 @@ var Layout = React.createClass({
 
         //if the user is logged in, show the logout and profile link
         if(this.state.isLoggedIn) {
-            loginOrOut = <li><Link to="/logout" className="navbar-brand">Logout</Link></li>;
-            profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand">{this.state.name ? this.state.name : "Profile" } </Link></li>;
+            loginOrOut = <li><Link to="/logout" className="navbar-brand"><span className="glyphicon glyphicon-off"></span></Link></li>;
+            //profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand">{this.state.name ? this.state.name : "Profile" } </Link></li>;
+            profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand"><span className="glyphicon glyphicon-user"></span></Link></li>;
             signUp = null;
-            accountSettings = <li><Link to="/accountSettings" className="navbar-brand">Account Settings</Link></li>;
+            accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog"></span></Link></li>;
 
         //if the user is not logged in, show the login and signup links
         } else {
@@ -65,15 +66,15 @@ var Layout = React.createClass({
                     <div className="container">
                         <div className="navbar-header">
                             <Link to="/" className="navbar-brand">
-                                SJSUConnect
+                                <span className="glyphicon glyphicon-home"></span>
                             </Link>
                         </div>
                         
                         <ul className="nav navbar-nav pull-right">
                             {signUp} {/*shows only if user is not logged in*/}
                             {profile} {/*shows only if user is logged in*/}
-                            {loginOrOut} {/*shows login or logout link depending on logged in state*/}
                             {accountSettings}
+                            {loginOrOut} {/*shows login or logout link depending on logged in state*/}
                         </ul>
                     </div>
                 </nav>

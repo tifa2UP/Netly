@@ -8,13 +8,20 @@ var Projects = require('./projects.js');
 var Interests = require('./interests.js');
 var Experience = require('./experience.js');
 var Skills = require('./skills.js');
+var ProfileImage = require('./profileImage.js');
 
 var Profile = React.createClass({
 	getInitialState: function(){
-		return {user_name: "", recruiter: false};
+		return {user_name: "", recruiter: false, path: "", isCurrentUser: false};
 	},
 
 	componentWillMount: function(){
+		var that = this;
+
+		firebase.auth().onAuthStateChanged((user) => {
+            this.setState({isCurrentUser: firebase.auth().currentUser.uid == this.props.params.id});
+        });
+
 		var userRef = firebase.database().ref().child('users/'+this.props.params.id);
 		userRef.once("value", snap=>{
 			var user = snap.val();
@@ -26,14 +33,18 @@ var Profile = React.createClass({
 	render: function(){
 		return (
 			<div>
-				<center><h1>{this.state.user_name}</h1></center>
+				<center>
+					<h1>{this.state.user_name}</h1>
+					<img src={this.state.path} />
+					<ProfileImage user_id={this.props.params.id} isCurrentUser={this.state.isCurrentUser}/>
+				</center>
 				<br />
-				<Summary user_id={this.props.params.id}/>
-				<Projects user_id={this.props.params.id}/>
-				<Education user_id={this.props.params.id}/>
-				<Interests user_id={this.props.params.id}/>
-				<Experience user_id={this.props.params.id}/>
-				<Skills user_id={this.props.params.id}/>
+				<Summary user_id={this.props.params.id} isCurrentUser={this.state.isCurrentUser}/>
+				<Projects user_id={this.props.params.id} isCurrentUser={this.state.isCurrentUser}/>
+				<Education user_id={this.props.params.id} isCurrentUser={this.state.isCurrentUser}/>
+				<Interests user_id={this.props.params.id} isCurrentUser={this.state.isCurrentUser}/>
+				<Experience user_id={this.props.params.id} isCurrentUser={this.state.isCurrentUser}/>
+				<Skills user_id={this.props.params.id} isCurrentUser={this.state.isCurrentUser}/>
 			</div>
 		);
 	}

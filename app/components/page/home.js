@@ -32,9 +32,6 @@ var Home = React.createClass({
 			//sets the postData to the user-posts child with the currentUserId & the postRefKey
 			firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
 
-			//refreshes pages after submission
-			hashHistory.push("/");
-
 			//emptys the post text field
 			this.refs.body.value = "";
 		}
@@ -74,9 +71,6 @@ var Home = React.createClass({
 				updates['/posts/' + post.post_id] = anotherPost;
 				updates['/user-posts/' + post.user_id + '/' + post.post_id] = anotherPost;
 				firebase.database().ref().update(updates);
-
-				//refreshes the page after like
-				hashHistory.push("/");
 			});
 		}
 	},
@@ -123,6 +117,7 @@ var Home = React.createClass({
 			}
 
 			this.state.postArray.splice(index, 1, updatedPost);
+			
 			//refreshes page when the posts are pushed into the array, so it shows without manually refreshing
 			hashHistory.push('/');
 		});
