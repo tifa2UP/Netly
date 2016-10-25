@@ -20,6 +20,18 @@ var Projects = React.createClass({
         });
 	},
 
+	componentWillReceiveProps: function(nextProps){
+        var userRef = firebase.database().ref().child('users/'+ nextProps.user_id);
+        userRef.on("value", snap => {
+        	var user = snap.val();
+			if(user.projects){
+				this.setState({projects: user.projects});
+			}else{
+				this.setState({projects: ""});
+			}
+        });
+	},
+
 	handleClickEdit: function(){
 		this.setState({editing: true});
 	},

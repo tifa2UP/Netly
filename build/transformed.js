@@ -27752,9 +27752,10 @@
 	var Logout = __webpack_require__(244);
 	var Layout = __webpack_require__(245);
 	var AccountSettings = __webpack_require__(246);
-	var Profile = __webpack_require__(249);
+	var AccountSettings2 = __webpack_require__(249);
+	var Profile = __webpack_require__(250);
 
-	var requireAuth = __webpack_require__(257);
+	var requireAuth = __webpack_require__(258);
 
 	var routes = React.createElement(
 		Router,
@@ -27767,7 +27768,8 @@
 			React.createElement(Route, { path: 'signup', component: NewUser }),
 			React.createElement(Route, { path: 'logout', component: Logout }),
 			React.createElement(Route, { path: 'accountSettings', component: AccountSettings, onEnter: requireAuth }),
-			React.createElement(Route, { path: 'users/:id', component: Profile, onEnter: requireAuth })
+			React.createElement(Route, { path: 'users/:id', component: Profile, onEnter: requireAuth }),
+			React.createElement(Route, { path: 'accountsettings/2', component: AccountSettings2, onEnter: requireAuth })
 		)
 	);
 
@@ -28467,15 +28469,6 @@
 			return { hasError: false, errorMsg: "", verified: false };
 		},
 
-		handleReauthenticate: function () {
-			return this.state.verified;
-		},
-
-		handleTypeChanges: function (e) {
-			this.setState({ hasError: false });
-			this.setState({ errorMsg: "" });
-		},
-
 		verifyPassword: function (e) {
 			var that = this;
 
@@ -28483,46 +28476,24 @@
 				var user = firebase.auth().currentUser;
 				var credential = firebase.auth.EmailAuthProvider.credential(user.email, this.refs.current_password.value);
 				user.reauthenticate(credential).then(function () {
-					that.setState({ hasError: false });
-					that.setState({ errorMsg: "" });
-					that.setState({ verified: true });
-					that.setState({ verificationMessage: "Your password has been verified!" });
-				}, function (error) {
-					that.setState({ hasError: true });
-					that.setState({ errorMsg: "Your current password is incorrect." });
-					that.setState({ verified: false });
+					hashHistory.push('/accountsettings/2');
+				}).catch(function (error) {
+					//handle error
 				});
-			} else {
-				this.setState({ hasError: true });
-				this.setState({ errorMsg: "Please enter your current password" });
-				this.setState({ verified: false });
 			}
 		},
 
-		//creates a div alert-danger with the error message
-		errorMessage: function () {
-			return React.createElement(
-				'div',
-				{ className: 'alert alert-danger' },
-				React.createElement(
-					'strong',
-					null,
-					'Error! '
-				),
-				this.state.errorMsg
-			);
-		},
-
 		//creates an empty div if no error message
-		noErrorMessage: function () {
+		enterPasswordAlert: function () {
 			return React.createElement(
 				'div',
 				{ className: 'alert alert-danger' },
-				'Please verify your current password.'
-			);
+				'Please enter your current password before proceeding.',
+				this.state.verificationMessage
+			);;
 		},
 
-		successMessage: function () {
+		successAlert: function () {
 			return React.createElement(
 				'div',
 				{ className: 'alert alert-success' },
@@ -28539,12 +28510,10 @@
 
 			//gets the appropriate error alert div depending on whether or not the form has an error
 			var alert;
-			if (this.state.hasError) {
-				alert = this.errorMessage();
-			} else if (this.state.verified) {
-				alert = this.successMessage();
+			if (this.state.verified) {
+				alert = this.successAlert();
 			} else {
-				alert = this.noErrorMessage();
+				alert = this.enterPasswordAlert();
 			}
 
 			return React.createElement(
@@ -28564,18 +28533,7 @@
 							'Account Settings'
 						),
 						React.createElement('br', null),
-						React.createElement('input', { type: 'password', ref: 'current_password', placeholder: 'Current Password', className: 'form-control', onChange: this.handleTypeChanges }),
-						React.createElement('br', null),
-						React.createElement(
-							'button',
-							{ onClick: this.verifyPassword, className: 'btn btn-success' },
-							'Verify Password'
-						),
-						React.createElement('br', null),
-						React.createElement('br', null),
-						React.createElement(UpdatePassword, { handleReauthenticate: this.handleReauthenticate }),
-						React.createElement('br', null),
-						React.createElement(DeleteAccount, { handleReauthenticate: this.handleReauthenticate }),
+						React.createElement('input', { type: 'password', ref: 'current_password', placeholder: 'Current Password', className: 'form-control', onChange: this.verifyPassword }),
 						React.createElement('br', null)
 					)
 				),
@@ -28605,9 +28563,7 @@
 		},
 
 		handleDestroy: function () {
-
-			if (this.props.handleReauthenticate()) {
-
+			if (true) {
 				var user = firebase.auth().currentUser;
 
 				if (confirm("Are you sure you want to delete your account?")) {
@@ -28701,8 +28657,7 @@
 		},
 
 		handleUpdatePassword: function () {
-
-			if (this.props.handleReauthenticate()) {
+			if (true) {
 				var new_password = this.refs.new_password.value;
 				var new_password_confirmation = this.refs.new_password_confirmation.value;
 				var that = this;
@@ -28716,6 +28671,7 @@
 						that.setState({ errorMsg: "An error occured!" });
 					});
 				} else {
+
 					that.setState({ hasError: true });
 					that.setState({ errorMsg: "Passwords do not match." });
 				}
@@ -28789,30 +28745,93 @@
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
-	var Summary = __webpack_require__(250);
-	var Education = __webpack_require__(251);
-	var Projects = __webpack_require__(252);
-	var Interests = __webpack_require__(253);
-	var Experience = __webpack_require__(254);
-	var Skills = __webpack_require__(255);
-	var ProfileImage = __webpack_require__(256);
+	var DeleteAccount = __webpack_require__(247);
+	var UpdatePassword = __webpack_require__(248);
+
+	var AccountSettings = React.createClass({
+		displayName: 'AccountSettings',
+
+
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				alert,
+				React.createElement('div', { className: 'col-md-4' }),
+				React.createElement(
+					'div',
+					{ className: 'col-md-4' },
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'h1',
+							null,
+							'Account Settings'
+						),
+						React.createElement('br', null),
+						React.createElement(UpdatePassword, null),
+						React.createElement('br', null),
+						React.createElement(DeleteAccount, null),
+						React.createElement('br', null)
+					)
+				),
+				React.createElement('div', { className: 'col-md-4' })
+			);
+		}
+	});
+
+	module.exports = AccountSettings;
+
+/***/ },
+/* 250 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+	var Summary = __webpack_require__(251);
+	var Education = __webpack_require__(252);
+	var Projects = __webpack_require__(253);
+	var Interests = __webpack_require__(254);
+	var Experience = __webpack_require__(255);
+	var Skills = __webpack_require__(256);
+	var ProfileImage = __webpack_require__(257);
 
 	var Profile = React.createClass({
 		displayName: 'Profile',
 
 		getInitialState: function () {
-			return { user_name: "", recruiter: false, path: "", isCurrentUser: false };
+			return { user_name: "", recruiter: false, path: "", isCurrentUser: false, currentID: "" };
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			this.setState({ currentID: nextProps.params.id });
+
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == nextProps.params.id });
+			});
+
+			var userRef = firebase.database().ref().child('users/' + nextProps.params.id);
+			userRef.on("value", snap => {
+				var user = snap.val();
+				this.setState({ user_name: user.first + " " + user.last });
+				this.setState({ recruiter: user.recruiter });
+			});
 		},
 
 		componentWillMount: function () {
 			var that = this;
+
+			this.setState({ currentID: this.props.params.id });
 
 			firebase.auth().onAuthStateChanged(user => {
 				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.params.id });
 			});
 
 			var userRef = firebase.database().ref().child('users/' + this.props.params.id);
-			userRef.once("value", snap => {
+			userRef.on("value", snap => {
 				var user = snap.val();
 				this.setState({ user_name: user.first + " " + user.last });
 				this.setState({ recruiter: user.recruiter });
@@ -28832,15 +28851,15 @@
 						this.state.user_name
 					),
 					React.createElement('img', { src: this.state.path }),
-					React.createElement(ProfileImage, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser })
+					React.createElement(ProfileImage, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser })
 				),
 				React.createElement('br', null),
-				React.createElement(Summary, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Projects, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Education, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Interests, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Experience, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Skills, { user_id: this.props.params.id, isCurrentUser: this.state.isCurrentUser })
+				React.createElement(Summary, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Projects, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Education, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Interests, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Experience, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Skills, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser })
 			);
 		}
 	});
@@ -28848,7 +28867,7 @@
 	module.exports = Profile;
 
 /***/ },
-/* 250 */
+/* 251 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28865,6 +28884,18 @@
 
 		componentWillMount: function () {
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			userRef.on("value", snap => {
+				var user = snap.val();
+				if (user.summary) {
+					this.setState({ summary: user.summary });
+				} else {
+					this.setState({ summary: "" });
+				}
+			});
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.summary) {
@@ -28981,7 +29012,7 @@
 	module.exports = Summary;
 
 /***/ },
-/* 251 */
+/* 252 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28998,6 +29029,18 @@
 
 		componentWillMount: function () {
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			userRef.on("value", snap => {
+				var user = snap.val();
+				if (user.education) {
+					this.setState({ education: user.education });
+				} else {
+					this.setState({ education: "" });
+				}
+			});
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.education) {
@@ -29114,7 +29157,7 @@
 	module.exports = Education;
 
 /***/ },
-/* 252 */
+/* 253 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29131,6 +29174,18 @@
 
 		componentWillMount: function () {
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			userRef.on("value", snap => {
+				var user = snap.val();
+				if (user.projects) {
+					this.setState({ projects: user.projects });
+				} else {
+					this.setState({ projects: "" });
+				}
+			});
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.projects) {
@@ -29247,7 +29302,7 @@
 	module.exports = Projects;
 
 /***/ },
-/* 253 */
+/* 254 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29264,6 +29319,18 @@
 
 		componentWillMount: function () {
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			userRef.on("value", snap => {
+				var user = snap.val();
+				if (user.interests) {
+					this.setState({ interests: user.interests });
+				} else {
+					this.setState({ interests: "" });
+				}
+			});
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.interests) {
@@ -29380,7 +29447,7 @@
 	module.exports = Interests;
 
 /***/ },
-/* 254 */
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -29398,6 +29465,18 @@
 
 		componentWillMount: function () {
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			userRef.on("value", snap => {
+				var user = snap.val();
+				if (user.experience) {
+					this.setState({ experience: user.experience });
+				} else {
+					this.setState({ experience: "" });
+				}
+			});
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.experience) {
@@ -29515,7 +29594,7 @@
 	module.exports = Experience;
 
 /***/ },
-/* 255 */
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29529,6 +29608,7 @@
 		getInitialState: function () {
 			return { isCurrentUser: false, editing: false };
 		},
+
 		componentWillMount: function () {
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.on("value", snap => {
@@ -29540,6 +29620,19 @@
 				}
 			});
 		},
+
+		componentWillReceiveProps: function (nextProps) {
+			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
+			userRef.on("value", snap => {
+				var user = snap.val();
+				if (user.skills) {
+					this.setState({ skills: user.skills });
+				} else {
+					this.setState({ skills: "" });
+				}
+			});
+		},
+
 		handleClickEdit: function () {
 			this.setState({ editing: true });
 		},
@@ -29645,7 +29738,7 @@
 	module.exports = Skills;
 
 /***/ },
-/* 256 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29705,6 +29798,32 @@
 	        });
 	    },
 
+	    componentWillReceiveProps: function (nextProps) {
+	        var that = this;
+
+	        var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
+	        userRef.on("value", snap => {
+	            var user = snap.val();
+	            this.setState({ userData: user });
+	            if (user.hasProfileImage) {
+	                var userImageRef = firebase.storage().ref().child('images/users/' + nextProps.user_id + '/profilepic.jpg');
+	                userImageRef.getDownloadURL().then(function (url) {
+	                    that.setState({ imgRef: url });
+	                }).catch(function (error) {
+	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+	                    defaultRef.getDownloadURL().then(function (url) {
+	                        that.setState({ imgRef: url });
+	                    });
+	                });
+	            } else {
+	                var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+	                defaultRef.getDownloadURL().then(function (url) {
+	                    that.setState({ imgRef: url });
+	                });
+	            }
+	        });
+	    },
+
 	    render: function () {
 	        var showUpload;
 	        if (this.props.isCurrentUser) {
@@ -29727,7 +29846,7 @@
 	module.exports = UploadImage;
 
 /***/ },
-/* 257 */
+/* 258 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);

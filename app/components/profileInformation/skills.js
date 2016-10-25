@@ -7,6 +7,7 @@ var Skills = React.createClass({
 	getInitialState: function(){
 		return {isCurrentUser: false, editing: false};
 	},
+
 	componentWillMount: function()
 	{
 		var userRef = firebase.database().ref().child('users/'+this.props.user_id);
@@ -19,6 +20,20 @@ var Skills = React.createClass({
 			}
         });
 	},
+
+	componentWillReceiveProps: function(nextProps)
+	{
+		var userRef = firebase.database().ref().child('users/'+ nextProps.user_id);
+        userRef.on("value", snap => {
+        	var user = snap.val();
+			if(user.skills){
+				this.setState({skills: user.skills});
+			}else{
+				this.setState({skills: ""});
+			}
+        });
+	},
+
 	handleClickEdit: function()
 	{
 		this.setState({editing:true});

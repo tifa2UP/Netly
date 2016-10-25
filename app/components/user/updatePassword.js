@@ -11,8 +11,7 @@ var UpdatePassword = React.createClass({
 	},
 
 	handleUpdatePassword: function(){
-
-		if(this.props.handleReauthenticate()){
+		if(true){
 			var new_password = this.refs.new_password.value;
 			var new_password_confirmation = this.refs.new_password_confirmation.value;
 			var that = this;
@@ -26,6 +25,7 @@ var UpdatePassword = React.createClass({
 					that.setState({errorMsg: "An error occured!"});
 				});
 			}else{
+
 				that.setState({hasError: true});
 				that.setState({errorMsg: "Passwords do not match."});
 			}

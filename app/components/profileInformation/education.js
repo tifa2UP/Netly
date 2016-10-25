@@ -20,6 +20,18 @@ var Education = React.createClass({
         });
 	},
 
+	componentWillReceiveProps: function(nextProps){
+		var userRef = firebase.database().ref().child('users/'+ nextProps.user_id);
+        userRef.on("value", snap => {
+        	var user = snap.val();
+			if(user.education){
+				this.setState({education: user.education});
+			}else{
+				this.setState({education: ""});
+			}
+        });
+	},
+
 	handleClickEdit: function(){
 		this.setState({editing: true});
 	},

@@ -12,49 +12,26 @@ var AccountSettings = React.createClass({
 		return{hasError: false, errorMsg: "", verified: false};
 	},
 
-	handleReauthenticate: function(){
-		return this.state.verified;
-	},
-
-	handleTypeChanges: function(e){
-		this.setState({hasError: false})
-		this.setState({errorMsg: ""});
-	},
-
 	verifyPassword: function(e){
 		var that = this;
 
 		if(this.refs.current_password.value){
 			var user = firebase.auth().currentUser;
 			var credential = firebase.auth.EmailAuthProvider.credential(user.email, this.refs.current_password.value);
-			user.reauthenticate(credential).then(function() {
-				that.setState({hasError: false})
-				that.setState({errorMsg: ""});
-				that.setState({verified: true});
-				that.setState({verificationMessage: "Your password has been verified!"});
-			}, function(error) {
-				that.setState({hasError: true});
-				that.setState({errorMsg: "Your current password is incorrect."});
-				that.setState({verified: false});
+			user.reauthenticate(credential).then(function(){
+				hashHistory.push('/accountsettings/2');
+			}).catch(function(error){
+				//handle error
 			});
-		}else{
-			this.setState({hasError: true});
-			this.setState({errorMsg: "Please enter your current password"});
-			this.setState({verified: false});
 		}
 	},
 
-	//creates a div alert-danger with the error message
-	errorMessage: function(){
-		return <div className="alert alert-danger"><strong>Error! </strong>{this.state.errorMsg}</div>;
-	},
-
 	//creates an empty div if no error message
-	noErrorMessage: function(){
-		return <div className="alert alert-danger">Please verify your current password.</div>;
+	enterPasswordAlert: function(){
+		return <div className="alert alert-danger">Please enter your current password before proceeding.{this.state.verificationMessage}</div>;;
 	},
 
-	successMessage: function(){
+	successAlert: function(){
 		return <div className="alert alert-success"><strong>Success! </strong>{this.state.verificationMessage}</div>;
 	},
 
@@ -62,12 +39,10 @@ var AccountSettings = React.createClass({
 
 		//gets the appropriate error alert div depending on whether or not the form has an error
 		var alert;
-		if(this.state.hasError){
-			alert = this.errorMessage();
-		}else if(this.state.verified){
-			alert = this.successMessage();
+		if(this.state.verified){
+			alert = this.successAlert();
 		}else{
-			alert = this.noErrorMessage();
+			alert = this.enterPasswordAlert();
 		}
 
 		return(
@@ -80,11 +55,7 @@ var AccountSettings = React.createClass({
 					<center>
 						<h1>Account Settings</h1><br />
 						
-						<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.handleTypeChanges}/><br />
-						<button onClick={this.verifyPassword} className="btn btn-success">Verify Password</button><br />
-						<br/>
-						<UpdatePassword handleReauthenticate={this.handleReauthenticate} /><br />
-						<DeleteAccount handleReauthenticate={this.handleReauthenticate} /><br />
+						<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.verifyPassword}/><br />
 					</center>
 				</div>
 				<div className="col-md-4">

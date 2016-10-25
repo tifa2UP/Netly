@@ -53,6 +53,32 @@ var UploadImage = React.createClass({
         });
     },
 
+    componentWillReceiveProps: function(nextProps){
+        var that = this;
+
+        var userRef = firebase.database().ref().child('users/'+ nextProps.user_id);
+        userRef.on("value", snap=>{
+            var user = snap.val();
+            this.setState({userData: user});
+            if(user.hasProfileImage){
+                var userImageRef = firebase.storage().ref().child('images/users/' +  nextProps.user_id + '/profilepic.jpg');
+                userImageRef.getDownloadURL().then(function(url){
+                    that.setState({imgRef: url});
+                }).catch(function(error){
+                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+                    defaultRef.getDownloadURL().then(function(url){
+                    that.setState({imgRef: url});
+                    });
+                });
+            }else{
+                var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+                defaultRef.getDownloadURL().then(function(url){
+                    that.setState({imgRef: url});
+                });
+            }
+        });
+    },
+
     render: function(){
         var showUpload;
         if(this.props.isCurrentUser){

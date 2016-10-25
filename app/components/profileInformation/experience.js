@@ -21,6 +21,18 @@ var Experience = React.createClass({
         });
 	},
 
+	componentWillReceiveProps: function(nextProps){
+		var userRef = firebase.database().ref().child('users/'+ nextProps.user_id);
+        userRef.on("value", snap => {
+        	var user = snap.val();
+			if(user.experience){
+				this.setState({experience: user.experience});
+			}else{
+				this.setState({experience: ""});
+			}
+        });
+	},
+
 	handleClickEdit: function(){
 		this.setState({editing: true});
 	},

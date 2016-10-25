@@ -20,6 +20,18 @@ var Interests = React.createClass({
         });
 	},
 
+	componentWillReceiveProps: function(nextProps){
+		var userRef = firebase.database().ref().child('users/'+ nextProps.user_id);
+        userRef.on("value", snap => {
+        	var user = snap.val();
+			if(user.interests){
+				this.setState({interests: user.interests});
+			}else{
+				this.setState({interests: ""});
+			}
+        });
+	},
+
 	handleClickEdit: function(){
 		this.setState({editing: true});
 	},
