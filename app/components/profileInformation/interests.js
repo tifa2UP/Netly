@@ -37,24 +37,19 @@ var Interests = React.createClass({
 	},
 
 	handleClickSave: function(){
+		var that = this;
+
 		this.setState({editing: false});
 		var newInterests = this.refs.newInterests.value;
 
 		var userRef = firebase.database().ref().child('users/'+this.props.user_id);
         userRef.once("value", snap => {
         	var user = snap.val();
-			var userInfo = {
-				email: user.email,
-  				first: user.first,
-  				last: user.last,
-  				summary: user.summary,
-  				experience: user.experience,
-  				education: user.education,
-  				skills: user.skills,
-  				projects: user.projects,
-  				recruiter: user.recruiter,
-  				interests: newInterests
-			};
+        	var userInfo = {};
+            for(var i in user){
+                userInfo[i] = user[i];
+            }
+			userInfo.interests = newInterests;
 			var updates = {};
 			updates['users/' + this.props.user_id] = userInfo;
 			firebase.database().ref().update(updates);

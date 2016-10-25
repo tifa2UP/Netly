@@ -9,12 +9,15 @@ var Layout = React.createClass({
     getInitialState: function() {
         return {
             isLoggedIn: (null != firebase.auth().currentUser),
-            recruiter: false
+            recruiter: false,
+            imgURL: ""
         }
     },
 
     //checks for login/logout changes and sets the logged in state accordingly, also gets the user's name
     componentWillMount: function() {
+        var that = this;
+
         firebase.auth().onAuthStateChanged((user) => {
             this.setState({isLoggedIn: (null != user)});
             this.setState({recruiter: this.state.isLoggedIn == false ? false : null});
@@ -24,6 +27,22 @@ var Layout = React.createClass({
             userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
             userRef.on("value", snap => {
                 var user = snap.val();
+                if(user.hasProfileImage){
+                    var userImageRef = firebase.storage().ref().child('images/users/' + firebase.auth().currentUser.uid + '/profilepic.jpg');
+                    userImageRef.getDownloadURL().then(function(url){
+                        that.setState({imgURL: url});
+                    }).catch(function(error){
+                        var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+                        defaultRef.getDownloadURL().then(function(url){
+                        that.setState({imgURL: url});
+                        });
+                    });
+                }else{
+                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+                    defaultRef.getDownloadURL().then(function(url){
+                        that.setState({imgURL: url});
+                    });
+                }
                 this.setState({recruiter: (user == null || !user.recruiter) ? false : true});
             });
         });
@@ -41,7 +60,7 @@ var Layout = React.createClass({
         if(this.state.isLoggedIn) {
             loginOrOut = <li><Link to="/logout" className="navbar-brand"><span className="glyphicon glyphicon-off"></span></Link></li>;
             //profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand">{this.state.name ? this.state.name : "Profile" } </Link></li>;
-            profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand"><span className="glyphicon glyphicon-user"></span></Link></li>;
+            profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand"><img src={this.state.imgURL} className="img-circle" width="20" height="20" style={{objectFit: 'cover'}}/></Link></li>;
             signUp = null;
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog"></span></Link></li>;
 

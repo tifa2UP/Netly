@@ -47,19 +47,11 @@ var Skills = React.createClass({
 		var userRef = firebase.database().ref().child('users/'+this.props.user_id);
         userRef.once("value", snap => {
         	var user = snap.val();
-			var userInfo = {
-				email: user.email,
-  				first: user.first,
-  				last: user.last,
-  				recruiter: user.recruiter,
-  				summary: user.summary,
-  				experience: user.experience,
-  				recruiter: user.recruiter,
-  				interests: user.interests,
-  				education: user.education,
-  				projects: user.projects,
-  				skills: newSkills
-            };
+			var userInfo = {};
+            for(var i in user){
+                userInfo[i] = user[i];
+            }
+			userInfo.skills = newSkills;
             var updates = {};
 			updates['users/' + this.props.user_id] = userInfo;
 			firebase.database().ref().update(updates);

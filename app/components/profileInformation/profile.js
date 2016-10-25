@@ -12,10 +12,11 @@ var ProfileImage = require('./profileImage.js');
 
 var Profile = React.createClass({
 	getInitialState: function(){
-		return {user_name: "", recruiter: false, path: "", isCurrentUser: false, currentID: ""};
+		return {user_name: "", recruiter: false, isCurrentUser: false, currentID: ""};
 	},
 
 	componentWillReceiveProps: function(nextProps){
+		//same as componentwillmount, but happens only if the params changed to another user
 		this.setState({currentID: nextProps.params.id});
 
 		firebase.auth().onAuthStateChanged((user) => {
@@ -33,12 +34,15 @@ var Profile = React.createClass({
 	componentWillMount: function(){
 		var that = this;
 
+		//sets the current user_id of the page
 		this.setState({currentID: this.props.params.id});
 
+		//checks to see if the user page belongs to the current user
 		firebase.auth().onAuthStateChanged((user) => {
             this.setState({isCurrentUser: firebase.auth().currentUser.uid == this.props.params.id});
         });
 
+		//gets the name of the user and whether or not he/she is a recruiter--not yet used
 		var userRef = firebase.database().ref().child('users/'+this.props.params.id);
 		userRef.on("value", snap=>{
 			var user = snap.val();
@@ -52,7 +56,6 @@ var Profile = React.createClass({
 			<div>
 				<center>
 					<h1>{this.state.user_name}</h1>
-					<img src={this.state.path} />
 					<ProfileImage user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
 				</center>
 				<br />

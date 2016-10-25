@@ -28316,12 +28316,15 @@
 	    getInitialState: function () {
 	        return {
 	            isLoggedIn: null != firebase.auth().currentUser,
-	            recruiter: false
+	            recruiter: false,
+	            imgURL: ""
 	        };
 	    },
 
 	    //checks for login/logout changes and sets the logged in state accordingly, also gets the user's name
 	    componentWillMount: function () {
+	        var that = this;
+
 	        firebase.auth().onAuthStateChanged(user => {
 	            this.setState({ isLoggedIn: null != user });
 	            this.setState({ recruiter: this.state.isLoggedIn == false ? false : null });
@@ -28331,6 +28334,22 @@
 	            userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
 	            userRef.on("value", snap => {
 	                var user = snap.val();
+	                if (user.hasProfileImage) {
+	                    var userImageRef = firebase.storage().ref().child('images/users/' + firebase.auth().currentUser.uid + '/profilepic.jpg');
+	                    userImageRef.getDownloadURL().then(function (url) {
+	                        that.setState({ imgURL: url });
+	                    }).catch(function (error) {
+	                        var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+	                        defaultRef.getDownloadURL().then(function (url) {
+	                            that.setState({ imgURL: url });
+	                        });
+	                    });
+	                } else {
+	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+	                    defaultRef.getDownloadURL().then(function (url) {
+	                        that.setState({ imgURL: url });
+	                    });
+	                }
 	                this.setState({ recruiter: user == null || !user.recruiter ? false : true });
 	            });
 	        });
@@ -28362,7 +28381,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: "/users/" + this.state.user_id, className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-user' })
+	                    React.createElement('img', { src: this.state.imgURL, className: 'img-circle', width: '20', height: '20', style: { objectFit: 'cover' } })
 	                )
 	            );
 	            signUp = null;
@@ -28803,10 +28822,11 @@
 		displayName: 'Profile',
 
 		getInitialState: function () {
-			return { user_name: "", recruiter: false, path: "", isCurrentUser: false, currentID: "" };
+			return { user_name: "", recruiter: false, isCurrentUser: false, currentID: "" };
 		},
 
 		componentWillReceiveProps: function (nextProps) {
+			//same as componentwillmount, but happens only if the params changed to another user
 			this.setState({ currentID: nextProps.params.id });
 
 			firebase.auth().onAuthStateChanged(user => {
@@ -28824,12 +28844,15 @@
 		componentWillMount: function () {
 			var that = this;
 
+			//sets the current user_id of the page
 			this.setState({ currentID: this.props.params.id });
 
+			//checks to see if the user page belongs to the current user
 			firebase.auth().onAuthStateChanged(user => {
 				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.params.id });
 			});
 
+			//gets the name of the user and whether or not he/she is a recruiter--not yet used
 			var userRef = firebase.database().ref().child('users/' + this.props.params.id);
 			userRef.on("value", snap => {
 				var user = snap.val();
@@ -28850,7 +28873,6 @@
 						null,
 						this.state.user_name
 					),
-					React.createElement('img', { src: this.state.path }),
 					React.createElement(ProfileImage, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser })
 				),
 				React.createElement('br', null),
@@ -28917,18 +28939,11 @@
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.once("value", snap => {
 				var user = snap.val();
-				var userInfo = {
-					email: user.email,
-					first: user.first,
-					last: user.last,
-					recruiter: user.recruiter,
-					summary: newSummary,
-					education: user.education,
-					projects: user.projects,
-					skills: user.skills,
-					experience: user.experience,
-					interests: user.interests
-				};
+				var userInfo = {};
+				for (var i in user) {
+					userInfo[i] = user[i];
+				}
+				userInfo.summary = newSummary;
 				var updates = {};
 				updates['users/' + this.props.user_id] = userInfo;
 				firebase.database().ref().update(updates);
@@ -29062,18 +29077,11 @@
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.once("value", snap => {
 				var user = snap.val();
-				var userInfo = {
-					email: user.email,
-					first: user.first,
-					last: user.last,
-					recruiter: user.recruiter,
-					summary: user.summary,
-					education: newEducation,
-					projects: user.projects,
-					skills: user.skills,
-					experience: user.experience,
-					interests: user.interests
-				};
+				var userInfo = {};
+				for (var i in user) {
+					userInfo[i] = user[i];
+				}
+				userInfo.education = newEducation;
 				var updates = {};
 				updates['users/' + this.props.user_id] = userInfo;
 				firebase.database().ref().update(updates);
@@ -29207,18 +29215,11 @@
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.once("value", snap => {
 				var user = snap.val();
-				var userInfo = {
-					email: user.email,
-					first: user.first,
-					last: user.last,
-					recruiter: user.recruiter,
-					summary: user.summary,
-					education: user.education,
-					projects: newProjects,
-					skills: user.skills,
-					experience: user.experience,
-					interests: user.interests
-				};
+				var userInfo = {};
+				for (var i in user) {
+					userInfo[i] = user[i];
+				}
+				userInfo.projects = newProjects;
 				var updates = {};
 				updates['users/' + this.props.user_id] = userInfo;
 				firebase.database().ref().update(updates);
@@ -29346,24 +29347,19 @@
 		},
 
 		handleClickSave: function () {
+			var that = this;
+
 			this.setState({ editing: false });
 			var newInterests = this.refs.newInterests.value;
 
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.once("value", snap => {
 				var user = snap.val();
-				var userInfo = {
-					email: user.email,
-					first: user.first,
-					last: user.last,
-					summary: user.summary,
-					experience: user.experience,
-					education: user.education,
-					skills: user.skills,
-					projects: user.projects,
-					recruiter: user.recruiter,
-					interests: newInterests
-				};
+				var userInfo = {};
+				for (var i in user) {
+					userInfo[i] = user[i];
+				}
+				userInfo.interests = newInterests;
 				var updates = {};
 				updates['users/' + this.props.user_id] = userInfo;
 				firebase.database().ref().update(updates);
@@ -29498,19 +29494,11 @@
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.once("value", snap => {
 				var user = snap.val();
-				var userInfo = {
-					email: user.email,
-					first: user.first,
-					last: user.last,
-					recruiter: user.recruiter,
-					summary: user.summary,
-					skills: user.skills,
-					recruiter: user.recruiter,
-					interests: user.interests,
-					education: user.education,
-					projects: user.projects,
-					experience: newExperience
-				};
+				var userInfo = {};
+				for (var i in user) {
+					userInfo[i] = user[i];
+				}
+				userInfo.experience = newExperience;
 				var updates = {};
 				updates['users/' + this.props.user_id] = userInfo;
 				firebase.database().ref().update(updates);
@@ -29644,19 +29632,11 @@
 			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 			userRef.once("value", snap => {
 				var user = snap.val();
-				var userInfo = {
-					email: user.email,
-					first: user.first,
-					last: user.last,
-					recruiter: user.recruiter,
-					summary: user.summary,
-					experience: user.experience,
-					recruiter: user.recruiter,
-					interests: user.interests,
-					education: user.education,
-					projects: user.projects,
-					skills: newSkills
-				};
+				var userInfo = {};
+				for (var i in user) {
+					userInfo[i] = user[i];
+				}
+				userInfo.skills = newSkills;
 				var updates = {};
 				updates['users/' + this.props.user_id] = userInfo;
 				firebase.database().ref().update(updates);
@@ -29751,15 +29731,20 @@
 	    displayName: 'UploadImage',
 
 	    getInitialState: function () {
-	        return { imgRef: "" };
+	        return { imgURL: "" };
 	    },
 
+	    //uploads the image into firebase storage
 	    handleUploadImage: function (e) {
 	        var that = this;
 
+	        //gets the file data
 	        var imageFile = e.target.files[0];
+	        //creates a new reference called profilepic.jpg in the user storage folder for this current user
 	        var userProfileImageRef = firebase.storage().ref().child('images/users/' + this.props.user_id + '/profilepic.jpg');
+	        //stores the file into the reference
 	        userProfileImageRef.put(imageFile).then(function (snapshot) {
+	            //gets the user data and reupdates it after changing hasProfileImage and imageFileName
 	            var userData = {};
 	            for (var i in that.state.userData) {
 	                userData[i] = that.state.userData[i];
@@ -29775,6 +29760,7 @@
 	    componentWillMount: function () {
 	        var that = this;
 
+	        //checks to see if the user has a profile picture, if not, use default image.
 	        var userRef = firebase.database().ref().child('users/' + this.props.user_id);
 	        userRef.on("value", snap => {
 	            var user = snap.val();
@@ -29782,17 +29768,17 @@
 	            if (user.hasProfileImage) {
 	                var userImageRef = firebase.storage().ref().child('images/users/' + this.props.user_id + '/profilepic.jpg');
 	                userImageRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgRef: url });
+	                    that.setState({ imgURL: url });
 	                }).catch(function (error) {
 	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
 	                    defaultRef.getDownloadURL().then(function (url) {
-	                        that.setState({ imgRef: url });
+	                        that.setState({ imgURL: url });
 	                    });
 	                });
 	            } else {
 	                var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
 	                defaultRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgRef: url });
+	                    that.setState({ imgURL: url });
 	                });
 	            }
 	        });
@@ -29801,6 +29787,7 @@
 	    componentWillReceiveProps: function (nextProps) {
 	        var that = this;
 
+	        //does the same as component will mount, but updates to the correct param user
 	        var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
 	        userRef.on("value", snap => {
 	            var user = snap.val();
@@ -29808,17 +29795,17 @@
 	            if (user.hasProfileImage) {
 	                var userImageRef = firebase.storage().ref().child('images/users/' + nextProps.user_id + '/profilepic.jpg');
 	                userImageRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgRef: url });
+	                    that.setState({ imgURL: url });
 	                }).catch(function (error) {
 	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
 	                    defaultRef.getDownloadURL().then(function (url) {
-	                        that.setState({ imgRef: url });
+	                        that.setState({ imgURL: url });
 	                    });
 	                });
 	            } else {
 	                var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
 	                defaultRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgRef: url });
+	                    that.setState({ imgURL: url });
 	                });
 	            }
 	        });
@@ -29826,6 +29813,7 @@
 
 	    render: function () {
 	        var showUpload;
+	        //shows an upload image option if currentuser
 	        if (this.props.isCurrentUser) {
 	            showUpload = React.createElement('input', { type: 'file', accept: 'image/*', onChange: this.handleUploadImage });
 	        } else {
@@ -29835,7 +29823,7 @@
 	        return React.createElement(
 	            'div',
 	            null,
-	            React.createElement('img', { src: this.state.imgRef, className: 'img-circle', alt: '', width: '200', height: '200', style: { objectFit: 'cover' } }),
+	            React.createElement('img', { src: this.state.imgURL, className: 'img-circle', alt: '', width: '200', height: '200', style: { objectFit: 'cover' } }),
 	            React.createElement('br', null),
 	            showUpload,
 	            React.createElement('br', null)
