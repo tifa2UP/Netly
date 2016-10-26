@@ -6,60 +6,116 @@ var DeleteAccount = require('./destroy.js');
 var UpdatePassword = require('./updatePassword.js');
 var UploadImage = require('./uploadImage.js');
 
-var AccountSettings = React.createClass({
 
-	//initially, no submission errors
-	getInitialState: function(){
-		return{hasError: false, errorMsg: "", verified: false};
-	},
 
-	handleReauthenticate: function(){
+class AccountSettings extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {hasError: false, errorMsg: "", verified: false, verificationMessage:""};
+		this.handleTypeChanges = this.handleTypeChanges.bind(this);
+		this.verifyPassword = this.verifyPassword.bind(this);
+	}
+	
+	
+	componentWillUnmount(){
+		console.log("inside of componentWillUnmount");
+	}
+	componentDidMount(){
+		console.log("inside of componentDidMount");
+	}
+	
+	componentWillUpdate(){
+		console.log("inside of componentWillUpdate");
+	}
+	
+	componentDidUpdate(){
+		console.log("inside of componentDidUpdate");
+	}
+
+	shouldComponentUpdate(){
+		console.log("inside of shouldComponentUpdate");
+		return false;
+	}
+	
+	handleReauthenticate(){
 		return this.state.verified;
-	},
+	}
+	
+	handleTypeChanges(){
+		this.setState({hasError: false, errorMsg: ""});
+	}
 
-	handleTypeChanges: function(e){
-		this.setState({hasError: false})
-		this.setState({errorMsg: ""});
-	},
-
-	verifyPassword: function(e){
-		var that = this;
-
+	verifyPassword(e){
+		//var that = this;
+//e.preventDefault();
 		if(this.refs.current_password.value){
 			var user = firebase.auth().currentUser;
 			var credential = firebase.auth.EmailAuthProvider.credential(user.email, this.refs.current_password.value);
-			user.reauthenticate(credential).then(function() {
-				that.setState({hasError: false})
-				that.setState({errorMsg: ""});
-				that.setState({verified: true});
-				that.setState({verificationMessage: "Your password has been verified!"});
-			}, function(error) {
-				that.setState({hasError: true});
-				that.setState({errorMsg: "Your current password is incorrect."});
-				that.setState({verified: false});
+			console.log(credential);
+			
+			user.reauthenticate(credential).then(function (){
+			
+			console.log("inside of onResolve");
+			
+			hashHistory.push("/accountSettings");
+			//break function;
+			return;
+			
+			},function (error){
+			
+			console.log("inside of onReject");
+			
 			});
+			
+			
+			
+			
+			
+			//.then(function(onResolve, onReject) {
+				
+			//});
+			/*user.reauthenticate(credential).then( 
+				(onResolve) => {
+				console.log("inside of onResolve");
+					this.setState({
+						hasError: false, 
+						errorMsg: "", 
+						verified: true,
+						verificationMessage: "Your password has been verified!"
+					})
+				}).then(
+				(onReject)=>{
+				console.log("inside of onReject");
+					this.setState({
+						hasError: true, 
+						errorMsg: "Your current password is incorrect.",
+						verified: false
+					})
+				});
 		}else{
-			this.setState({hasError: true});
-			this.setState({errorMsg: "Please enter your current password"});
-			this.setState({verified: false});
+			this.setState({
+				hasError: true,
+				errorMsg: "Please enter your current password",
+				verified: false
+			});*/
 		}
-	},
+	}
 
 	//creates a div alert-danger with the error message
-	errorMessage: function(){
+	errorMessage(){
 		return <div className="alert alert-danger"><strong>Error! </strong>{this.state.errorMsg}</div>;
-	},
+	}
 
 	//creates an empty div if no error message
-	noErrorMessage: function(){
+	noErrorMessage(){
 		return <div className="alert alert-danger">Please verify your current password.</div>;
-	},
+	}
 
-	successMessage: function(){
+	successMessage(){
 		return <div className="alert alert-success"><strong>Success! </strong>{this.state.verificationMessage}</div>;
-	},
+	}
 
-	render: function(){
+	render(){
 
 		//gets the appropriate error alert div depending on whether or not the form has an error
 		var alert;
@@ -94,6 +150,6 @@ var AccountSettings = React.createClass({
 			</div>
 		);
 	}
-});
+}
 
 module.exports = AccountSettings;

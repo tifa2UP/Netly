@@ -21,7 +21,7 @@ var routes = (
 			<Route path="login" component={SessionUser}/>
 			<Route path="signup" component={NewUser}/>
 			<Route path="logout" component={Logout}/>
-			<Route path="accountSettings" component={AccountSettings} onEnter={requireAuth}/>
+			<Route path="accountSettings" component={AccountSettings} />//onEnter={requireAuth}/>
 			<Route path="profile" component={Profile} onEnter={requireAuth} />
 		</Route>
 	</Router>
