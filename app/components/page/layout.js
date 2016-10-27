@@ -53,6 +53,8 @@ var Layout = React.createClass({
         var profile;
         var signUp;
         var accountSettings;
+        var requests;
+        var connections;
 
         var navClassName;
 
@@ -63,6 +65,8 @@ var Layout = React.createClass({
             profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand"><img src={this.state.imgURL} className="img-circle" width="20" height="20" style={{objectFit: 'cover'}}/></Link></li>;
             signUp = null;
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog"></span></Link></li>;
+            requests = <li><Link to="/requests" className="navbar-brand">Requests</Link></li>;
+            connections = <li><Link to="/connections" className="navbar-brand">Connections</Link></li>;
 
         //if the user is not logged in, show the login and signup links
         } else {
@@ -70,6 +74,8 @@ var Layout = React.createClass({
             profile = null;
             signUp = <li><Link to="/signup" className="navbar-brand">Sign Up</Link></li>;
             accountSettings = null;
+            requests = null;
+            connections = null;
         }
 
         //if recruiter -> black navbar, else job seeker -> default navbar
@@ -92,6 +98,8 @@ var Layout = React.createClass({
                         <ul className="nav navbar-nav pull-right">
                             {signUp} {/*shows only if user is not logged in*/}
                             {profile} {/*shows only if user is logged in*/}
+                            {requests}
+                            {connections}
                             {accountSettings}
                             {loginOrOut} {/*shows login or logout link depending on logged in state*/}
                         </ul>

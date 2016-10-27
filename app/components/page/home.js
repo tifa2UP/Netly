@@ -11,6 +11,52 @@ var Home = React.createClass({
 		return {postArray: []};
 	},
 
+	//loading all posts into the state's postArray
+	componentWillMount: function(){
+		var that = this;
+		//gets the post reference
+		var postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
+		//for each child added to post, push to postArray
+		postsRef.on("child_added", snap => {
+			var post = snap.val();
+			var newPostWithId = {
+				user_id: post.user_id,
+				user_name: post.user_name,
+				body: post.body,
+				created_at: post.created_at,
+				likes: post.likes,
+				post_id: snap.ref.key
+			};
+			
+			var updatedPostArray = this.state.postArray;
+			updatedPostArray.push(newPostWithId);
+			this.setState({postArray : updatedPostArray});
+		});
+
+		//for each child changed to post, replace that post with the post already in postArray
+		postsRef.on("child_changed", snap => {
+			var post = snap.val();
+			var updatedPost = {
+				user_id: post.user_id,
+				user_name: post.user_name,
+				body: post.body,
+				created_at: post.created_at,
+				likes: post.likes,
+				post_id: snap.ref.key
+			};
+			var index;
+			for(var i = 0; i < this.state.postArray.length; i++){
+				if(this.state.postArray[i].post_id == updatedPost.post_id){
+					index = i;
+				}
+			}
+
+			var updatedPostArray = this.state.postArray;
+			updatedPostArray.splice(index, 1, updatedPost);
+			this.setState({postArray: updatedPostArray});
+		});
+	},
+
 	//adds the new post to the database upon clicking Post
 	handlePost: function(){
 
@@ -73,54 +119,6 @@ var Home = React.createClass({
 				firebase.database().ref().update(updates);
 			});
 		}
-	},
-
-	//loading all posts into the state's postArray
-	componentWillMount: function(){
-		//gets the post reference
-		var postsRef = firebase.database().ref().child('posts');
-		//for each child added to post, push to postArray
-		postsRef.on("child_added", snap => {
-			var post = snap.val();
-			var newPostWithId = {
-				user_id: post.user_id,
-				user_name: post.user_name,
-				body: post.body,
-				created_at: post.created_at,
-				likes: post.likes,
-				post_id: snap.ref.path.o[1]
-			};
-			this.state.postArray.push(newPostWithId);
-
-			//refreshes page when the posts are pushed into the array, so it shows without manually refreshing
-			hashHistory.push('/');
-		});
-
-		//gets the post reference
-		var postsRef = firebase.database().ref().child('posts');
-		//for each child changed to post, replace that post with the post already in postArray
-		postsRef.on("child_changed", snap => {
-			var post = snap.val();
-			var updatedPost = {
-				user_id: post.user_id,
-				user_name: post.user_name,
-				body: post.body,
-				created_at: post.created_at,
-				likes: post.likes,
-				post_id: snap.ref.path.o[1]
-			};
-			var index;
-			for(var i = 0; i < this.state.postArray.length; i++){
-				if(this.state.postArray[i].post_id == updatedPost.post_id){
-					index = i;
-				}
-			}
-
-			this.state.postArray.splice(index, 1, updatedPost);
-			
-			//refreshes page when the posts are pushed into the array, so it shows without manually refreshing
-			hashHistory.push('/');
-		});
 	},
 
 	//just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"

@@ -10,7 +10,7 @@ var Skills = React.createClass({
 
 	componentWillMount: function()
 	{
-		var userRef = firebase.database().ref().child('users/'+this.props.user_id);
+		var userRef = firebase.database().ref().child('users/'+this.props.pageID);
         userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.skills){
@@ -23,7 +23,7 @@ var Skills = React.createClass({
 
 	componentWillReceiveProps: function(nextProps)
 	{
-		var userRef = firebase.database().ref().child('users/'+ nextProps.user_id);
+		var userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
         userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.skills){
@@ -44,7 +44,7 @@ var Skills = React.createClass({
         this.setState({editing: false});
 		var newSkills = this.refs.newSkills.value;
 
-		var userRef = firebase.database().ref().child('users/'+this.props.user_id);
+		var userRef = firebase.database().ref().child('users/'+this.props.pageID);
         userRef.once("value", snap => {
         	var user = snap.val();
 			var userInfo = {};
@@ -53,7 +53,7 @@ var Skills = React.createClass({
             }
 			userInfo.skills = newSkills;
             var updates = {};
-			updates['users/' + this.props.user_id] = userInfo;
+			updates['users/' + this.props.pageID] = userInfo;
 			firebase.database().ref().update(updates);
         });
     },

@@ -4,6 +4,9 @@
     ".write": "auth != null",
     "post":{
     	".indexOn": "user_id"
+    },
+    "connections":{
+    	".indexOn": "status"
     }
   }
 }

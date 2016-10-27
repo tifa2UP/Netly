@@ -27754,8 +27754,10 @@
 	var AccountSettings = __webpack_require__(246);
 	var AccountSettings2 = __webpack_require__(249);
 	var Profile = __webpack_require__(250);
+	var AwaitingAcceptance = __webpack_require__(259);
+	var Connections = __webpack_require__(260);
 
-	var requireAuth = __webpack_require__(258);
+	var requireAuth = __webpack_require__(261);
 
 	var routes = React.createElement(
 		Router,
@@ -27769,7 +27771,9 @@
 			React.createElement(Route, { path: 'logout', component: Logout }),
 			React.createElement(Route, { path: 'accountSettings', component: AccountSettings, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'users/:id', component: Profile, onEnter: requireAuth }),
-			React.createElement(Route, { path: 'accountsettings/2', component: AccountSettings2, onEnter: requireAuth })
+			React.createElement(Route, { path: 'accountsettings/2', component: AccountSettings2, onEnter: requireAuth }),
+			React.createElement(Route, { path: 'requests', component: AwaitingAcceptance, onEnter: requireAuth }),
+			React.createElement(Route, { path: 'connections', component: Connections, onEnter: requireAuth })
 		)
 	);
 
@@ -28082,6 +28086,52 @@
 			return { postArray: [] };
 		},
 
+		//loading all posts into the state's postArray
+		componentWillMount: function () {
+			var that = this;
+			//gets the post reference
+			var postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
+			//for each child added to post, push to postArray
+			postsRef.on("child_added", snap => {
+				var post = snap.val();
+				var newPostWithId = {
+					user_id: post.user_id,
+					user_name: post.user_name,
+					body: post.body,
+					created_at: post.created_at,
+					likes: post.likes,
+					post_id: snap.ref.key
+				};
+
+				var updatedPostArray = this.state.postArray;
+				updatedPostArray.push(newPostWithId);
+				this.setState({ postArray: updatedPostArray });
+			});
+
+			//for each child changed to post, replace that post with the post already in postArray
+			postsRef.on("child_changed", snap => {
+				var post = snap.val();
+				var updatedPost = {
+					user_id: post.user_id,
+					user_name: post.user_name,
+					body: post.body,
+					created_at: post.created_at,
+					likes: post.likes,
+					post_id: snap.ref.key
+				};
+				var index;
+				for (var i = 0; i < this.state.postArray.length; i++) {
+					if (this.state.postArray[i].post_id == updatedPost.post_id) {
+						index = i;
+					}
+				}
+
+				var updatedPostArray = this.state.postArray;
+				updatedPostArray.splice(index, 1, updatedPost);
+				this.setState({ postArray: updatedPostArray });
+			});
+		},
+
 		//adds the new post to the database upon clicking Post
 		handlePost: function () {
 
@@ -28144,54 +28194,6 @@
 					firebase.database().ref().update(updates);
 				});
 			}
-		},
-
-		//loading all posts into the state's postArray
-		componentWillMount: function () {
-			//gets the post reference
-			var postsRef = firebase.database().ref().child('posts');
-			//for each child added to post, push to postArray
-			postsRef.on("child_added", snap => {
-				var post = snap.val();
-				var newPostWithId = {
-					user_id: post.user_id,
-					user_name: post.user_name,
-					body: post.body,
-					created_at: post.created_at,
-					likes: post.likes,
-					post_id: snap.ref.path.o[1]
-				};
-				this.state.postArray.push(newPostWithId);
-
-				//refreshes page when the posts are pushed into the array, so it shows without manually refreshing
-				hashHistory.push('/');
-			});
-
-			//gets the post reference
-			var postsRef = firebase.database().ref().child('posts');
-			//for each child changed to post, replace that post with the post already in postArray
-			postsRef.on("child_changed", snap => {
-				var post = snap.val();
-				var updatedPost = {
-					user_id: post.user_id,
-					user_name: post.user_name,
-					body: post.body,
-					created_at: post.created_at,
-					likes: post.likes,
-					post_id: snap.ref.path.o[1]
-				};
-				var index;
-				for (var i = 0; i < this.state.postArray.length; i++) {
-					if (this.state.postArray[i].post_id == updatedPost.post_id) {
-						index = i;
-					}
-				}
-
-				this.state.postArray.splice(index, 1, updatedPost);
-
-				//refreshes page when the posts are pushed into the array, so it shows without manually refreshing
-				hashHistory.push('/');
-			});
 		},
 
 		//just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"
@@ -28360,6 +28362,8 @@
 	        var profile;
 	        var signUp;
 	        var accountSettings;
+	        var requests;
+	        var connections;
 
 	        var navClassName;
 
@@ -28394,6 +28398,24 @@
 	                    React.createElement('span', { className: 'glyphicon glyphicon-cog' })
 	                )
 	            );
+	            requests = React.createElement(
+	                'li',
+	                null,
+	                React.createElement(
+	                    Link,
+	                    { to: '/requests', className: 'navbar-brand' },
+	                    'Requests'
+	                )
+	            );
+	            connections = React.createElement(
+	                'li',
+	                null,
+	                React.createElement(
+	                    Link,
+	                    { to: '/connections', className: 'navbar-brand' },
+	                    'Connections'
+	                )
+	            );
 
 	            //if the user is not logged in, show the login and signup links
 	        } else {
@@ -28417,6 +28439,8 @@
 	                )
 	            );
 	            accountSettings = null;
+	            requests = null;
+	            connections = null;
 	        }
 
 	        //if recruiter -> black navbar, else job seeker -> default navbar
@@ -28451,6 +28475,8 @@
 	                        ' ',
 	                        profile,
 	                        ' ',
+	                        requests,
+	                        connections,
 	                        accountSettings,
 	                        loginOrOut,
 	                        ' '
@@ -28817,20 +28843,22 @@
 	var Experience = __webpack_require__(255);
 	var Skills = __webpack_require__(256);
 	var ProfileImage = __webpack_require__(257);
+	var Connection = __webpack_require__(258);
 
 	var Profile = React.createClass({
 		displayName: 'Profile',
 
 		getInitialState: function () {
-			return { user_name: "", recruiter: false, isCurrentUser: false, currentID: "" };
+			return { user_name: "", recruiter: false, isCurrentUser: false, pageID: "", currentUserID: "" };
 		},
 
 		componentWillReceiveProps: function (nextProps) {
 			//same as componentwillmount, but happens only if the params changed to another user
-			this.setState({ currentID: nextProps.params.id });
+			this.setState({ pageID: nextProps.params.id });
 
 			firebase.auth().onAuthStateChanged(user => {
-				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == nextProps.params.id });
+				this.setState({ isCurrentUser: user.uid == nextProps.params.id });
+				this.setState({ currentUserID: user.uid });
 			});
 
 			var userRef = firebase.database().ref().child('users/' + nextProps.params.id);
@@ -28844,12 +28872,13 @@
 		componentWillMount: function () {
 			var that = this;
 
-			//sets the current user_id of the page
-			this.setState({ currentID: this.props.params.id });
+			//sets the current pageID of the page
+			this.setState({ pageID: this.props.params.id });
 
 			//checks to see if the user page belongs to the current user
 			firebase.auth().onAuthStateChanged(user => {
-				this.setState({ isCurrentUser: firebase.auth().currentUser.uid == this.props.params.id });
+				this.setState({ isCurrentUser: user.uid == this.props.params.id });
+				this.setState({ currentUserID: user.uid });
 			});
 
 			//gets the name of the user and whether or not he/she is a recruiter--not yet used
@@ -28873,15 +28902,16 @@
 						null,
 						this.state.user_name
 					),
-					React.createElement(ProfileImage, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser })
+					React.createElement(ProfileImage, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement(Connection, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser, currentUserID: this.state.currentUserID })
 				),
 				React.createElement('br', null),
-				React.createElement(Summary, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Projects, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Education, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Interests, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Experience, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Skills, { user_id: this.state.currentID, isCurrentUser: this.state.isCurrentUser })
+				React.createElement(Summary, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Projects, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Education, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Interests, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Experience, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement(Skills, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser })
 			);
 		}
 	});
@@ -28905,7 +28935,7 @@
 		},
 
 		componentWillMount: function () {
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.summary) {
@@ -28917,7 +28947,7 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.summary) {
@@ -28936,7 +28966,7 @@
 			this.setState({ editing: false });
 			var newSummary = this.refs.newSummary.value;
 
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
@@ -28945,7 +28975,7 @@
 				}
 				userInfo.summary = newSummary;
 				var updates = {};
-				updates['users/' + this.props.user_id] = userInfo;
+				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
 		},
@@ -29043,7 +29073,7 @@
 		},
 
 		componentWillMount: function () {
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.education) {
@@ -29055,7 +29085,7 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.education) {
@@ -29074,7 +29104,7 @@
 			this.setState({ editing: false });
 			var newEducation = this.refs.newEducation.value;
 
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
@@ -29083,7 +29113,7 @@
 				}
 				userInfo.education = newEducation;
 				var updates = {};
-				updates['users/' + this.props.user_id] = userInfo;
+				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
 		},
@@ -29181,7 +29211,7 @@
 		},
 
 		componentWillMount: function () {
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.projects) {
@@ -29193,7 +29223,7 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.projects) {
@@ -29212,7 +29242,7 @@
 			this.setState({ editing: false });
 			var newProjects = this.refs.newProjects.value;
 
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
@@ -29221,7 +29251,7 @@
 				}
 				userInfo.projects = newProjects;
 				var updates = {};
-				updates['users/' + this.props.user_id] = userInfo;
+				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
 		},
@@ -29319,7 +29349,7 @@
 		},
 
 		componentWillMount: function () {
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.interests) {
@@ -29331,7 +29361,7 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.interests) {
@@ -29352,7 +29382,7 @@
 			this.setState({ editing: false });
 			var newInterests = this.refs.newInterests.value;
 
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
@@ -29361,7 +29391,7 @@
 				}
 				userInfo.interests = newInterests;
 				var updates = {};
-				updates['users/' + this.props.user_id] = userInfo;
+				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
 		},
@@ -29460,7 +29490,7 @@
 		},
 
 		componentWillMount: function () {
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.experience) {
@@ -29472,7 +29502,7 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.experience) {
@@ -29491,7 +29521,7 @@
 			this.setState({ editing: false });
 			var newExperience = this.refs.newExperience.value;
 
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
@@ -29500,7 +29530,7 @@
 				}
 				userInfo.experience = newExperience;
 				var updates = {};
-				updates['users/' + this.props.user_id] = userInfo;
+				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
 		},
@@ -29598,7 +29628,7 @@
 		},
 
 		componentWillMount: function () {
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.skills) {
@@ -29610,7 +29640,7 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
 			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.skills) {
@@ -29629,7 +29659,7 @@
 			this.setState({ editing: false });
 			var newSkills = this.refs.newSkills.value;
 
-			var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
@@ -29638,7 +29668,7 @@
 				}
 				userInfo.skills = newSkills;
 				var updates = {};
-				updates['users/' + this.props.user_id] = userInfo;
+				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
 		},
@@ -29741,7 +29771,7 @@
 	        //gets the file data
 	        var imageFile = e.target.files[0];
 	        //creates a new reference called profilepic.jpg in the user storage folder for this current user
-	        var userProfileImageRef = firebase.storage().ref().child('images/users/' + this.props.user_id + '/profilepic.jpg');
+	        var userProfileImageRef = firebase.storage().ref().child('images/users/' + this.props.pageID + '/profilepic.jpg');
 	        //stores the file into the reference
 	        userProfileImageRef.put(imageFile).then(function (snapshot) {
 	            //gets the user data and reupdates it after changing hasProfileImage and imageFileName
@@ -29752,7 +29782,7 @@
 	            userData.hasProfileImage = true;
 	            userData.imageFileName = imageFile.name;
 	            var updates = {};
-	            updates['users/' + that.props.user_id] = userData;
+	            updates['users/' + that.props.pageID] = userData;
 	            firebase.database().ref().update(updates);
 	        });
 	    },
@@ -29761,12 +29791,12 @@
 	        var that = this;
 
 	        //checks to see if the user has a profile picture, if not, use default image.
-	        var userRef = firebase.database().ref().child('users/' + this.props.user_id);
+	        var userRef = firebase.database().ref().child('users/' + this.props.pageID);
 	        userRef.on("value", snap => {
 	            var user = snap.val();
 	            this.setState({ userData: user });
 	            if (user.hasProfileImage) {
-	                var userImageRef = firebase.storage().ref().child('images/users/' + this.props.user_id + '/profilepic.jpg');
+	                var userImageRef = firebase.storage().ref().child('images/users/' + this.props.pageID + '/profilepic.jpg');
 	                userImageRef.getDownloadURL().then(function (url) {
 	                    that.setState({ imgURL: url });
 	                }).catch(function (error) {
@@ -29788,12 +29818,12 @@
 	        var that = this;
 
 	        //does the same as component will mount, but updates to the correct param user
-	        var userRef = firebase.database().ref().child('users/' + nextProps.user_id);
+	        var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
 	        userRef.on("value", snap => {
 	            var user = snap.val();
 	            this.setState({ userData: user });
 	            if (user.hasProfileImage) {
-	                var userImageRef = firebase.storage().ref().child('images/users/' + nextProps.user_id + '/profilepic.jpg');
+	                var userImageRef = firebase.storage().ref().child('images/users/' + nextProps.pageID + '/profilepic.jpg');
 	                userImageRef.getDownloadURL().then(function (url) {
 	                    that.setState({ imgURL: url });
 	                }).catch(function (error) {
@@ -29835,6 +29865,504 @@
 
 /***/ },
 /* 258 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var Connection = React.createClass({
+		displayName: 'Connection',
+
+		getInitialState: function () {
+			return {
+				status: "",
+				currentUserID: "",
+				pageID: "",
+				isCurrentUser: false
+			};
+		},
+
+		componentWillMount: function () {
+			this.setState({ currentUserID: this.props.currentUserID });
+			this.setState({ pageID: this.props.pageID });
+			this.setState({ isCurrentUser: this.props.isCurrentUser });
+
+			if (!this.props.isCurrentUser) {
+				var connectionRef = firebase.database().ref().child('connections/' + this.props.currentUserID + '/' + this.props.pageID);
+				connectionRef.on("value", snap => {
+					var connection = snap.val();
+					if (connection && connection.status) {
+						this.setState({ status: connection.status });
+					}
+				});
+			}
+
+			if (!this.props.isCurrentUser) {
+				var connectionRef = firebase.database().ref().child('connections/' + this.props.currentUserID);
+				connectionRef.on("child_removed", snap => {
+					var removedKey = snap.ref.key;
+					if (removedKey == this.props.pageID) {
+						this.setState({ status: "" });
+					}
+				});
+			}
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			this.setState({ currentUserID: nextProps.currentUserID });
+			this.setState({ pageID: nextProps.pageID });
+			this.setState({ isCurrentUser: nextProps.isCurrentUser });
+
+			if (!nextProps.isCurrentUser) {
+				var connectionRef = firebase.database().ref().child('connections/' + nextProps.currentUserID + '/' + nextProps.pageID);
+				connectionRef.on("value", snap => {
+					var connection = snap.val();
+					if (connection && connection.status) {
+						this.setState({ status: connection.status });
+					}
+				});
+			}
+
+			if (!this.props.isCurrentUser) {
+				var connectionRef = firebase.database().ref().child('connections/' + nextProps.currentUserID);
+				connectionRef.on("child_removed", snap => {
+					var removedKey = snap.ref.key;
+					if (removedKey == nextProps.pageID) {
+						this.setState({ status: "" });
+					}
+				});
+			}
+		},
+
+		handleAddConnection: function () {
+			var connectionUpdate = {};
+			connectionUpdate['connections/' + this.state.currentUserID + '/' + this.state.pageID] = { status: "requested" };
+			firebase.database().ref().update(connectionUpdate);
+
+			var connectionOtherUpdate = {};
+			connectionOtherUpdate['connections/' + this.state.pageID + '/' + this.state.currentUserID] = { status: "awaiting-acceptance" };
+			firebase.database().ref().update(connectionOtherUpdate);
+		},
+
+		handleRemoveConnection: function () {
+			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID + '/' + this.state.pageID);
+			connectionRef.remove();
+
+			var connectionOtherRef = firebase.database().ref().child('connections/' + this.state.pageID + '/' + this.state.currentUserID);
+			connectionOtherRef.remove();
+		},
+
+		handleAcceptConnection: function () {
+			var connectionUpdate = {};
+			connectionUpdate['connections/' + this.state.currentUserID + '/' + this.state.pageID] = { status: "accepted" };
+			firebase.database().ref().update(connectionUpdate);
+
+			var connectionOtherUpdate = {};
+			connectionOtherUpdate['connections/' + this.state.pageID + '/' + this.state.currentUserID] = { status: "accepted" };
+			firebase.database().ref().update(connectionOtherUpdate);
+		},
+
+		showAccepted: function () {
+			return React.createElement(
+				'button',
+				{ className: 'btn btn-default', onClick: this.handleRemoveConnection },
+				'Remove Connection'
+			);
+		},
+
+		showRequested: function () {
+			return React.createElement(
+				'button',
+				{ className: 'btn btn-default', onClick: this.handleRemoveConnection },
+				'Undo Request'
+			);
+		},
+
+		showAwaitingAcceptance: function () {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'button',
+					{ className: 'btn btn-default', onClick: this.handleAcceptConnection },
+					'Accept Connection'
+				),
+				React.createElement(
+					'button',
+					{ className: 'btn btn-default', onClick: this.handleRemoveConnection },
+					'Delete Request'
+				)
+			);
+		},
+
+		showAdd: function () {
+			return React.createElement(
+				'button',
+				{ className: 'btn btn-default', onClick: this.handleAddConnection },
+				'Add Connection'
+			);
+		},
+
+		render: function () {
+			var connectionButton;
+			if (this.state.isCurrentUser) {
+				connectionButton = React.createElement('div', null); //can't add yourself of course.
+			} else if (this.state.status == "accepted") {
+				connectionButton = this.showAccepted();
+			} else if (this.state.status == "requested") {
+				connectionButton = this.showRequested();
+			} else if (this.state.status == "awaiting-acceptance") {
+				connectionButton = this.showAwaitingAcceptance();
+			} else {
+				//not connected
+				connectionButton = this.showAdd();
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				connectionButton
+			);
+		}
+	});
+
+	module.exports = Connection;
+
+/***/ },
+/* 259 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var AwaitingAcceptance = React.createClass({
+		displayName: 'AwaitingAcceptance',
+
+		getInitialState: function () {
+			return {
+				currentUserID: "",
+				requesters: []
+			};
+		},
+
+		componentWillMount: function () {
+			var that = this;
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ currentUserID: user.uid });
+				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('awaiting-acceptance');
+				connectionRef.on("child_added", snap => {
+					var requesterID = snap.ref.key;
+					var requesterRef = firebase.database().ref().child('users/' + requesterID);
+					requesterRef.on("value", snap => {
+						var userData = snap.val();
+						var userInfo = {
+							first: userData.first,
+							last: userData.last,
+							hasProfileImage: userData.hasProfileImage,
+							user_id: snap.ref.key,
+							url: ""
+						};
+						if (userInfo.hasProfileImage) {
+							var userImageRef = firebase.storage().ref().child('images/users/' + userInfo.user_id + '/profilepic.jpg');
+							userImageRef.getDownloadURL().then(function (url) {
+								userInfo.url = url;
+								var updatedRequesters = Array.prototype.slice.call(that.state.requesters);
+								updatedRequesters.push(userInfo);
+								that.setState({ requesters: updatedRequesters });
+							}).catch(function (error) {
+								var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+								defaultRef.getDownloadURL().then(function (url) {
+									userInfo.url = url;
+									var updatedRequesters = that.state.requesters.slice();
+									updatedRequesters.push(userInfo);
+									that.setState({ requesters: updatedRequesters });
+								});
+							});
+						} else {
+							var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+							defaultRef.getDownloadURL().then(function (url) {
+								userInfo.url = url;
+								var updatedRequesters = that.state.requesters.slice();
+								updatedRequesters.push(userInfo);
+								that.setState({ requesters: updatedRequesters });
+							});
+						}
+					});
+				});
+
+				//if status was updated, remove from array of requesters
+				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
+				connectionRef.on("child_changed", snap => {
+					var userChangedKey = snap.ref.key;
+					var index = -1;
+					for (var i = 0; i < this.state.requesters.length; i++) {
+						if (this.state.requesters[i].user_id == userChangedKey) {
+							index = i;
+						}
+					}
+
+					if (index > -1) {
+						var updatedRequesters = this.state.requesters.slice();
+						updatedRequesters.splice(index, 1);
+						this.setState({ requesters: updatedRequesters });
+					}
+				});
+
+				//if rejected acceptance, remove from array of requesters
+				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
+				connectionRef.on("child_removed", snap => {
+					var userChangedKey = snap.ref.key;
+					var index = -1;
+					for (var i = 0; i < this.state.requesters.length; i++) {
+						if (this.state.requesters[i].user_id == userChangedKey) {
+							index = i;
+						}
+					}
+
+					if (index > -1) {
+						var updatedRequesters = this.state.requesters.slice();
+						updatedRequesters.splice(index, 1);
+						this.setState({ requesters: updatedRequesters });
+					}
+				});
+			});
+		},
+
+		handleAcceptConnection: function (user) {
+			var connectionUpdate = {};
+			connectionUpdate['connections/' + this.state.currentUserID + '/' + user.user_id] = { status: "accepted" };
+			firebase.database().ref().update(connectionUpdate);
+
+			var connectionOtherUpdate = {};
+			connectionOtherUpdate['connections/' + user.user_id + '/' + this.state.currentUserID] = { status: "accepted" };
+			firebase.database().ref().update(connectionOtherUpdate);
+		},
+
+		handleRemoveConnection: function (user) {
+			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID + '/' + user.user_id);
+			connectionRef.remove();
+
+			var connectionOtherRef = firebase.database().ref().child('connections/' + user.user_id + '/' + this.state.currentUserID);
+			connectionOtherRef.remove();
+		},
+
+		showAwaitingAcceptance: function (user) {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'button',
+					{ className: 'btn btn-default', onClick: this.handleAcceptConnection.bind(null, user) },
+					'Accept Connection'
+				),
+				React.createElement(
+					'button',
+					{ className: 'btn btn-default', onClick: this.handleRemoveConnection.bind(null, user) },
+					'Delete Request'
+				)
+			);
+		},
+
+		render: function () {
+			var showRequests;
+			if (this.state.requesters.length == 0) {
+				showRequests = React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'center',
+						null,
+						'No new requests!'
+					)
+				);
+			} else {
+				showRequests = this.state.requesters.map((user, index) => React.createElement(
+					'div',
+					{ key: index },
+					React.createElement(
+						Link,
+						{ to: "users/" + user.user_id },
+						React.createElement('img', { src: user.url, className: 'img-circle', alt: '', width: '50', height: '50', style: { objectFit: 'cover' } }),
+						user.first + " " + user.last
+					),
+					this.showAwaitingAcceptance(user),
+					React.createElement('br', null)
+				));
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'center',
+					null,
+					React.createElement(
+						'h1',
+						null,
+						'Requests'
+					)
+				),
+				showRequests
+			);
+		}
+	});
+
+	module.exports = AwaitingAcceptance;
+
+/***/ },
+/* 260 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var AllConnections = React.createClass({
+		displayName: 'AllConnections',
+
+		getInitialState: function () {
+			return {
+				currentUserID: "",
+				connections: []
+			};
+		},
+
+		componentWillMount: function () {
+			var that = this;
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ currentUserID: user.uid });
+				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('accepted');
+				connectionRef.on("child_added", snap => {
+					var connectionID = snap.ref.key;
+					var connectionRef = firebase.database().ref().child('users/' + connectionID);
+					connectionRef.on("value", snap => {
+						var userData = snap.val();
+						var userInfo = {
+							first: userData.first,
+							last: userData.last,
+							hasProfileImage: userData.hasProfileImage,
+							user_id: snap.ref.key,
+							url: ""
+						};
+						if (userInfo.hasProfileImage) {
+							var userImageRef = firebase.storage().ref().child('images/users/' + userInfo.user_id + '/profilepic.jpg');
+							userImageRef.getDownloadURL().then(function (url) {
+								userInfo.url = url;
+								var updatedConnections = that.state.connections.slice();
+								updatedConnections.push(userInfo);
+								that.setState({ connections: updatedConnections });
+							}).catch(function (error) {
+								var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+								defaultRef.getDownloadURL().then(function (url) {
+									userInfo.url = url;
+									var updatedConnections = that.state.connections.slice();
+									updatedConnections.push(userInfo);
+									that.setState({ connections: updatedConnections });
+								});
+							});
+						} else {
+							var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
+							defaultRef.getDownloadURL().then(function (url) {
+								userInfo.url = url;
+								var updatedConnections = that.state.connections.slice();
+								updatedConnections.push(userInfo);
+								that.setState({ connections: updatedConnections });
+							});
+						}
+					});
+				});
+
+				//if status was updated, remove from array of connections
+				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
+				connectionRef.on("child_changed", snap => {
+					var userChangedKey = snap.ref.key;
+					var index = -1;
+					for (var i = 0; i < this.state.connections.length; i++) {
+						if (this.state.connections[i].user_id == userChangedKey) {
+							index = i;
+						}
+					}
+
+					if (index > -1) {
+						var updatedConnections = this.state.connections.slice();
+						updatedConnections.splice(index, 1);
+						this.setState({ connections: updatedConnections });
+					}
+				});
+
+				//if rejected acceptance, remove from array of connections
+				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
+				connectionRef.on("child_removed", snap => {
+					var userChangedKey = snap.ref.key;
+					var index = -1;
+					for (var i = 0; i < this.state.connections.length; i++) {
+						if (this.state.connections[i].user_id == userChangedKey) {
+							index = i;
+						}
+					}
+
+					if (index > -1) {
+						var updatedConnections = this.state.connections.slice();
+						updatedConnections.splice(index, 1);
+						this.setState({ connections: updatedConnections });
+					}
+				});
+			});
+		},
+
+		render: function () {
+			var showConnections;
+			if (this.state.connections.length == 0) {
+				showConnections = React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'center',
+						null,
+						'You currently have no connections. Add some!'
+					)
+				);
+			} else {
+				showConnections = this.state.connections.map((user, index) => React.createElement(
+					'div',
+					{ key: index },
+					React.createElement(
+						Link,
+						{ to: "users/" + user.user_id },
+						React.createElement('img', { src: user.url, className: 'img-circle', alt: '', width: '50', height: '50', style: { objectFit: 'cover' } }),
+						user.first + " " + user.last
+					),
+					React.createElement('br', null),
+					React.createElement('br', null)
+				));
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'center',
+					null,
+					React.createElement(
+						'h1',
+						null,
+						'Connections'
+					)
+				),
+				showConnections
+			);
+		}
+	});
+
+	module.exports = AllConnections;
+
+/***/ },
+/* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);
