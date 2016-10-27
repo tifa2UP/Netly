@@ -30057,7 +30057,7 @@
 				connectionRef.on("child_added", snap => {
 					var requesterID = snap.ref.key;
 					var requesterRef = firebase.database().ref().child('users/' + requesterID);
-					requesterRef.on("value", snap => {
+					requesterRef.once("value", snap => {
 						var userData = snap.val();
 						var userInfo = {
 							first: userData.first,
@@ -30240,7 +30240,7 @@
 				connectionRef.on("child_added", snap => {
 					var connectionID = snap.ref.key;
 					var connectionRef = firebase.database().ref().child('users/' + connectionID);
-					connectionRef.on("value", snap => {
+					connectionRef.once("value", snap => {
 						var userData = snap.val();
 						var userInfo = {
 							first: userData.first,

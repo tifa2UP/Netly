@@ -19,7 +19,7 @@ var AllConnections = React.createClass({
 			connectionRef.on("child_added", snap=>{
 				var connectionID = snap.ref.key;
 				var connectionRef = firebase.database().ref().child('users/' + connectionID);
-				connectionRef.on("value", snap=>{
+				connectionRef.once("value", snap=>{
 					var userData = snap.val();
 					var userInfo = {
 						first: userData.first,

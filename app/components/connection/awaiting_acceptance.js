@@ -19,7 +19,7 @@ var AwaitingAcceptance = React.createClass({
 			connectionRef.on("child_added", snap=>{
 				var requesterID = snap.ref.key;
 				var requesterRef = firebase.database().ref().child('users/' + requesterID);
-				requesterRef.on("value", snap=>{
+				requesterRef.once("value", snap=>{
 					var userData = snap.val();
 					var userInfo = {
 						first: userData.first,
