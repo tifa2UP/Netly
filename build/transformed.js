@@ -28562,6 +28562,14 @@
 			this.setState({ hasError: false });
 		},
 
+		handleKeyPress: function (e) {
+			if (e.key == "Enter") {
+				try {
+					this.verifyPassword();
+				} catch (e) {}
+			}
+		},
+
 		//creates an empty div if no error message
 		enterPasswordAlert: function () {
 			return React.createElement(
@@ -28623,7 +28631,7 @@
 				show = React.createElement(
 					'div',
 					null,
-					React.createElement('input', { type: 'password', ref: 'current_password', placeholder: 'Current Password', className: 'form-control', onChange: this.handleTypingChange }),
+					React.createElement('input', { type: 'password', ref: 'current_password', placeholder: 'Current Password', className: 'form-control', onChange: this.handleTypingChange, onKeyPress: this.handleKeyPress }),
 					React.createElement('br', null),
 					React.createElement(
 						'button',

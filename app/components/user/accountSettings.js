@@ -42,6 +42,14 @@ var AccountSettings = React.createClass({
 		this.setState({hasError: false});
 	},
 
+	handleKeyPress: function(e){
+		if(e.key == "Enter"){
+			try{
+				this.verifyPassword();
+			}catch(e){}
+		}
+	},
+
 	//creates an empty div if no error message
 	enterPasswordAlert: function(){
 		return <div className="alert alert-info">Please enter your current password before proceeding.</div>;;
@@ -77,7 +85,7 @@ var AccountSettings = React.createClass({
 		}else{
 			show = 
 				<div>
-					<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.handleTypingChange}/><br />
+					<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.handleTypingChange} onKeyPress={this.handleKeyPress}/><br />
 					<button className="btn btn-success" onClick={this.verifyPassword}>Verify</button>
 				</div>
 		}
