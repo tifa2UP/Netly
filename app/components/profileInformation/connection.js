@@ -19,18 +19,16 @@ var Connection = React.createClass({
 		this.setState({isCurrentUser: this.props.isCurrentUser});
 
 		if(!this.props.isCurrentUser){
-			var connectionRef = firebase.database().ref().child('connections/' + this.props.currentUserID + '/' + this.props.pageID);
-			connectionRef.on("value", snap=>{
+			this.connectionRef = firebase.database().ref().child('connections/' + this.props.currentUserID + '/' + this.props.pageID);
+			this.connectionRef.on("value", snap=>{
 				var connection = snap.val();
 				if(connection && connection.status){
 					this.setState({status: connection.status});
 				}
 			});
-		}
 
-		if(!this.props.isCurrentUser){
-			var connectionRef = firebase.database().ref().child('connections/' + this.props.currentUserID);
-			connectionRef.on("child_removed", snap=>{
+			this.connectionRefUpdates = firebase.database().ref().child('connections/' + this.props.currentUserID);
+			this.connectionRefUpdates.on("child_removed", snap=>{
 				var removedKey = snap.ref.key;
 				if(removedKey == this.props.pageID){
 					this.setState({status: ""});
@@ -45,24 +43,27 @@ var Connection = React.createClass({
 		this.setState({isCurrentUser: nextProps.isCurrentUser});
 
 		if(!nextProps.isCurrentUser){
-			var connectionRef = firebase.database().ref().child('connections/' + nextProps.currentUserID + '/' + nextProps.pageID);
-			connectionRef.on("value", snap=>{
+			this.connectionRef = firebase.database().ref().child('connections/' + nextProps.currentUserID + '/' + nextProps.pageID);
+			this.connectionRef.on("value", snap=>{
 				var connection = snap.val();
 				if(connection && connection.status){
 					this.setState({status: connection.status});
 				}
 			});
-		}
 
-		if(!this.props.isCurrentUser){
-			var connectionRef = firebase.database().ref().child('connections/' + nextProps.currentUserID);
-			connectionRef.on("child_removed", snap=>{
+			this.connectionRefUpdates = firebase.database().ref().child('connections/' + nextProps.currentUserID);
+			this.connectionRefUpdates.on("child_removed", snap=>{
 				var removedKey = snap.ref.key;
 				if(removedKey == nextProps.pageID){
 					this.setState({status: ""});
 				}
 			});
 		}
+	},
+
+	componentWillUnmount: function(){
+		this.connectionRef.off();
+		this.connectionRefUpdates.off();
 	},
 
 	handleAddConnection: function(){

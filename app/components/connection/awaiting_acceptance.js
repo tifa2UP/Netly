@@ -13,8 +13,10 @@ var AwaitingAcceptance = React.createClass({
 
 	componentWillMount: function(){
 		var that = this;
-		firebase.auth().onAuthStateChanged((user) => {
+		this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
 			this.setState({currentUserID: user.uid});
+
+			//get connections whose status is awaiting acceptance
 			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('awaiting-acceptance');
 			connectionRef.on("child_added", snap=>{
 				var requesterID = snap.ref.key;
@@ -28,6 +30,8 @@ var AwaitingAcceptance = React.createClass({
 						user_id: snap.ref.key,
 						url: "",
 					};
+
+					//gets the user's profile image url & updates the state
 					if(userInfo.hasProfileImage){
 	                    var userImageRef = firebase.storage().ref().child('images/users/' + userInfo.user_id + '/profilepic.jpg');
 	                    userImageRef.getDownloadURL().then(function(url){
@@ -53,6 +57,7 @@ var AwaitingAcceptance = React.createClass({
 	                        that.setState({requesters: updatedRequesters});
 	                    });
 	                }
+
 				});
 			});
 
@@ -94,6 +99,11 @@ var AwaitingAcceptance = React.createClass({
 		});
 	},
 
+	componentWillUnmount: function(){
+		this.unsubscribe();
+	},
+
+	//update the connection status to accepted
 	handleAcceptConnection: function(user){
 		var connectionUpdate = {};
 		connectionUpdate['connections/' + this.state.currentUserID + '/' + user.user_id] = {status: "accepted"}
@@ -104,6 +114,7 @@ var AwaitingAcceptance = React.createClass({
 		firebase.database().ref().update(connectionOtherUpdate);
 	},
 
+	//remove the connection
 	handleRemoveConnection: function(user){
 		var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID + '/' + user.user_id);
 		connectionRef.remove();
@@ -112,6 +123,7 @@ var AwaitingAcceptance = React.createClass({
 		connectionOtherRef.remove();
 	},
 
+	//show the accept & delete request buttons
 	showAwaitingAcceptance: function(user){
 		return(
 			<div>

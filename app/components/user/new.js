@@ -35,7 +35,7 @@ var SignUpForm = React.createClass({
 		}
 
 		//if successfully logged in, add the user child to the database with the name and email.
-		firebase.auth().onAuthStateChanged(function(user) {
+		this.unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
   			if (user) {
   				var userData = {
   					email: email,
@@ -60,6 +60,13 @@ var SignUpForm = React.createClass({
 				hashHistory.push("/");
   			}
 		});
+	},
+
+	componentWillUnmount: function(){
+		if (typeof this.unsubscribe == 'function')
+		{
+			this.unsubscribe(); 
+		}
 	},
 
 	//if "Enter" was pressed, act as Sign Up was clicked

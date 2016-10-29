@@ -29,13 +29,20 @@ var LogInForm = React.createClass({
 		});
 
 		//if successfully logged in, reroute to home
-		firebase.auth().onAuthStateChanged(function(user) {
+		this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
   			if (user) {
 				hashHistory.push("/");
   			} else {
 		    	hashHistory.push("/login");
   			}
 		});
+	},
+
+	componentWillUnmount: function(){
+		if (typeof this.unsubscribe == 'function')
+		{
+			this.unsubscribe(); 
+		}
 	},
 
 	//if user pressed "Enter" while filling out his/her info, act as if Login was clicked

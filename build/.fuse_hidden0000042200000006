@@ -27752,11 +27752,12 @@
 	var Logout = __webpack_require__(244);
 	var Layout = __webpack_require__(245);
 	var AccountSettings = __webpack_require__(246);
-	var Profile = __webpack_require__(249);
-	var AwaitingAcceptance = __webpack_require__(258);
-	var Connections = __webpack_require__(259);
+	var AccountSettings2 = __webpack_require__(249);
+	var Profile = __webpack_require__(250);
+	var AwaitingAcceptance = __webpack_require__(259);
+	var Connections = __webpack_require__(260);
 
-	var requireAuth = __webpack_require__(260);
+	var requireAuth = __webpack_require__(261);
 
 	var routes = React.createElement(
 		Router,
@@ -27770,6 +27771,7 @@
 			React.createElement(Route, { path: 'logout', component: Logout }),
 			React.createElement(Route, { path: 'accountSettings', component: AccountSettings, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'users/:id', component: Profile, onEnter: requireAuth }),
+			React.createElement(Route, { path: 'accountsettings/2', component: AccountSettings2, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'requests', component: AwaitingAcceptance, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'connections', component: Connections, onEnter: requireAuth })
 		)
@@ -27820,7 +27822,7 @@
 			}
 
 			//if successfully logged in, add the user child to the database with the name and email.
-			this.unsubscribe = firebase.auth().onAuthStateChanged(function (user) {
+			firebase.auth().onAuthStateChanged(function (user) {
 				if (user) {
 					var userData = {
 						email: email,
@@ -27845,12 +27847,6 @@
 					hashHistory.push("/");
 				}
 			});
-		},
-
-		componentWillUnmount: function () {
-			if (typeof this.unsubscribe == 'function') {
-				this.unsubscribe();
-			}
 		},
 
 		//if "Enter" was pressed, act as Sign Up was clicked
@@ -27985,19 +27981,13 @@
 			});
 
 			//if successfully logged in, reroute to home
-			this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
+			firebase.auth().onAuthStateChanged(function (user) {
 				if (user) {
 					hashHistory.push("/");
 				} else {
 					hashHistory.push("/login");
 				}
 			});
-		},
-
-		componentWillUnmount: function () {
-			if (typeof this.unsubscribe == 'function') {
-				this.unsubscribe();
-			}
 		},
 
 		//if user pressed "Enter" while filling out his/her info, act as if Login was clicked
@@ -28100,9 +28090,9 @@
 		componentWillMount: function () {
 			var that = this;
 			//gets the post reference
-			this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
+			var postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
 			//for each child added to post, push to postArray
-			this.postsRef.on("child_added", snap => {
+			postsRef.on("child_added", snap => {
 				var post = snap.val();
 				var newPostWithId = {
 					user_id: post.user_id,
@@ -28119,7 +28109,7 @@
 			});
 
 			//for each child changed to post, replace that post with the post already in postArray
-			this.postsRef.on("child_changed", snap => {
+			postsRef.on("child_changed", snap => {
 				var post = snap.val();
 				var updatedPost = {
 					user_id: post.user_id,
@@ -28140,10 +28130,6 @@
 				updatedPostArray.splice(index, 1, updatedPost);
 				this.setState({ postArray: updatedPostArray });
 			});
-		},
-
-		componentWillUnmount: function () {
-			this.postsRef.off();
 		},
 
 		//adds the new post to the database upon clicking Post
@@ -28341,14 +28327,14 @@
 	    componentWillMount: function () {
 	        var that = this;
 
-	        this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
+	        firebase.auth().onAuthStateChanged(user => {
 	            this.setState({ isLoggedIn: null != user });
 	            this.setState({ recruiter: this.state.isLoggedIn == false ? false : null });
 	            this.setState({ name: user.displayName });
 	            this.setState({ user_id: user.uid });
 
-	            this.userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
-	            this.userRef.on("value", snap => {
+	            userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
+	            userRef.on("value", snap => {
 	                var user = snap.val();
 	                if (user.hasProfileImage) {
 	                    var userImageRef = firebase.storage().ref().child('images/users/' + firebase.auth().currentUser.uid + '/profilepic.jpg');
@@ -28369,10 +28355,6 @@
 	                this.setState({ recruiter: user == null || !user.recruiter ? false : true });
 	            });
 	        });
-	    },
-
-	    componentWillUnmount: function () {
-	        this.unsubscribe();
 	    },
 
 	    render: function () {
@@ -28529,7 +28511,7 @@
 
 		//initially, no submission errors
 		getInitialState: function () {
-			return { hasError: false, errorMsg: "", verified: false, verificationMessage: "" };
+			return { hasError: false, errorMsg: "", verified: false };
 		},
 
 		verifyPassword: function (e) {
@@ -28539,35 +28521,20 @@
 				var user = firebase.auth().currentUser;
 				var credential = firebase.auth.EmailAuthProvider.credential(user.email, this.refs.current_password.value);
 				user.reauthenticate(credential).then(function () {
-					that.setState({ verified: true });
-					that.setState({ verificationMessage: "Your password has been verified." });
-					that.setState({ hasError: false });
-					that.setState({ errorMsg: "" });
+					hashHistory.push('/accountsettings/2');
 				}).catch(function (error) {
-					that.setState({ hasError: true });
-					that.setState({ errorMsg: "The password you entered is invalid." });
-					that.setState({ verified: false });
-					that.setState({ verificationMessage: "" });
+					//handle error
 				});
-			} else {
-				this.setState({ hasError: true });
-				this.setState({ errorMsg: "Your current password cannot be blank." });
-				this.setState({ verified: false });
-				this.setState({ verificationMessage: "" });
 			}
-		},
-
-		handleTypingChange: function () {
-			this.setState({ verified: false });
-			this.setState({ hasError: false });
 		},
 
 		//creates an empty div if no error message
 		enterPasswordAlert: function () {
 			return React.createElement(
 				'div',
-				{ className: 'alert alert-info' },
-				'Please enter your current password before proceeding.'
+				{ className: 'alert alert-danger' },
+				'Please enter your current password before proceeding.',
+				this.state.verificationMessage
 			);;
 		},
 
@@ -28584,53 +28551,14 @@
 			);
 		},
 
-		//creates an empty div if no error message
-		errorAlert: function () {
-			return React.createElement(
-				'div',
-				{ className: 'alert alert-danger' },
-				React.createElement(
-					'strong',
-					null,
-					'Error! '
-				),
-				this.state.errorMsg
-			);
-		},
-
 		render: function () {
+
 			//gets the appropriate error alert div depending on whether or not the form has an error
 			var alert;
 			if (this.state.verified) {
 				alert = this.successAlert();
-			} else if (this.state.hasError) {
-				alert = this.errorAlert();
 			} else {
 				alert = this.enterPasswordAlert();
-			}
-
-			var show;
-			if (this.state.verified) {
-				show = React.createElement(
-					'div',
-					null,
-					React.createElement(UpdatePassword, null),
-					React.createElement('br', null),
-					React.createElement(DeleteAccount, null),
-					React.createElement('br', null)
-				);
-			} else {
-				show = React.createElement(
-					'div',
-					null,
-					React.createElement('input', { type: 'password', ref: 'current_password', placeholder: 'Current Password', className: 'form-control', onChange: this.handleTypingChange }),
-					React.createElement('br', null),
-					React.createElement(
-						'button',
-						{ className: 'btn btn-success', onClick: this.verifyPassword },
-						'Verify'
-					)
-				);
 			}
 
 			return React.createElement(
@@ -28650,7 +28578,8 @@
 							'Account Settings'
 						),
 						React.createElement('br', null),
-						show
+						React.createElement('input', { type: 'password', ref: 'current_password', placeholder: 'Current Password', className: 'form-control', onChange: this.verifyPassword }),
+						React.createElement('br', null)
 					)
 				),
 				React.createElement('div', { className: 'col-md-4' })
@@ -28861,22 +28790,83 @@
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
+	var DeleteAccount = __webpack_require__(247);
+	var UpdatePassword = __webpack_require__(248);
 
-	//profile components
-	var Summary = __webpack_require__(250);
-	var Education = __webpack_require__(251);
-	var Projects = __webpack_require__(252);
-	var Interests = __webpack_require__(253);
-	var Experience = __webpack_require__(254);
-	var Skills = __webpack_require__(255);
-	var ProfileImage = __webpack_require__(256);
-	var Connection = __webpack_require__(257);
+	var AccountSettings = React.createClass({
+		displayName: 'AccountSettings',
+
+
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				alert,
+				React.createElement('div', { className: 'col-md-4' }),
+				React.createElement(
+					'div',
+					{ className: 'col-md-4' },
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'h1',
+							null,
+							'Account Settings'
+						),
+						React.createElement('br', null),
+						React.createElement(UpdatePassword, null),
+						React.createElement('br', null),
+						React.createElement(DeleteAccount, null),
+						React.createElement('br', null)
+					)
+				),
+				React.createElement('div', { className: 'col-md-4' })
+			);
+		}
+	});
+
+	module.exports = AccountSettings;
+
+/***/ },
+/* 250 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+	var Summary = __webpack_require__(251);
+	var Education = __webpack_require__(252);
+	var Projects = __webpack_require__(253);
+	var Interests = __webpack_require__(254);
+	var Experience = __webpack_require__(255);
+	var Skills = __webpack_require__(256);
+	var ProfileImage = __webpack_require__(257);
+	var Connection = __webpack_require__(258);
 
 	var Profile = React.createClass({
 		displayName: 'Profile',
 
 		getInitialState: function () {
 			return { user_name: "", recruiter: false, isCurrentUser: false, pageID: "", currentUserID: "" };
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			//same as componentwillmount, but happens only if the params changed to another user
+			this.setState({ pageID: nextProps.params.id });
+
+			firebase.auth().onAuthStateChanged(user => {
+				this.setState({ isCurrentUser: user.uid == nextProps.params.id });
+				this.setState({ currentUserID: user.uid });
+			});
+
+			var userRef = firebase.database().ref().child('users/' + nextProps.params.id);
+			userRef.on("value", snap => {
+				var user = snap.val();
+				this.setState({ user_name: user.first + " " + user.last });
+				this.setState({ recruiter: user.recruiter });
+			});
 		},
 
 		componentWillMount: function () {
@@ -28886,40 +28876,18 @@
 			this.setState({ pageID: this.props.params.id });
 
 			//checks to see if the user page belongs to the current user
-			this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
+			firebase.auth().onAuthStateChanged(user => {
 				this.setState({ isCurrentUser: user.uid == this.props.params.id });
 				this.setState({ currentUserID: user.uid });
 			});
 
 			//gets the name of the user and whether or not he/she is a recruiter--not yet used
-			this.userRef = firebase.database().ref().child('users/' + this.props.params.id);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.params.id);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				this.setState({ user_name: user.first + " " + user.last });
 				this.setState({ recruiter: user.recruiter });
 			});
-		},
-
-		componentWillReceiveProps: function (nextProps) {
-			//same as componentwillmount, but happens only if the params changed to another user
-			this.setState({ pageID: nextProps.params.id });
-
-			this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
-				this.setState({ isCurrentUser: user.uid == nextProps.params.id });
-				this.setState({ currentUserID: user.uid });
-			});
-
-			this.userRef = firebase.database().ref().child('users/' + nextProps.params.id);
-			this.userRef.on("value", snap => {
-				var user = snap.val();
-				this.setState({ user_name: user.first + " " + user.last });
-				this.setState({ recruiter: user.recruiter });
-			});
-		},
-
-		componentWillUnmount: function () {
-			this.userRef.off();
-			this.unsubscribe();
 		},
 
 		render: function () {
@@ -28951,7 +28919,7 @@
 	module.exports = Profile;
 
 /***/ },
-/* 250 */
+/* 251 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28967,8 +28935,8 @@
 		},
 
 		componentWillMount: function () {
-			this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.summary) {
 					this.setState({ summary: user.summary });
@@ -28979,8 +28947,8 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.summary) {
 					this.setState({ summary: user.summary });
@@ -28988,10 +28956,6 @@
 					this.setState({ summary: "" });
 				}
 			});
-		},
-
-		componentWillUnmount: function () {
-			this.userRef.off();
 		},
 
 		handleClickEdit: function () {
@@ -29002,7 +28966,8 @@
 			this.setState({ editing: false });
 			var newSummary = this.refs.newSummary.value;
 
-			this.userRef.once("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
 				for (var i in user) {
@@ -29092,7 +29057,7 @@
 	module.exports = Summary;
 
 /***/ },
-/* 251 */
+/* 252 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29108,8 +29073,8 @@
 		},
 
 		componentWillMount: function () {
-			this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.education) {
 					this.setState({ education: user.education });
@@ -29120,8 +29085,8 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.education) {
 					this.setState({ education: user.education });
@@ -29139,7 +29104,8 @@
 			this.setState({ editing: false });
 			var newEducation = this.refs.newEducation.value;
 
-			this.userRef.once("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
 				for (var i in user) {
@@ -29223,17 +29189,13 @@
 				partToShow,
 				React.createElement('br', null)
 			);
-		},
-
-		componentWillUnmount: function () {
-			this.userRef.off();
 		}
 	});
 
 	module.exports = Education;
 
 /***/ },
-/* 252 */
+/* 253 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29249,8 +29211,8 @@
 		},
 
 		componentWillMount: function () {
-			this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.projects) {
 					this.setState({ projects: user.projects });
@@ -29261,8 +29223,8 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.projects) {
 					this.setState({ projects: user.projects });
@@ -29280,7 +29242,8 @@
 			this.setState({ editing: false });
 			var newProjects = this.refs.newProjects.value;
 
-			this.userRef.once("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
 				for (var i in user) {
@@ -29291,10 +29254,6 @@
 				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
-		},
-
-		componentWillUnmount: function () {
-			this.userRef.off();
 		},
 
 		handleClickCancel: function () {
@@ -29374,7 +29333,7 @@
 	module.exports = Projects;
 
 /***/ },
-/* 253 */
+/* 254 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29390,8 +29349,8 @@
 		},
 
 		componentWillMount: function () {
-			this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.interests) {
 					this.setState({ interests: user.interests });
@@ -29402,8 +29361,8 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.interests) {
 					this.setState({ interests: user.interests });
@@ -29419,11 +29378,12 @@
 
 		handleClickSave: function () {
 			var that = this;
-			this.setState({ editing: false });
 
+			this.setState({ editing: false });
 			var newInterests = this.refs.newInterests.value;
 
-			this.userRef.once("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
 				for (var i in user) {
@@ -29513,7 +29473,7 @@
 	module.exports = Interests;
 
 /***/ },
-/* 254 */
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -29530,8 +29490,8 @@
 		},
 
 		componentWillMount: function () {
-			this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.experience) {
 					this.setState({ experience: user.experience });
@@ -29542,8 +29502,8 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.experience) {
 					this.setState({ experience: user.experience });
@@ -29561,7 +29521,8 @@
 			this.setState({ editing: false });
 			var newExperience = this.refs.newExperience.value;
 
-			this.userRef.once("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
 				for (var i in user) {
@@ -29651,7 +29612,7 @@
 	module.exports = Experience;
 
 /***/ },
-/* 255 */
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29667,8 +29628,8 @@
 		},
 
 		componentWillMount: function () {
-			this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.skills) {
 					this.setState({ skills: user.skills });
@@ -29679,8 +29640,8 @@
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-			this.userRef.on("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
+			userRef.on("value", snap => {
 				var user = snap.val();
 				if (user.skills) {
 					this.setState({ skills: user.skills });
@@ -29698,7 +29659,8 @@
 			this.setState({ editing: false });
 			var newSkills = this.refs.newSkills.value;
 
-			this.userRef.once("value", snap => {
+			var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+			userRef.once("value", snap => {
 				var user = snap.val();
 				var userInfo = {};
 				for (var i in user) {
@@ -29709,10 +29671,6 @@
 				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
-		},
-
-		componentWillUnmount: function () {
-			this.userRef.off();
 		},
 
 		handleClickCancel: function () {
@@ -29790,7 +29748,7 @@
 	module.exports = Skills;
 
 /***/ },
-/* 256 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29806,12 +29764,35 @@
 	        return { imgURL: "" };
 	    },
 
+	    //uploads the image into firebase storage
+	    handleUploadImage: function (e) {
+	        var that = this;
+
+	        //gets the file data
+	        var imageFile = e.target.files[0];
+	        //creates a new reference called profilepic.jpg in the user storage folder for this current user
+	        var userProfileImageRef = firebase.storage().ref().child('images/users/' + this.props.pageID + '/profilepic.jpg');
+	        //stores the file into the reference
+	        userProfileImageRef.put(imageFile).then(function (snapshot) {
+	            //gets the user data and reupdates it after changing hasProfileImage and imageFileName
+	            var userData = {};
+	            for (var i in that.state.userData) {
+	                userData[i] = that.state.userData[i];
+	            }
+	            userData.hasProfileImage = true;
+	            userData.imageFileName = imageFile.name;
+	            var updates = {};
+	            updates['users/' + that.props.pageID] = userData;
+	            firebase.database().ref().update(updates);
+	        });
+	    },
+
 	    componentWillMount: function () {
 	        var that = this;
 
 	        //checks to see if the user has a profile picture, if not, use default image.
-	        this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-	        this.userRef.on("value", snap => {
+	        var userRef = firebase.database().ref().child('users/' + this.props.pageID);
+	        userRef.on("value", snap => {
 	            var user = snap.val();
 	            this.setState({ userData: user });
 	            if (user.hasProfileImage) {
@@ -29837,8 +29818,8 @@
 	        var that = this;
 
 	        //does the same as component will mount, but updates to the correct param user
-	        this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-	        this.userRef.on("value", snap => {
+	        var userRef = firebase.database().ref().child('users/' + nextProps.pageID);
+	        userRef.on("value", snap => {
 	            var user = snap.val();
 	            this.setState({ userData: user });
 	            if (user.hasProfileImage) {
@@ -29857,33 +29838,6 @@
 	                    that.setState({ imgURL: url });
 	                });
 	            }
-	        });
-	    },
-
-	    componentWillUnmount: function () {
-	        this.userRef.off();
-	    },
-
-	    //uploads the image into firebase storage
-	    handleUploadImage: function (e) {
-	        var that = this;
-
-	        //gets the file data
-	        var imageFile = e.target.files[0];
-	        //creates a new reference called profilepic.jpg in the user storage folder for this current user
-	        var userProfileImageRef = firebase.storage().ref().child('images/users/' + this.props.pageID + '/profilepic.jpg');
-	        //stores the file into the reference
-	        userProfileImageRef.put(imageFile).then(function (snapshot) {
-	            //gets the user data and reupdates it after changing hasProfileImage and imageFileName
-	            var userData = {};
-	            for (var i in that.state.userData) {
-	                userData[i] = that.state.userData[i];
-	            }
-	            userData.hasProfileImage = true;
-	            userData.imageFileName = imageFile.name;
-	            var updates = {};
-	            updates['users/' + that.props.pageID] = userData;
-	            firebase.database().ref().update(updates);
 	        });
 	    },
 
@@ -29910,7 +29864,7 @@
 	module.exports = UploadImage;
 
 /***/ },
-/* 257 */
+/* 258 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29936,16 +29890,18 @@
 			this.setState({ isCurrentUser: this.props.isCurrentUser });
 
 			if (!this.props.isCurrentUser) {
-				this.connectionRef = firebase.database().ref().child('connections/' + this.props.currentUserID + '/' + this.props.pageID);
-				this.connectionRef.on("value", snap => {
+				var connectionRef = firebase.database().ref().child('connections/' + this.props.currentUserID + '/' + this.props.pageID);
+				connectionRef.on("value", snap => {
 					var connection = snap.val();
 					if (connection && connection.status) {
 						this.setState({ status: connection.status });
 					}
 				});
+			}
 
-				this.connectionRefUpdates = firebase.database().ref().child('connections/' + this.props.currentUserID);
-				this.connectionRefUpdates.on("child_removed", snap => {
+			if (!this.props.isCurrentUser) {
+				var connectionRef = firebase.database().ref().child('connections/' + this.props.currentUserID);
+				connectionRef.on("child_removed", snap => {
 					var removedKey = snap.ref.key;
 					if (removedKey == this.props.pageID) {
 						this.setState({ status: "" });
@@ -29960,27 +29916,24 @@
 			this.setState({ isCurrentUser: nextProps.isCurrentUser });
 
 			if (!nextProps.isCurrentUser) {
-				this.connectionRef = firebase.database().ref().child('connections/' + nextProps.currentUserID + '/' + nextProps.pageID);
-				this.connectionRef.on("value", snap => {
+				var connectionRef = firebase.database().ref().child('connections/' + nextProps.currentUserID + '/' + nextProps.pageID);
+				connectionRef.on("value", snap => {
 					var connection = snap.val();
 					if (connection && connection.status) {
 						this.setState({ status: connection.status });
 					}
 				});
+			}
 
-				this.connectionRefUpdates = firebase.database().ref().child('connections/' + nextProps.currentUserID);
-				this.connectionRefUpdates.on("child_removed", snap => {
+			if (!this.props.isCurrentUser) {
+				var connectionRef = firebase.database().ref().child('connections/' + nextProps.currentUserID);
+				connectionRef.on("child_removed", snap => {
 					var removedKey = snap.ref.key;
 					if (removedKey == nextProps.pageID) {
 						this.setState({ status: "" });
 					}
 				});
 			}
-		},
-
-		componentWillUnmount: function () {
-			this.connectionRef.off();
-			this.connectionRefUpdates.off();
 		},
 
 		handleAddConnection: function () {
@@ -30078,7 +30031,7 @@
 	module.exports = Connection;
 
 /***/ },
-/* 258 */
+/* 259 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30098,10 +30051,8 @@
 
 		componentWillMount: function () {
 			var that = this;
-			this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
+			firebase.auth().onAuthStateChanged(user => {
 				this.setState({ currentUserID: user.uid });
-
-				//get connections whose status is awaiting acceptance
 				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('awaiting-acceptance');
 				connectionRef.on("child_added", snap => {
 					var requesterID = snap.ref.key;
@@ -30115,8 +30066,6 @@
 							user_id: snap.ref.key,
 							url: ""
 						};
-
-						//gets the user's profile image url & updates the state
 						if (userInfo.hasProfileImage) {
 							var userImageRef = firebase.storage().ref().child('images/users/' + userInfo.user_id + '/profilepic.jpg');
 							userImageRef.getDownloadURL().then(function (url) {
@@ -30183,11 +30132,6 @@
 			});
 		},
 
-		componentWillUnmount: function () {
-			this.unsubscribe();
-		},
-
-		//update the connection status to accepted
 		handleAcceptConnection: function (user) {
 			var connectionUpdate = {};
 			connectionUpdate['connections/' + this.state.currentUserID + '/' + user.user_id] = { status: "accepted" };
@@ -30198,7 +30142,6 @@
 			firebase.database().ref().update(connectionOtherUpdate);
 		},
 
-		//remove the connection
 		handleRemoveConnection: function (user) {
 			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID + '/' + user.user_id);
 			connectionRef.remove();
@@ -30207,7 +30150,6 @@
 			connectionOtherRef.remove();
 		},
 
-		//show the accept & delete request buttons
 		showAwaitingAcceptance: function (user) {
 			return React.createElement(
 				'div',
@@ -30272,7 +30214,7 @@
 	module.exports = AwaitingAcceptance;
 
 /***/ },
-/* 259 */
+/* 260 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30292,15 +30234,13 @@
 
 		componentWillMount: function () {
 			var that = this;
-			this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
+			firebase.auth().onAuthStateChanged(user => {
 				this.setState({ currentUserID: user.uid });
-
-				//gets the connections whose status is accepted
-				this.connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('accepted');
-				this.connectionRef.on("child_added", snap => {
+				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('accepted');
+				connectionRef.on("child_added", snap => {
 					var connectionID = snap.ref.key;
-					this.otherConnectionRef = firebase.database().ref().child('users/' + connectionID);
-					this.otherConnectionRef.once("value", snap => {
+					var connectionRef = firebase.database().ref().child('users/' + connectionID);
+					connectionRef.once("value", snap => {
 						var userData = snap.val();
 						var userInfo = {
 							first: userData.first,
@@ -30338,8 +30278,8 @@
 				});
 
 				//if status was updated, remove from array of connections
-				this.connectionRefUpdates = firebase.database().ref().child('connections/' + this.state.currentUserID);
-				this.connectionRefUpdates.on("child_changed", snap => {
+				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
+				connectionRef.on("child_changed", snap => {
 					var userChangedKey = snap.ref.key;
 					var index = -1;
 					for (var i = 0; i < this.state.connections.length; i++) {
@@ -30356,7 +30296,8 @@
 				});
 
 				//if rejected acceptance, remove from array of connections
-				this.connectionRefUpdates.on("child_removed", snap => {
+				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
+				connectionRef.on("child_removed", snap => {
 					var userChangedKey = snap.ref.key;
 					var index = -1;
 					for (var i = 0; i < this.state.connections.length; i++) {
@@ -30372,15 +30313,6 @@
 					}
 				});
 			});
-		},
-
-		componentWillUnmount: function () {
-			if (this.otherConnectionRef) {
-				this.otherConnectionRef.off();
-			}
-			this.connectionRef.off();
-			this.connectionRefUpdates.off();
-			this.unsubscribe();
 		},
 
 		render: function () {
@@ -30430,7 +30362,7 @@
 	module.exports = AllConnections;
 
 /***/ },
-/* 260 */
+/* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);

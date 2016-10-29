@@ -53,7 +53,6 @@ var DeleteAccount = React.createClass({
 				var userRef = firebase.database().ref('users/' + user.uid);
 				userRef.remove();
 
-
 				setTimeout(function() {
 					user.delete().then(function(){
 						//redirects to home after success

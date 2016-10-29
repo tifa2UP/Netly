@@ -9,8 +9,8 @@ var Summary = React.createClass({
 	},
 
 	componentWillMount: function(){
-        var userRef = firebase.database().ref().child('users/'+this.props.pageID);
-        userRef.on("value", snap => {
+        this.userRef = firebase.database().ref().child('users/'+this.props.pageID);
+        this.userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.summary){
 				this.setState({summary: user.summary});
@@ -21,8 +21,8 @@ var Summary = React.createClass({
 	},
 
 	componentWillReceiveProps: function(nextProps){
-        var userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
-        userRef.on("value", snap => {
+        this.userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
+        this.userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.summary){
 				this.setState({summary: user.summary});
@@ -30,6 +30,10 @@ var Summary = React.createClass({
 				this.setState({summary: ""});
 			}
         });
+	},
+
+	componentWillUnmount: function(){
+		this.userRef.off();
 	},
 
 	handleClickEdit: function(){
@@ -40,8 +44,7 @@ var Summary = React.createClass({
 		this.setState({editing: false});
 		var newSummary = this.refs.newSummary.value;
 
-		var userRef = firebase.database().ref().child('users/'+this.props.pageID);
-        userRef.once("value", snap => {
+        this.userRef.once("value", snap => {
         	var user = snap.val();
 			var userInfo = {};
             for(var i in user){
