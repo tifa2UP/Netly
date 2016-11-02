@@ -13,13 +13,15 @@ var AllConnections = React.createClass({
 
 	componentWillMount: function(){
 		var that = this;
-		firebase.auth().onAuthStateChanged((user) => {
+		this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
 			this.setState({currentUserID: user.uid});
-			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('accepted');
-			connectionRef.on("child_added", snap=>{
+
+			//gets the connections whose status is accepted
+			this.connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('accepted');
+			this.connectionRef.on("child_added", snap=>{
 				var connectionID = snap.ref.key;
-				var connectionRef = firebase.database().ref().child('users/' + connectionID);
-				connectionRef.once("value", snap=>{
+				this.otherConnectionRef = firebase.database().ref().child('users/' + connectionID);
+				this.otherConnectionRef.once("value", snap=>{
 					var userData = snap.val();
 					var userInfo = {
 						first: userData.first,
@@ -57,8 +59,8 @@ var AllConnections = React.createClass({
 			});
 
 			//if status was updated, remove from array of connections
-			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
-			connectionRef.on("child_changed", snap=>{
+			this.connectionRefUpdates = firebase.database().ref().child('connections/' + this.state.currentUserID);
+			this.connectionRefUpdates.on("child_changed", snap=>{
 				var userChangedKey = snap.ref.key;
 				var index = -1;
 				for(var i = 0; i < this.state.connections.length; i++){
@@ -75,8 +77,7 @@ var AllConnections = React.createClass({
 			});
 
 			//if rejected acceptance, remove from array of connections
-			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
-			connectionRef.on("child_removed", snap=>{
+			this.connectionRefUpdates.on("child_removed", snap=>{
 				var userChangedKey = snap.ref.key;
 				var index = -1;
 				for(var i = 0; i < this.state.connections.length; i++){
@@ -92,6 +93,15 @@ var AllConnections = React.createClass({
 	        	}
 			});
 		});
+	},
+
+	componentWillUnmount: function(){
+		if(this.otherConnectionRef){
+			this.otherConnectionRef.off();
+		}
+		this.connectionRef.off();
+		this.connectionRefUpdates.off();
+		this.unsubscribe();
 	},
 
 	render: function(){

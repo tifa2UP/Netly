@@ -9,8 +9,8 @@ var Projects = React.createClass({
 	},
 
 	componentWillMount: function(){
-        var userRef = firebase.database().ref().child('users/'+this.props.pageID);
-        userRef.on("value", snap => {
+        this.userRef = firebase.database().ref().child('users/'+this.props.pageID);
+        this.userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.projects){
 				this.setState({projects: user.projects});
@@ -21,8 +21,8 @@ var Projects = React.createClass({
 	},
 
 	componentWillReceiveProps: function(nextProps){
-        var userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
-        userRef.on("value", snap => {
+        this.userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
+        this.userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.projects){
 				this.setState({projects: user.projects});
@@ -40,8 +40,7 @@ var Projects = React.createClass({
 		this.setState({editing: false});
 		var newProjects = this.refs.newProjects.value;
 
-		var userRef = firebase.database().ref().child('users/'+this.props.pageID);
-        userRef.once("value", snap => {
+        this.userRef.once("value", snap => {
         	var user = snap.val();
 			var userInfo = {};
             for(var i in user){
@@ -52,6 +51,10 @@ var Projects = React.createClass({
 			updates['users/' + this.props.pageID] = userInfo;
 			firebase.database().ref().update(updates);
         });
+	},
+
+	componentWillUnmount: function(){
+		this.userRef.off();
 	},
 
 	handleClickCancel: function(){

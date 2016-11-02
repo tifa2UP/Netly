@@ -15,9 +15,9 @@ var Home = React.createClass({
 	componentWillMount: function(){
 		var that = this;
 		//gets the post reference
-		var postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
+		this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
 		//for each child added to post, push to postArray
-		postsRef.on("child_added", snap => {
+		this.postsRef.on("child_added", snap => {
 			var post = snap.val();
 			var newPostWithId = {
 				user_id: post.user_id,
@@ -34,7 +34,7 @@ var Home = React.createClass({
 		});
 
 		//for each child changed to post, replace that post with the post already in postArray
-		postsRef.on("child_changed", snap => {
+		this.postsRef.on("child_changed", snap => {
 			var post = snap.val();
 			var updatedPost = {
 				user_id: post.user_id,
@@ -55,6 +55,10 @@ var Home = React.createClass({
 			updatedPostArray.splice(index, 1, updatedPost);
 			this.setState({postArray: updatedPostArray});
 		});
+	},
+
+	componentWillUnmount: function(){
+		this.postsRef.off();
 	},
 
 	//adds the new post to the database upon clicking Post

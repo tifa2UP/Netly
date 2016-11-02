@@ -2,6 +2,8 @@ var React = require('react');
 var firebase = require('firebase');
 var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
+
+//profile components
 var Summary = require('./summary.js');
 var Education = require('./education.js');
 var Projects = require('./projects.js');
@@ -16,23 +18,6 @@ var Profile = React.createClass({
 		return {user_name: "", recruiter: false, isCurrentUser: false, pageID: "", currentUserID: ""};
 	},
 
-	componentWillReceiveProps: function(nextProps){
-		//same as componentwillmount, but happens only if the params changed to another user
-		this.setState({pageID: nextProps.params.id});
-
-		firebase.auth().onAuthStateChanged((user) => {
-            this.setState({isCurrentUser: user.uid == nextProps.params.id});
-            this.setState({currentUserID: user.uid});
-        });
-
-		var userRef = firebase.database().ref().child('users/'+ nextProps.params.id);
-		userRef.on("value", snap=>{
-			var user = snap.val();
-			this.setState({user_name: user.first + " " + user.last});
-			this.setState({recruiter: user.recruiter});
-		});
-	},
-
 	componentWillMount: function(){
 		var that = this;
 
@@ -40,18 +25,40 @@ var Profile = React.createClass({
 		this.setState({pageID: this.props.params.id});
 
 		//checks to see if the user page belongs to the current user
-		firebase.auth().onAuthStateChanged((user) => {
+		this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
             this.setState({isCurrentUser: user.uid == this.props.params.id});
             this.setState({currentUserID: user.uid});
         });
 
 		//gets the name of the user and whether or not he/she is a recruiter--not yet used
-		var userRef = firebase.database().ref().child('users/'+this.props.params.id);
-		userRef.on("value", snap=>{
+		this.userRef = firebase.database().ref().child('users/'+this.props.params.id);
+		this.userRef.on("value", snap=>{
 			var user = snap.val();
 			this.setState({user_name: user.first + " " + user.last});
 			this.setState({recruiter: user.recruiter});
 		});
+	},
+
+	componentWillReceiveProps: function(nextProps){
+		//same as componentwillmount, but happens only if the params changed to another user
+		this.setState({pageID: nextProps.params.id});
+
+		this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+            this.setState({isCurrentUser: user.uid == nextProps.params.id});
+            this.setState({currentUserID: user.uid});
+        });
+
+		this.userRef = firebase.database().ref().child('users/'+ nextProps.params.id);
+		this.userRef.on("value", snap=>{
+			var user = snap.val();
+			this.setState({user_name: user.first + " " + user.last});
+			this.setState({recruiter: user.recruiter});
+		});
+	},
+
+	componentWillUnmount: function(){
+		this.userRef.off();
+		this.unsubscribe();
 	},
 
 	render: function(){	

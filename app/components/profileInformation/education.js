@@ -9,8 +9,8 @@ var Education = React.createClass({
 	},
 
 	componentWillMount: function(){
-        var userRef = firebase.database().ref().child('users/'+this.props.pageID);
-        userRef.on("value", snap => {
+        this.userRef = firebase.database().ref().child('users/'+this.props.pageID);
+        this.userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.education){
 				this.setState({education: user.education});
@@ -21,8 +21,8 @@ var Education = React.createClass({
 	},
 
 	componentWillReceiveProps: function(nextProps){
-		var userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
-        userRef.on("value", snap => {
+		this.userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
+        this.userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.education){
 				this.setState({education: user.education});
@@ -40,8 +40,7 @@ var Education = React.createClass({
 		this.setState({editing: false});
 		var newEducation = this.refs.newEducation.value;
 
-		var userRef = firebase.database().ref().child('users/'+this.props.pageID);
-        userRef.once("value", snap => {
+        this.userRef.once("value", snap => {
         	var user = snap.val();
 			var userInfo = {};
             for(var i in user){
@@ -57,6 +56,7 @@ var Education = React.createClass({
 	handleClickCancel: function(){
 		this.setState({editing: false});
 	},
+
 
 	defaultEducation: function(){
 		var editButton;
@@ -101,7 +101,11 @@ var Education = React.createClass({
 			</div>
 
 		);
-	}
+	},
+
+	componentWillUnmount: function(){
+		this.userRef.off();
+	},
 });
 
 module.exports = Education;

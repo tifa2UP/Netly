@@ -18,14 +18,14 @@ var Layout = React.createClass({
     componentWillMount: function() {
         var that = this;
 
-        firebase.auth().onAuthStateChanged((user) => {
+        this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
             this.setState({isLoggedIn: (null != user)});
             this.setState({recruiter: this.state.isLoggedIn == false ? false : null});
             this.setState({name: user.displayName});
             this.setState({user_id: user.uid});
 
-            userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
-            userRef.on("value", snap => {
+            this.userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
+            this.userRef.on("value", snap => {
                 var user = snap.val();
                 if(user.hasProfileImage){
                     var userImageRef = firebase.storage().ref().child('images/users/' + firebase.auth().currentUser.uid + '/profilepic.jpg');
@@ -46,6 +46,10 @@ var Layout = React.createClass({
                 this.setState({recruiter: (user == null || !user.recruiter) ? false : true});
             });
         });
+    },
+
+    componentWillUnmount: function(){
+        this.unsubscribe();
     },
 
     render: function() {

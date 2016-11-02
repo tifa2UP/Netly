@@ -7,6 +7,13 @@ var UpdatePassword = require('./updatePassword.js');
 var UploadImage = require('./uploadImage.js');
 
 
+<<<<<<< HEAD
+=======
+	//initially, no submission errors
+	getInitialState: function(){
+		return{hasError: false, errorMsg: "", verified: false, verificationMessage: ""};
+	},
+>>>>>>> 510107b4d50a6c64e3e65446c364ff8c73fbf3eb
 
 <<<<<<< HEAD
 class AccountSettings extends React.Component {
@@ -106,11 +113,38 @@ class AccountSettings extends React.Component {
 			});*/
 =======
 			user.reauthenticate(credential).then(function(){
-				hashHistory.push('/accountsettings/2');
+				that.setState({verified: true});
+				that.setState({verificationMessage: "Your password has been verified."});
+				that.setState({hasError: false});
+				that.setState({errorMsg: ""});
 			}).catch(function(error){
-				//handle error
+				that.setState({hasError: true});
+				that.setState({errorMsg: "The password you entered is invalid."});
+				that.setState({verified: false});
+				that.setState({verificationMessage: ""});
 			});
+<<<<<<< HEAD
 >>>>>>> 5a00b2973165a90dbe91d3bb88ef86ca556f2d74
+=======
+		}else{
+			this.setState({hasError: true});
+			this.setState({errorMsg: "Your current password cannot be blank."});
+			this.setState({verified: false});
+			this.setState({verificationMessage: ""});
+		}
+	},
+
+	handleTypingChange: function(){
+		this.setState({verified: false});
+		this.setState({hasError: false});
+	},
+
+	handleKeyPress: function(e){
+		if(e.key == "Enter"){
+			try{
+				this.verifyPassword();
+			}catch(e){}
+>>>>>>> 510107b4d50a6c64e3e65446c364ff8c73fbf3eb
 		}
 	}
 
@@ -129,7 +163,7 @@ class AccountSettings extends React.Component {
 =======
 	//creates an empty div if no error message
 	enterPasswordAlert: function(){
-		return <div className="alert alert-danger">Please enter your current password before proceeding.{this.state.verificationMessage}</div>;;
+		return <div className="alert alert-info">Please enter your current password before proceeding.</div>;;
 	},
 
 	successAlert: function(){
@@ -137,14 +171,39 @@ class AccountSettings extends React.Component {
 		return <div className="alert alert-success"><strong>Success! </strong>{this.state.verificationMessage}</div>;
 	}
 
+<<<<<<< HEAD
 	render(){
+=======
+	//creates an empty div if no error message
+	errorAlert: function(){
+		return <div className="alert alert-danger"><strong>Error! </strong>{this.state.errorMsg}</div>;
+	},
+>>>>>>> 510107b4d50a6c64e3e65446c364ff8c73fbf3eb
 
+	render: function(){
 		//gets the appropriate error alert div depending on whether or not the form has an error
 		var alert;
 		if(this.state.verified){
 			alert = this.successAlert();
+		}else if(this.state.hasError){
+			alert = this.errorAlert();
 		}else{
 			alert = this.enterPasswordAlert();
+		}
+
+		var show;
+		if(this.state.verified){
+			show = 
+				<div>
+					<UpdatePassword /><br />
+					<DeleteAccount /><br />
+				</div>
+		}else{
+			show = 
+				<div>
+					<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.handleTypingChange} onKeyPress={this.handleKeyPress}/><br />
+					<button className="btn btn-success" onClick={this.verifyPassword}>Verify</button>
+				</div>
 		}
 
 		return(
@@ -157,6 +216,7 @@ class AccountSettings extends React.Component {
 					<center>
 						<h1>Account Settings</h1><br />
 <<<<<<< HEAD
+<<<<<<< HEAD
 						<UploadImage />
 
 						<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.handleTypeChanges}/><br />
@@ -168,6 +228,9 @@ class AccountSettings extends React.Component {
 						
 						<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.verifyPassword}/><br />
 >>>>>>> 5a00b2973165a90dbe91d3bb88ef86ca556f2d74
+=======
+						{show}
+>>>>>>> 510107b4d50a6c64e3e65446c364ff8c73fbf3eb
 					</center>
 				</div>
 				<div className="col-md-4">

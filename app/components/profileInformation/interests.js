@@ -9,8 +9,8 @@ var Interests = React.createClass({
 	},
 
 	componentWillMount: function(){
-        var userRef = firebase.database().ref().child('users/'+this.props.pageID);
-        userRef.on("value", snap => {
+        this.userRef = firebase.database().ref().child('users/'+this.props.pageID);
+        this.userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.interests){
 				this.setState({interests: user.interests});
@@ -21,8 +21,8 @@ var Interests = React.createClass({
 	},
 
 	componentWillReceiveProps: function(nextProps){
-		var userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
-        userRef.on("value", snap => {
+		this.userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
+        this.userRef.on("value", snap => {
         	var user = snap.val();
 			if(user.interests){
 				this.setState({interests: user.interests});
@@ -38,12 +38,11 @@ var Interests = React.createClass({
 
 	handleClickSave: function(){
 		var that = this;
-
 		this.setState({editing: false});
+
 		var newInterests = this.refs.newInterests.value;
 
-		var userRef = firebase.database().ref().child('users/'+this.props.pageID);
-        userRef.once("value", snap => {
+        this.userRef.once("value", snap => {
         	var user = snap.val();
         	var userInfo = {};
             for(var i in user){
