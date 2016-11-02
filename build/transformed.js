@@ -27751,12 +27751,13 @@
 	var Home = __webpack_require__(243);
 	var Logout = __webpack_require__(244);
 	var Layout = __webpack_require__(245);
-	var AccountSettings = __webpack_require__(246);
-	var Profile = __webpack_require__(249);
-	var AwaitingAcceptance = __webpack_require__(258);
-	var Connections = __webpack_require__(259);
+	var AccountSettings = __webpack_require__(247);
+	var Profile = __webpack_require__(250);
+	var AwaitingAcceptance = __webpack_require__(259);
+	var Connections = __webpack_require__(260);
+	var SearchResults = __webpack_require__(261);
 
-	var requireAuth = __webpack_require__(260);
+	var requireAuth = __webpack_require__(262);
 
 	var routes = React.createElement(
 		Router,
@@ -27771,7 +27772,8 @@
 			React.createElement(Route, { path: 'accountSettings', component: AccountSettings, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'users/:id', component: Profile, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'requests', component: AwaitingAcceptance, onEnter: requireAuth }),
-			React.createElement(Route, { path: 'connections', component: Connections, onEnter: requireAuth })
+			React.createElement(Route, { path: 'connections', component: Connections, onEnter: requireAuth }),
+			React.createElement(Route, { path: 'results/:name', component: SearchResults, onEnter: requireAuth })
 		)
 	);
 
@@ -28323,6 +28325,7 @@
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
+	var Search = __webpack_require__(246);
 
 	var Layout = React.createClass({
 	    displayName: 'Layout',
@@ -28382,6 +28385,7 @@
 	        var accountSettings;
 	        var requests;
 	        var connections;
+	        var search;
 
 	        var navClassName;
 
@@ -28434,6 +28438,11 @@
 	                    'Connections'
 	                )
 	            );
+	            search = React.createElement(
+	                'li',
+	                null,
+	                React.createElement(Search, null)
+	            );
 
 	            //if the user is not logged in, show the login and signup links
 	        } else {
@@ -28459,6 +28468,7 @@
 	            accountSettings = null;
 	            requests = null;
 	            connections = null;
+	            search = null;
 	        }
 
 	        //if recruiter -> black navbar, else job seeker -> default navbar
@@ -28489,6 +28499,7 @@
 	                    React.createElement(
 	                        'ul',
 	                        { className: 'nav navbar-nav pull-right' },
+	                        search,
 	                        signUp,
 	                        ' ',
 	                        profile,
@@ -28517,11 +28528,53 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
+	var ReactDOM = __webpack_require__(34);
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
-	var DeleteAccount = __webpack_require__(247);
-	var UpdatePassword = __webpack_require__(248);
+
+	var Search = React.createClass({
+	    displayName: 'Search',
+
+	    getInitialState: function () {
+	        return {
+	            userInput: '',
+	            showResult: false
+	        };
+	    },
+
+	    handleSearch: function () {
+	        var path = "results/" + this.refs.search.value;
+	        hashHistory.push(path);
+	    },
+
+	    render: function () {
+
+	        return React.createElement(
+	            'div',
+	            null,
+	            React.createElement('input', { type: 'text', ref: 'search', placeholder: 'Search for people', type: 'text' }),
+	            React.createElement(
+	                'button',
+	                { onClick: this.handleSearch },
+	                'Search'
+	            )
+	        );
+	    }
+	});
+
+	module.exports = Search;
+
+/***/ },
+/* 247 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+	var DeleteAccount = __webpack_require__(248);
+	var UpdatePassword = __webpack_require__(249);
 
 	var AccountSettings = React.createClass({
 		displayName: 'AccountSettings',
@@ -28669,7 +28722,7 @@
 	module.exports = AccountSettings;
 
 /***/ },
-/* 247 */
+/* 248 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28763,7 +28816,7 @@
 	module.exports = DeleteAccount;
 
 /***/ },
-/* 248 */
+/* 249 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28862,7 +28915,7 @@
 	module.exports = UpdatePassword;
 
 /***/ },
-/* 249 */
+/* 250 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28871,14 +28924,14 @@
 	var hashHistory = __webpack_require__(177).hashHistory;
 
 	//profile components
-	var Summary = __webpack_require__(250);
-	var Education = __webpack_require__(251);
-	var Projects = __webpack_require__(252);
-	var Interests = __webpack_require__(253);
-	var Experience = __webpack_require__(254);
-	var Skills = __webpack_require__(255);
-	var ProfileImage = __webpack_require__(256);
-	var Connection = __webpack_require__(257);
+	var Summary = __webpack_require__(251);
+	var Education = __webpack_require__(252);
+	var Projects = __webpack_require__(253);
+	var Interests = __webpack_require__(254);
+	var Experience = __webpack_require__(255);
+	var Skills = __webpack_require__(256);
+	var ProfileImage = __webpack_require__(257);
+	var Connection = __webpack_require__(258);
 
 	var Profile = React.createClass({
 		displayName: 'Profile',
@@ -28959,7 +29012,7 @@
 	module.exports = Profile;
 
 /***/ },
-/* 250 */
+/* 251 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29100,7 +29153,7 @@
 	module.exports = Summary;
 
 /***/ },
-/* 251 */
+/* 252 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29241,7 +29294,7 @@
 	module.exports = Education;
 
 /***/ },
-/* 252 */
+/* 253 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29382,7 +29435,7 @@
 	module.exports = Projects;
 
 /***/ },
-/* 253 */
+/* 254 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29521,7 +29574,7 @@
 	module.exports = Interests;
 
 /***/ },
-/* 254 */
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -29659,7 +29712,7 @@
 	module.exports = Experience;
 
 /***/ },
-/* 255 */
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29798,7 +29851,7 @@
 	module.exports = Skills;
 
 /***/ },
-/* 256 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29918,7 +29971,7 @@
 	module.exports = UploadImage;
 
 /***/ },
-/* 257 */
+/* 258 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30086,7 +30139,7 @@
 	module.exports = Connection;
 
 /***/ },
-/* 258 */
+/* 259 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30280,7 +30333,7 @@
 	module.exports = AwaitingAcceptance;
 
 /***/ },
-/* 259 */
+/* 260 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30438,7 +30491,84 @@
 	module.exports = AllConnections;
 
 /***/ },
-/* 260 */
+/* 261 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ReactDOM = __webpack_require__(34);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var Results = React.createClass({
+		displayName: 'Results',
+
+		getInitialState: function () {
+			return { users: [], prop_name: "" };
+		},
+
+		componentWillMount: function () {
+			this.state.users.splice(0, this.state.users.length);
+			this.setState({ prop_name: this.props.params.name }); //to make sure we don't head over to compWillReceiveProps with the same prop name
+
+			var userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(this.props.params.name);
+			userRef.on('child_added', snap => {
+				var user = snap.val();
+				user.id = snap.ref.key;
+				this.state.users.push(user);
+				this.setState({ users: this.state.users });
+			});
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			if (this.state.prop_name != nextProps.params.name) {
+				this.setState({ prop_name: nextProps.params.name }); //to make sure we don't go through the compWillReceiveProps function twice
+
+				this.state.users.splice(0, this.state.users.length);
+				var userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(nextProps.params.name);
+				userRef.on('child_added', snap => {
+					var user = snap.val();
+					user.id = snap.ref.key;
+					this.state.users.push(user);
+					this.setState({ users: this.state.users });
+					console.log(this.state.users);
+				});
+			}
+		},
+
+		render: function () {
+			var empty;
+			if (this.state.users.length == 0) {
+				empty = React.createElement(
+					'div',
+					null,
+					'No results!'
+				);
+			} else {
+				empty = React.createElement('div', null);
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				empty,
+				this.state.users.map((user, index) => React.createElement(
+					'div',
+					{ key: index },
+					React.createElement(
+						Link,
+						{ to: "users/" + user.id },
+						user.first
+					)
+				))
+			);
+		}
+	});
+
+	module.exports = Results;
+
+/***/ },
+/* 262 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);

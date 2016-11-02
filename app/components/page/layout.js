@@ -2,6 +2,7 @@ var React = require('react');
 var firebase = require('firebase');
 var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
+var Search = require('./search.js');
 
 var Layout = React.createClass({
 
@@ -59,6 +60,7 @@ var Layout = React.createClass({
         var accountSettings;
         var requests;
         var connections;
+        var search;
 
         var navClassName;
 
@@ -71,6 +73,7 @@ var Layout = React.createClass({
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog"></span></Link></li>;
             requests = <li><Link to="/requests" className="navbar-brand">Requests</Link></li>;
             connections = <li><Link to="/connections" className="navbar-brand">Connections</Link></li>;
+            search = <li><Search /></li>
 
         //if the user is not logged in, show the login and signup links
         } else {
@@ -80,6 +83,7 @@ var Layout = React.createClass({
             accountSettings = null;
             requests = null;
             connections = null;
+            search = null;
         }
 
         //if recruiter -> black navbar, else job seeker -> default navbar
@@ -100,6 +104,7 @@ var Layout = React.createClass({
                         </div>
                         
                         <ul className="nav navbar-nav pull-right">
+                            {search}
                             {signUp} {/*shows only if user is not logged in*/}
                             {profile} {/*shows only if user is logged in*/}
                             {requests}

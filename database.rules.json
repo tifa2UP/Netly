@@ -7,6 +7,9 @@
     },
     "connections":{
     	".indexOn": "status"
+    },
+    "users":{
+        ".indexOn": "first"
     }
   }
 }
