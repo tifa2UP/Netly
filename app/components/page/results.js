@@ -42,20 +42,20 @@ var Results = React.createClass({
 	},
 
 	render: function(){
-		var empty;
-		if(this.state.users.length == 0){
-			empty = <div>No results!</div>
-		}else{
-			empty = <div></div>
-		}
+		var empty = <div>Your search returned {this.state.users.length} results...</div>
 
 		return(
 			<div>
-				{empty}
+				<center>
+					<h1>Showing results for "{this.state.prop_name}"</h1>
+					{empty}
+				</center>
 				{this.state.users.map((user,index) => (
-					<div key={index}>
-						<Link to={"users/"+ user.id}>{user.first}</Link>
-					</div>
+        			<div key={index}>
+       					<Link to={"users/" + user.id}><h4><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> 
+       					{user.first + " " + user.last}</h4></Link>
+        				<br /><br />
+        			</div>
 				))}
 			</div>
 		)

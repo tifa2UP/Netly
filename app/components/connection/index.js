@@ -89,8 +89,8 @@ var AllConnections = React.createClass({
 			showConnections = 
 				this.state.connections.map((user,index) => (
         			<div key={index}>
-       					<Link to={"users/" + user.user_id}><img src={user.imageURL} className="img-circle" alt="" width="50" height="50" style={{objectFit: 'cover'}}/> 
-       					{user.first + " " + user.last}</Link>
+       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> 
+       					{user.first + " " + user.last}</h4></Link>
         				<br /><br />
         			</div>
    				))

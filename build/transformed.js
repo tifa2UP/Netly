@@ -27829,6 +27829,7 @@
 						first: firstName,
 						last: lastName,
 						recruiter: recruiter,
+						imageURL: "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7",
 						summary: "",
 						projects: "",
 						skills: "",
@@ -28353,22 +28354,7 @@
 	            this.userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
 	            this.userRef.on("value", snap => {
 	                var user = snap.val();
-	                if (user.hasProfileImage) {
-	                    var userImageRef = firebase.storage().ref().child('images/users/' + firebase.auth().currentUser.uid + '/profilepic.jpg');
-	                    userImageRef.getDownloadURL().then(function (url) {
-	                        that.setState({ imgURL: url });
-	                    }).catch(function (error) {
-	                        var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                        defaultRef.getDownloadURL().then(function (url) {
-	                            that.setState({ imgURL: url });
-	                        });
-	                    });
-	                } else {
-	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                    defaultRef.getDownloadURL().then(function (url) {
-	                        that.setState({ imgURL: url });
-	                    });
-	                }
+	                this.setState({ imgURL: user.imageURL });
 	                this.setState({ recruiter: user == null || !user.recruiter ? false : true });
 	            });
 	        });
@@ -28532,13 +28518,6 @@
 	var Search = React.createClass({
 	    displayName: 'Search',
 
-	    getInitialState: function () {
-	        return {
-	            userInput: '',
-	            showResult: false
-	        };
-	    },
-
 	    handleSearch: function (e) {
 	        e.preventDefault();
 	        if (this.refs.search.value != "") {
@@ -28548,7 +28527,6 @@
 	    },
 
 	    render: function () {
-
 	        return React.createElement(
 	            'form',
 	            { className: 'navbar-form pull-left', onSubmit: this.handleSearch },
@@ -29867,7 +29845,7 @@
 	    displayName: 'UploadImage',
 
 	    getInitialState: function () {
-	        return { imgURL: "" };
+	        return { imgURL: "", userData: {} };
 	    },
 
 	    componentWillMount: function () {
@@ -29878,22 +29856,6 @@
 	        this.userRef.on("value", snap => {
 	            var user = snap.val();
 	            this.setState({ userData: user });
-	            if (user.hasProfileImage) {
-	                var userImageRef = firebase.storage().ref().child('images/users/' + this.props.pageID + '/profilepic.jpg');
-	                userImageRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgURL: url });
-	                }).catch(function (error) {
-	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                    defaultRef.getDownloadURL().then(function (url) {
-	                        that.setState({ imgURL: url });
-	                    });
-	                });
-	            } else {
-	                var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                defaultRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgURL: url });
-	                });
-	            }
 	        });
 	    },
 
@@ -29905,22 +29867,6 @@
 	        this.userRef.on("value", snap => {
 	            var user = snap.val();
 	            this.setState({ userData: user });
-	            if (user.hasProfileImage) {
-	                var userImageRef = firebase.storage().ref().child('images/users/' + nextProps.pageID + '/profilepic.jpg');
-	                userImageRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgURL: url });
-	                }).catch(function (error) {
-	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                    defaultRef.getDownloadURL().then(function (url) {
-	                        that.setState({ imgURL: url });
-	                    });
-	                });
-	            } else {
-	                var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                defaultRef.getDownloadURL().then(function (url) {
-	                    that.setState({ imgURL: url });
-	                });
-	            }
 	        });
 	    },
 
@@ -29943,8 +29889,9 @@
 	            for (var i in that.state.userData) {
 	                userData[i] = that.state.userData[i];
 	            }
-	            userData.hasProfileImage = true;
-	            userData.imageFileName = imageFile.name;
+
+	            userData.imageURL = snapshot.downloadURL;
+
 	            var updates = {};
 	            updates['users/' + that.props.pageID] = userData;
 	            firebase.database().ref().update(updates);
@@ -29963,7 +29910,7 @@
 	        return React.createElement(
 	            'div',
 	            null,
-	            React.createElement('img', { src: this.state.imgURL, className: 'img-circle', alt: '', width: '200', height: '200', style: { objectFit: 'cover' } }),
+	            React.createElement('img', { src: this.state.userData.imageURL, className: 'img-circle', alt: '', width: '200', height: '200', style: { objectFit: 'cover' } }),
 	            React.createElement('br', null),
 	            showUpload,
 	            React.createElement('br', null)
@@ -30369,35 +30316,12 @@
 						var userInfo = {
 							first: userData.first,
 							last: userData.last,
-							hasProfileImage: userData.hasProfileImage,
 							user_id: snap.ref.key,
-							url: ""
+							imageURL: userData.imageURL
 						};
-						if (userInfo.hasProfileImage) {
-							var userImageRef = firebase.storage().ref().child('images/users/' + userInfo.user_id + '/profilepic.jpg');
-							userImageRef.getDownloadURL().then(function (url) {
-								userInfo.url = url;
-								var updatedConnections = that.state.connections.slice();
-								updatedConnections.push(userInfo);
-								that.setState({ connections: updatedConnections });
-							}).catch(function (error) {
-								var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-								defaultRef.getDownloadURL().then(function (url) {
-									userInfo.url = url;
-									var updatedConnections = that.state.connections.slice();
-									updatedConnections.push(userInfo);
-									that.setState({ connections: updatedConnections });
-								});
-							});
-						} else {
-							var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-							defaultRef.getDownloadURL().then(function (url) {
-								userInfo.url = url;
-								var updatedConnections = that.state.connections.slice();
-								updatedConnections.push(userInfo);
-								that.setState({ connections: updatedConnections });
-							});
-						}
+						var updatedConnections = that.state.connections.slice();
+						updatedConnections.push(userInfo);
+						that.setState({ connections: updatedConnections });
 					});
 				});
 
@@ -30466,8 +30390,12 @@
 					React.createElement(
 						Link,
 						{ to: "users/" + user.user_id },
-						React.createElement('img', { src: user.url, className: 'img-circle', alt: '', width: '50', height: '50', style: { objectFit: 'cover' } }),
-						user.first + " " + user.last
+						React.createElement(
+							'h4',
+							null,
+							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover' } }),
+							user.first + " " + user.last
+						)
 					),
 					React.createElement('br', null),
 					React.createElement('br', null)
@@ -30514,8 +30442,8 @@
 			this.state.users.splice(0, this.state.users.length);
 			this.setState({ prop_name: this.props.params.name }); //to make sure we don't head over to compWillReceiveProps with the same prop name
 
-			var userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(this.props.params.name);
-			userRef.on('child_added', snap => {
+			this.userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(this.props.params.name);
+			this.userRef.on('child_added', snap => {
 				var user = snap.val();
 				user.id = snap.ref.key;
 				this.state.users.push(user);
@@ -30528,8 +30456,8 @@
 				this.setState({ prop_name: nextProps.params.name }); //to make sure we don't go through the compWillReceiveProps function twice
 
 				this.state.users.splice(0, this.state.users.length);
-				var userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(nextProps.params.name);
-				userRef.on('child_added', snap => {
+				this.userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(nextProps.params.name);
+				this.userRef.on('child_added', snap => {
 					var user = snap.val();
 					user.id = snap.ref.key;
 					this.state.users.push(user);
@@ -30538,30 +30466,49 @@
 			}
 		},
 
+		componentWillUnmount: function () {
+			this.userRef.off();
+		},
+
 		render: function () {
-			var empty;
-			if (this.state.users.length == 0) {
-				empty = React.createElement(
-					'div',
-					null,
-					'No results!'
-				);
-			} else {
-				empty = React.createElement('div', null);
-			}
+			var empty = React.createElement(
+				'div',
+				null,
+				'Your search returned ',
+				this.state.users.length,
+				' results...'
+			);
 
 			return React.createElement(
 				'div',
 				null,
-				empty,
+				React.createElement(
+					'center',
+					null,
+					React.createElement(
+						'h1',
+						null,
+						'Showing results for "',
+						this.state.prop_name,
+						'"'
+					),
+					empty
+				),
 				this.state.users.map((user, index) => React.createElement(
 					'div',
 					{ key: index },
 					React.createElement(
 						Link,
 						{ to: "users/" + user.id },
-						user.first
-					)
+						React.createElement(
+							'h4',
+							null,
+							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover' } }),
+							user.first + " " + user.last
+						)
+					),
+					React.createElement('br', null),
+					React.createElement('br', null)
 				))
 			);
 		}
