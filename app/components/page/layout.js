@@ -2,6 +2,7 @@ var React = require('react');
 var firebase = require('firebase');
 var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
+var Search = require('./search.js');
 
 var Layout = React.createClass({
 
@@ -53,6 +54,7 @@ var Layout = React.createClass({
         var profile;
         var signUp;
         var accountSettings;
+        var search;
 
         var navClassName;
 
@@ -63,13 +65,14 @@ var Layout = React.createClass({
             profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand"><img src={this.state.imgURL} className="img-circle" width="20" height="20" style={{objectFit: 'cover'}}/></Link></li>;
             signUp = null;
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog"></span></Link></li>;
-
+            search = <li><span> </span ><Search /></li>;
         //if the user is not logged in, show the login and signup links
         } else {
             loginOrOut = <li><Link to="/login" className="navbar-brand">Login</Link></li>;
             profile = null;
             signUp = <li><Link to="/signup" className="navbar-brand">Sign Up</Link></li>;
             accountSettings = null;
+            search = null;
         }
 
         //if recruiter -> black navbar, else job seeker -> default navbar
@@ -87,11 +90,16 @@ var Layout = React.createClass({
                             <Link to="/" className="navbar-brand">
                                 <span className="glyphicon glyphicon-home"></span>
                             </Link>
+                           
+
                         </div>
                         
                         <ul className="nav navbar-nav pull-right">
                             {signUp} {/*shows only if user is not logged in*/}
-                            {profile} {/*shows only if user is logged in*/}
+
+                             {search}
+                            {profile} {/*shows only if user is logged in*/} 
+                           
                             {accountSettings}
                             {loginOrOut} {/*shows login or logout link depending on logged in state*/}
                         </ul>
