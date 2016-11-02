@@ -41,7 +41,13 @@ var SignUpForm = React.createClass({
   					email: email,
   					first: firstName,
   					last: lastName,
-  					recruiter: recruiter
+  					recruiter: recruiter,
+  					summary: "",
+  					projects: "",
+  					skills: "",
+  					education: "",
+  					experience: "",
+  					interests: ""
   				};
 
   				firebase.database().ref('users/' + firebase.auth().currentUser.uid).set(userData);

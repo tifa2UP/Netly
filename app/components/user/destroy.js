@@ -11,9 +11,7 @@ var DeleteAccount = React.createClass({
 	},
 
 	handleDestroy: function(){
-
-		if(this.props.handleReauthenticate()){
-
+		if(true){
 			var user = firebase.auth().currentUser;
 
 			if(confirm("Are you sure you want to delete your account?")){

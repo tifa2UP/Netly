@@ -8,6 +8,7 @@ var UploadImage = require('./uploadImage.js');
 
 
 
+<<<<<<< HEAD
 class AccountSettings extends React.Component {
 	constructor(props) {
 		super(props);
@@ -44,6 +45,10 @@ class AccountSettings extends React.Component {
 	handleTypeChanges(){
 		this.setState({hasError: false, errorMsg: ""});
 	}
+=======
+	verifyPassword: function(e){
+		var that = this;
+>>>>>>> 5a00b2973165a90dbe91d3bb88ef86ca556f2d74
 
 	verifyPassword(e){
 		//var that = this;
@@ -51,6 +56,7 @@ class AccountSettings extends React.Component {
 		if(this.refs.current_password.value){
 			var user = firebase.auth().currentUser;
 			var credential = firebase.auth.EmailAuthProvider.credential(user.email, this.refs.current_password.value);
+<<<<<<< HEAD
 			console.log(credential);
 			
 			user.reauthenticate(credential).then(function (){
@@ -98,9 +104,17 @@ class AccountSettings extends React.Component {
 				errorMsg: "Please enter your current password",
 				verified: false
 			});*/
+=======
+			user.reauthenticate(credential).then(function(){
+				hashHistory.push('/accountsettings/2');
+			}).catch(function(error){
+				//handle error
+			});
+>>>>>>> 5a00b2973165a90dbe91d3bb88ef86ca556f2d74
 		}
 	}
 
+<<<<<<< HEAD
 	//creates a div alert-danger with the error message
 	errorMessage(){
 		return <div className="alert alert-danger"><strong>Error! </strong>{this.state.errorMsg}</div>;
@@ -112,6 +126,14 @@ class AccountSettings extends React.Component {
 	}
 
 	successMessage(){
+=======
+	//creates an empty div if no error message
+	enterPasswordAlert: function(){
+		return <div className="alert alert-danger">Please enter your current password before proceeding.{this.state.verificationMessage}</div>;;
+	},
+
+	successAlert: function(){
+>>>>>>> 5a00b2973165a90dbe91d3bb88ef86ca556f2d74
 		return <div className="alert alert-success"><strong>Success! </strong>{this.state.verificationMessage}</div>;
 	}
 
@@ -119,12 +141,10 @@ class AccountSettings extends React.Component {
 
 		//gets the appropriate error alert div depending on whether or not the form has an error
 		var alert;
-		if(this.state.hasError){
-			alert = this.errorMessage();
-		}else if(this.state.verified){
-			alert = this.successMessage();
+		if(this.state.verified){
+			alert = this.successAlert();
 		}else{
-			alert = this.noErrorMessage();
+			alert = this.enterPasswordAlert();
 		}
 
 		return(
@@ -136,6 +156,7 @@ class AccountSettings extends React.Component {
 				<div className="col-md-4">
 					<center>
 						<h1>Account Settings</h1><br />
+<<<<<<< HEAD
 						<UploadImage />
 
 						<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.handleTypeChanges}/><br />
@@ -143,6 +164,10 @@ class AccountSettings extends React.Component {
 						<br/>
 						<UpdatePassword handleReauthenticate={this.handleReauthenticate} /><br />
 						<DeleteAccount handleReauthenticate={this.handleReauthenticate} />
+=======
+						
+						<input type="password" ref="current_password" placeholder="Current Password" className="form-control" onChange={this.verifyPassword}/><br />
+>>>>>>> 5a00b2973165a90dbe91d3bb88ef86ca556f2d74
 					</center>
 				</div>
 				<div className="col-md-4">
