@@ -28,36 +28,11 @@ var AwaitingAcceptance = React.createClass({
 						last: userData.last,
 						hasProfileImage: userData.hasProfileImage,
 						user_id: snap.ref.key,
-						url: "",
+						imageURL: userData.imageURL,
 					};
-
-					//gets the user's profile image url & updates the state
-					if(userInfo.hasProfileImage){
-	                    var userImageRef = firebase.storage().ref().child('images/users/' + userInfo.user_id + '/profilepic.jpg');
-	                    userImageRef.getDownloadURL().then(function(url){
-	                        userInfo.url = url;
-	                        var updatedRequesters = Array.prototype.slice.call(that.state.requesters);
-	                        updatedRequesters.push(userInfo);
-	                        that.setState({requesters: updatedRequesters});
-	                    }).catch(function(error){
-	                        var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                        defaultRef.getDownloadURL().then(function(url){
-	                        	userInfo.url = url;
-	                        	var updatedRequesters = that.state.requesters.slice();
-	                        	updatedRequesters.push(userInfo);
-	                        	that.setState({requesters: updatedRequesters});
-	                        });
-	                    });
-	                }else{
-	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                    defaultRef.getDownloadURL().then(function(url){
-	                        userInfo.url = url;
-	                        var updatedRequesters = that.state.requesters.slice();
-	                        updatedRequesters.push(userInfo);
-	                        that.setState({requesters: updatedRequesters});
-	                    });
-	                }
-
+					var updatedRequesters = that.state.requesters.slice();
+	                updatedRequesters.push(userInfo);
+	                that.setState({requesters: updatedRequesters});
 				});
 			});
 
@@ -141,8 +116,8 @@ var AwaitingAcceptance = React.createClass({
 			showRequests = 
 				this.state.requesters.map((user,index) => (
         			<div key={index}>
-       					<Link to={"users/" + user.user_id}><img src={user.url} className="img-circle" alt="" width="50" height="50" style={{objectFit: 'cover'}}/> 
-       					{user.first + " " + user.last}</Link>
+       					<Link to={"users/" + user.user_id}><h1><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> 
+       					{user.first + " " + user.last}</h1></Link>
         				{this.showAwaitingAcceptance(user)}
         				<br />
         			</div>
