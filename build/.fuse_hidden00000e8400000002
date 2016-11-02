@@ -28438,7 +28438,11 @@
 	                    'Connections'
 	                )
 	            );
-	            search = React.createElement(Search, null);
+	            search = React.createElement(
+	                'li',
+	                null,
+	                React.createElement(Search, null)
+	            );
 
 	            //if the user is not logged in, show the login and signup links
 	        } else {
@@ -28492,10 +28496,10 @@
 	                            React.createElement('span', { className: 'glyphicon glyphicon-home' })
 	                        )
 	                    ),
-	                    search,
 	                    React.createElement(
 	                        'ul',
 	                        { className: 'nav navbar-nav pull-right' },
+	                        search,
 	                        signUp,
 	                        ' ',
 	                        profile,
@@ -28539,28 +28543,21 @@
 	        };
 	    },
 
-	    handleSearch: function (e) {
-	        e.preventDefault();
-	        if (this.refs.search.value != "") {
-	            var path = "results/" + this.refs.search.value;
-	            hashHistory.push(path);
-	        }
+	    handleSearch: function () {
+	        var path = "results/" + this.refs.search.value;
+	        hashHistory.push(path);
 	    },
 
 	    render: function () {
 
 	        return React.createElement(
-	            'form',
-	            { className: 'navbar-form pull-left', onSubmit: this.handleSearch },
-	            React.createElement(
-	                'div',
-	                { className: 'form-group' },
-	                React.createElement('input', { type: 'text', className: 'form-control', ref: 'search', placeholder: 'Search for people' })
-	            ),
+	            'div',
+	            null,
+	            React.createElement('input', { type: 'text', ref: 'search', placeholder: 'Search for people', type: 'text' }),
 	            React.createElement(
 	                'button',
-	                { className: 'btn btn-default' },
-	                'Submit'
+	                { onClick: this.handleSearch },
+	                'Search'
 	            )
 	        );
 	    }
@@ -30534,6 +30531,7 @@
 					user.id = snap.ref.key;
 					this.state.users.push(user);
 					this.setState({ users: this.state.users });
+					console.log(this.state.users);
 				});
 			}
 		},

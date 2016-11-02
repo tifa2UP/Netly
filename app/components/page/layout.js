@@ -73,7 +73,7 @@ var Layout = React.createClass({
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog"></span></Link></li>;
             requests = <li><Link to="/requests" className="navbar-brand">Requests</Link></li>;
             connections = <li><Link to="/connections" className="navbar-brand">Connections</Link></li>;
-            search = <li><Search /></li>
+            search = <Search />
 
         //if the user is not logged in, show the login and signup links
         } else {
@@ -102,9 +102,8 @@ var Layout = React.createClass({
                                 <span className="glyphicon glyphicon-home"></span>
                             </Link>
                         </div>
-                        
+                        {search}
                         <ul className="nav navbar-nav pull-right">
-                            {search}
                             {signUp} {/*shows only if user is not logged in*/}
                             {profile} {/*shows only if user is logged in*/}
                             {requests}

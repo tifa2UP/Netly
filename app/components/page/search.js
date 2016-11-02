@@ -12,19 +12,23 @@ var Search = React.createClass({
         };
     },
 
-    handleSearch: function() {
-        var path = "results/" + this.refs.search.value;
-        hashHistory.push(path);  
+    handleSearch: function(e) {
+        e.preventDefault();
+        if(this.refs.search.value != ""){
+            var path = "results/" + this.refs.search.value;
+            hashHistory.push(path);
+        }
     },
 
     render: function () {
     
         return (
-
-            <div>
-                <input type="text" ref="search" placeholder="Search for people" type="text" />
-                <button onClick={this.handleSearch}>Search</button>
-            </div>
+            <form className="navbar-form pull-left" onSubmit={this.handleSearch}>
+                <div className="form-group">
+                    <input type="text" className="form-control" ref="search" placeholder="Search for people"/>
+                </div>
+                <button className="btn btn-default">Submit</button>
+            </form>
         )
     }
 });

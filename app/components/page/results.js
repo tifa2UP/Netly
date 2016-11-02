@@ -33,7 +33,6 @@ var Results = React.createClass({
 		       	user.id = snap.ref.key;
 		       	this.state.users.push(user);
 		       	this.setState({users: this.state.users});
-		       	console.log(this.state.users);
 		    });
 		}
 	},
