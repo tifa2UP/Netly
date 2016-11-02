@@ -28,22 +28,7 @@ var Layout = React.createClass({
             this.userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
             this.userRef.on("value", snap => {
                 var user = snap.val();
-                if(user.hasProfileImage){
-                    var userImageRef = firebase.storage().ref().child('images/users/' + firebase.auth().currentUser.uid + '/profilepic.jpg');
-                    userImageRef.getDownloadURL().then(function(url){
-                        that.setState({imgURL: url});
-                    }).catch(function(error){
-                        var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-                        defaultRef.getDownloadURL().then(function(url){
-                        that.setState({imgURL: url});
-                        });
-                    });
-                }else{
-                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-                    defaultRef.getDownloadURL().then(function(url){
-                        that.setState({imgURL: url});
-                    });
-                }
+                this.setState({imgURL: user.imageURL});
                 this.setState({recruiter: (user == null || !user.recruiter) ? false : true});
             });
         });

@@ -5,13 +5,6 @@ var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
 
 var Search = React.createClass({
-    getInitialState: function () {
-        return {
-        userInput: '',
-        showResult: false
-        };
-    },
-
     handleSearch: function(e) {
         e.preventDefault();
         if(this.refs.search.value != ""){
@@ -21,7 +14,6 @@ var Search = React.createClass({
     },
 
     render: function () {
-    
         return (
             <form className="navbar-form pull-left" onSubmit={this.handleSearch}>
                 <div className="form-group">

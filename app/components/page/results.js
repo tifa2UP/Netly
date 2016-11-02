@@ -13,8 +13,8 @@ var Results = React.createClass({
 		this.state.users.splice(0, this.state.users.length);
 		this.setState({prop_name: this.props.params.name}); //to make sure we don't head over to compWillReceiveProps with the same prop name
 
-		var userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(this.props.params.name);
-        userRef.on('child_added', snap =>{
+		this.userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(this.props.params.name);
+        this.userRef.on('child_added', snap =>{
             var user = snap.val();
        	    user.id = snap.ref.key;
        	    this.state.users.push(user);
@@ -27,14 +27,18 @@ var Results = React.createClass({
 			this.setState({prop_name: nextProps.params.name}); //to make sure we don't go through the compWillReceiveProps function twice
 
 			this.state.users.splice(0, this.state.users.length);
-			var userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(nextProps.params.name);
-		    userRef.on('child_added', snap =>{
+			this.userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(nextProps.params.name);
+		    this.userRef.on('child_added', snap =>{
 		        var user = snap.val();
 		       	user.id = snap.ref.key;
 		       	this.state.users.push(user);
 		       	this.setState({users: this.state.users});
 		    });
 		}
+	},
+
+	componentWillUnmount: function(){
+		this.userRef.off();
 	},
 
 	render: function(){

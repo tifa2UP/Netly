@@ -6,7 +6,7 @@ var hashHistory = require('react-router').hashHistory;
 
 var UploadImage = React.createClass({
     getInitialState: function(){
-        return{imgURL: ""};
+        return{imgURL: "", userData: {}};
     },
 
     componentWillMount: function(){
@@ -17,22 +17,6 @@ var UploadImage = React.createClass({
         this.userRef.on("value", snap=>{
             var user = snap.val();
             this.setState({userData: user});
-            if(user.hasProfileImage){
-                var userImageRef = firebase.storage().ref().child('images/users/' + this.props.pageID + '/profilepic.jpg');
-                userImageRef.getDownloadURL().then(function(url){
-                    that.setState({imgURL: url});
-                }).catch(function(error){
-                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-                    defaultRef.getDownloadURL().then(function(url){
-                    that.setState({imgURL: url});
-                    });
-                });
-            }else{
-                var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-                defaultRef.getDownloadURL().then(function(url){
-                    that.setState({imgURL: url});
-                });
-            }
         });
     },
 
@@ -44,22 +28,6 @@ var UploadImage = React.createClass({
         this.userRef.on("value", snap=>{
             var user = snap.val();
             this.setState({userData: user});
-            if(user.hasProfileImage){
-                var userImageRef = firebase.storage().ref().child('images/users/' +  nextProps.pageID + '/profilepic.jpg');
-                userImageRef.getDownloadURL().then(function(url){
-                    that.setState({imgURL: url});
-                }).catch(function(error){
-                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-                    defaultRef.getDownloadURL().then(function(url){
-                    that.setState({imgURL: url});
-                    });
-                });
-            }else{
-                var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-                defaultRef.getDownloadURL().then(function(url){
-                    that.setState({imgURL: url});
-                });
-            }
         });
     },
 
@@ -82,8 +50,9 @@ var UploadImage = React.createClass({
             for(var i in that.state.userData){
                 userData[i] = that.state.userData[i];
             }
-            userData.hasProfileImage = true;
-            userData.imageFileName = imageFile.name;
+
+            userData.imageURL = snapshot.downloadURL;
+
             var updates = {};
             updates['users/' + that.props.pageID] = userData;
             firebase.database().ref().update(updates);
@@ -101,7 +70,7 @@ var UploadImage = React.createClass({
 
         return (
             <div>
-                <img src={this.state.imgURL} className="img-circle" alt="" width="200" height="200" style={{objectFit: 'cover'}}/><br />
+                <img src={this.state.userData.imageURL} className="img-circle" alt="" width="200" height="200" style={{objectFit: 'cover'}}/><br />
                 {showUpload}
                 <br />
             </div>

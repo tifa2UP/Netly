@@ -26,35 +26,12 @@ var AllConnections = React.createClass({
 					var userInfo = {
 						first: userData.first,
 						last: userData.last,
-						hasProfileImage: userData.hasProfileImage,
 						user_id: snap.ref.key,
-						url: "",
+						imageURL: userData.imageURL,
 					};
-					if(userInfo.hasProfileImage){
-	                    var userImageRef = firebase.storage().ref().child('images/users/' + userInfo.user_id + '/profilepic.jpg');
-	                    userImageRef.getDownloadURL().then(function(url){
-	                        userInfo.url = url;
-	                        var updatedConnections = that.state.connections.slice();
-	                        updatedConnections.push(userInfo);
-	                        that.setState({connections: updatedConnections});
-	                    }).catch(function(error){
-	                        var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                        defaultRef.getDownloadURL().then(function(url){
-	                        	userInfo.url = url;
-	                        	var updatedConnections = that.state.connections.slice();
-	                        	updatedConnections.push(userInfo);
-	                        	that.setState({connections: updatedConnections});
-	                        });
-	                    });
-	                }else{
-	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                    defaultRef.getDownloadURL().then(function(url){
-	                        userInfo.url = url;
-	                        var updatedConnections = that.state.connections.slice();
-	                        updatedConnections.push(userInfo);
-	                        that.setState({connections: updatedConnections});
-	                    });
-	                }
+					var updatedConnections = that.state.connections.slice();
+	                updatedConnections.push(userInfo);
+	                that.setState({connections: updatedConnections});
 				});
 			});
 
@@ -112,7 +89,7 @@ var AllConnections = React.createClass({
 			showConnections = 
 				this.state.connections.map((user,index) => (
         			<div key={index}>
-       					<Link to={"users/" + user.user_id}><img src={user.url} className="img-circle" alt="" width="50" height="50" style={{objectFit: 'cover'}}/> 
+       					<Link to={"users/" + user.user_id}><img src={user.imageURL} className="img-circle" alt="" width="50" height="50" style={{objectFit: 'cover'}}/> 
        					{user.first + " " + user.last}</Link>
         				<br /><br />
         			</div>
