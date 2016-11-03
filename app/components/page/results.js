@@ -13,12 +13,14 @@ var Results = React.createClass({
 		this.state.users.splice(0, this.state.users.length);
 		this.setState({prop_name: this.props.params.name}); //to make sure we don't head over to compWillReceiveProps with the same prop name
 
-		this.userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(this.props.params.name);
+		this.userRef = firebase.database().ref().child('users').orderByChild('last');
         this.userRef.on('child_added', snap =>{
             var user = snap.val();
-       	    user.id = snap.ref.key;
-       	    this.state.users.push(user);
-            this.setState({users: this.state.users});
+       	    if((user.first + " " + user.last).toLowerCase().indexOf(this.props.params.name.toLowerCase()) >= 0){
+       	    	user.id = snap.ref.key;
+	       	    this.state.users.push(user);
+	            this.setState({users: this.state.users});
+       	    }
         });
 	},
 
@@ -27,13 +29,15 @@ var Results = React.createClass({
 			this.setState({prop_name: nextProps.params.name}); //to make sure we don't go through the compWillReceiveProps function twice
 
 			this.state.users.splice(0, this.state.users.length);
-			this.userRef = firebase.database().ref().child('users').orderByChild('first').equalTo(nextProps.params.name);
-		    this.userRef.on('child_added', snap =>{
-		        var user = snap.val();
-		       	user.id = snap.ref.key;
-		       	this.state.users.push(user);
-		       	this.setState({users: this.state.users});
-		    });
+			this.userRef = firebase.database().ref().child('users').orderByChild('last');
+	        this.userRef.on('child_added', snap =>{
+	            var user = snap.val();
+	       	    if((user.first + " " + user.last).toLowerCase().indexOf(nextProps.params.name.toLowerCase()) >= 0){
+	       	    	user.id = snap.ref.key;
+		       	    this.state.users.push(user);
+		            this.setState({users: this.state.users});
+	       	    }
+	        });
 		}
 	},
 
@@ -42,13 +46,11 @@ var Results = React.createClass({
 	},
 
 	render: function(){
-		var empty = <div>Your search returned {this.state.users.length} results...</div>
-
 		return(
 			<div>
 				<center>
 					<h1>Showing results for "{this.state.prop_name}"</h1>
-					{empty}
+					<div>Your search returned {this.state.users.length} results...</div>
 				</center>
 				{this.state.users.map((user,index) => (
         			<div key={index}>
