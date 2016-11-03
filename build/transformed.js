@@ -28337,7 +28337,8 @@
 	        return {
 	            isLoggedIn: null != firebase.auth().currentUser,
 	            recruiter: false,
-	            imgURL: ""
+	            imgURL: "",
+	            requests: []
 	        };
 	    },
 
@@ -28357,6 +28358,34 @@
 	                this.setState({ imgURL: user.imageURL });
 	                this.setState({ recruiter: user == null || !user.recruiter ? false : true });
 	            });
+
+	            this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
+	            this.connectionRef.on("child_added", snap => {
+	                if (snap.val()) {
+	                    this.state.requests.push(snap.ref.key);
+	                    this.setState({ requests: this.state.requests });
+	                }
+	            });
+
+	            this.connectionRefUpdate = firebase.database().ref().child('connections/' + user.uid);
+	            this.connectionRefUpdate.on("child_changed", snap => {
+	                if (snap.val().status == 'accepted') {
+	                    var index = this.state.requests.indexOf(snap.ref.key);
+	                    if (index >= 0) {
+	                        this.state.requests.splice(index, 1);
+	                        this.setState({ requests: this.state.requests });
+	                    }
+	                }
+	            });
+
+	            this.connectionRefUpdate = firebase.database().ref().child('connections/' + user.uid);
+	            this.connectionRefUpdate.on("child_removed", snap => {
+	                var index = this.state.requests.indexOf(snap.ref.key);
+	                if (index >= 0) {
+	                    this.state.requests.splice(index, 1);
+	                    this.setState({ requests: this.state.requests });
+	                }
+	            });
 	        });
 	    },
 
@@ -28375,6 +28404,15 @@
 
 	        var navClassName;
 
+	        var style;
+	        if (this.state.requests.length > 0) {
+	            style = {
+	                color: 'red'
+	            };
+	        } else {
+	            style = {};
+	        }
+
 	        //if the user is logged in, show the logout and profile link
 	        if (this.state.isLoggedIn) {
 	            loginOrOut = React.createElement(
@@ -28386,7 +28424,6 @@
 	                    React.createElement('span', { className: 'glyphicon glyphicon-off' })
 	                )
 	            );
-	            //profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand">{this.state.name ? this.state.name : "Profile" } </Link></li>;
 	            profile = React.createElement(
 	                'li',
 	                null,
@@ -28412,7 +28449,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/requests', className: 'navbar-brand' },
-	                    'Requests'
+	                    React.createElement('span', { className: 'glyphicon glyphicon-bell', style: style })
 	                )
 	            );
 	            connections = React.createElement(
@@ -28421,7 +28458,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/connections', className: 'navbar-brand' },
-	                    'Connections'
+	                    React.createElement('span', { className: 'glyphicon glyphicon-globe' })
 	                )
 	            );
 	            search = React.createElement(Search, null);
@@ -28538,7 +28575,7 @@
 	            React.createElement(
 	                'button',
 	                { className: 'btn btn-default' },
-	                'Submit'
+	                React.createElement('span', { className: 'glyphicon glyphicon-search' })
 	            )
 	        );
 	    }
@@ -29902,7 +29939,12 @@
 	        var showUpload;
 	        //shows an upload image option if currentuser
 	        if (this.props.isCurrentUser) {
-	            showUpload = React.createElement('input', { type: 'file', accept: 'image/*', onChange: this.handleUploadImage });
+	            showUpload = React.createElement(
+	                'label',
+	                { className: 'btn btn-file btn-link' },
+	                React.createElement('span', { className: 'glyphicon glyphicon-paperclip' }),
+	                React.createElement('input', { type: 'file', accept: 'image/*', onChange: this.handleUploadImage, style: { display: 'none' } })
+	            );
 	        } else {
 	            showUpload = React.createElement('div', null);
 	        }
@@ -30113,8 +30155,8 @@
 				this.setState({ currentUserID: user.uid });
 
 				//get connections whose status is awaiting acceptance
-				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('awaiting-acceptance');
-				connectionRef.on("child_added", snap => {
+				this.connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('awaiting-acceptance');
+				this.connectionRef.on("child_added", snap => {
 					var requesterID = snap.ref.key;
 					var requesterRef = firebase.database().ref().child('users/' + requesterID);
 					requesterRef.once("value", snap => {
@@ -30133,8 +30175,8 @@
 				});
 
 				//if status was updated, remove from array of requesters
-				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
-				connectionRef.on("child_changed", snap => {
+				this.connectionRefUpdate = firebase.database().ref().child('connections/' + this.state.currentUserID);
+				this.connectionRefUpdate.on("child_changed", snap => {
 					var userChangedKey = snap.ref.key;
 					var index = -1;
 					for (var i = 0; i < this.state.requesters.length; i++) {
@@ -30151,8 +30193,8 @@
 				});
 
 				//if rejected acceptance, remove from array of requesters
-				var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
-				connectionRef.on("child_removed", snap => {
+				//var connectionRefRemove = firebase.database().ref().child('connections/' + this.state.currentUserID);
+				this.connectionRefUpdate.on("child_removed", snap => {
 					var userChangedKey = snap.ref.key;
 					var index = -1;
 					for (var i = 0; i < this.state.requesters.length; i++) {
@@ -30171,6 +30213,8 @@
 		},
 
 		componentWillUnmount: function () {
+			this.connectionRef.off();
+			this.connectionRefUpdate.off();
 			this.unsubscribe();
 		},
 
@@ -30232,7 +30276,7 @@
 						Link,
 						{ to: "users/" + user.user_id },
 						React.createElement(
-							'h1',
+							'h4',
 							null,
 							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover' } }),
 							user.first + " " + user.last
@@ -30306,8 +30350,8 @@
 				});
 
 				//if status was updated, remove from array of connections
-				this.connectionRefUpdates = firebase.database().ref().child('connections/' + this.state.currentUserID);
-				this.connectionRefUpdates.on("child_changed", snap => {
+				this.connectionRefUpdate = firebase.database().ref().child('connections/' + this.state.currentUserID);
+				this.connectionRefUpdate.on("child_changed", snap => {
 					var userChangedKey = snap.ref.key;
 					var index = -1;
 					for (var i = 0; i < this.state.connections.length; i++) {
@@ -30324,7 +30368,7 @@
 				});
 
 				//if rejected acceptance, remove from array of connections
-				this.connectionRefUpdates.on("child_removed", snap => {
+				this.connectionRefUpdate.on("child_removed", snap => {
 					var userChangedKey = snap.ref.key;
 					var index = -1;
 					for (var i = 0; i < this.state.connections.length; i++) {
@@ -30343,11 +30387,8 @@
 		},
 
 		componentWillUnmount: function () {
-			if (this.otherConnectionRef) {
-				this.otherConnectionRef.off();
-			}
 			this.connectionRef.off();
-			this.connectionRefUpdates.off();
+			this.connectionRefUpdate.off();
 			this.unsubscribe();
 		},
 

@@ -17,8 +17,8 @@ var AwaitingAcceptance = React.createClass({
 			this.setState({currentUserID: user.uid});
 
 			//get connections whose status is awaiting acceptance
-			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('awaiting-acceptance');
-			connectionRef.on("child_added", snap=>{
+			this.connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('awaiting-acceptance');
+			this.connectionRef.on("child_added", snap=>{
 				var requesterID = snap.ref.key;
 				var requesterRef = firebase.database().ref().child('users/' + requesterID);
 				requesterRef.once("value", snap=>{
@@ -37,8 +37,8 @@ var AwaitingAcceptance = React.createClass({
 			});
 
 			//if status was updated, remove from array of requesters
-			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
-			connectionRef.on("child_changed", snap=>{
+			this.connectionRefUpdate = firebase.database().ref().child('connections/' + this.state.currentUserID);
+			this.connectionRefUpdate.on("child_changed", snap=>{
 				var userChangedKey = snap.ref.key;
 				var index = -1;
 				for(var i = 0; i < this.state.requesters.length; i++){
@@ -55,8 +55,8 @@ var AwaitingAcceptance = React.createClass({
 			});
 
 			//if rejected acceptance, remove from array of requesters
-			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
-			connectionRef.on("child_removed", snap=>{
+			//var connectionRefRemove = firebase.database().ref().child('connections/' + this.state.currentUserID);
+			this.connectionRefUpdate.on("child_removed", snap=>{
 				var userChangedKey = snap.ref.key;
 				var index = -1;
 				for(var i = 0; i < this.state.requesters.length; i++){
@@ -75,6 +75,8 @@ var AwaitingAcceptance = React.createClass({
 	},
 
 	componentWillUnmount: function(){
+		this.connectionRef.off();
+		this.connectionRefUpdate.off();
 		this.unsubscribe();
 	},
 
@@ -116,8 +118,8 @@ var AwaitingAcceptance = React.createClass({
 			showRequests = 
 				this.state.requesters.map((user,index) => (
         			<div key={index}>
-       					<Link to={"users/" + user.user_id}><h1><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> 
-       					{user.first + " " + user.last}</h1></Link>
+       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> 
+       					{user.first + " " + user.last}</h4></Link>
         				{this.showAwaitingAcceptance(user)}
         				<br />
         			</div>

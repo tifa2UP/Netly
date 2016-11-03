@@ -36,8 +36,8 @@ var AllConnections = React.createClass({
 			});
 
 			//if status was updated, remove from array of connections
-			this.connectionRefUpdates = firebase.database().ref().child('connections/' + this.state.currentUserID);
-			this.connectionRefUpdates.on("child_changed", snap=>{
+			this.connectionRefUpdate = firebase.database().ref().child('connections/' + this.state.currentUserID);
+			this.connectionRefUpdate.on("child_changed", snap=>{
 				var userChangedKey = snap.ref.key;
 				var index = -1;
 				for(var i = 0; i < this.state.connections.length; i++){
@@ -54,7 +54,7 @@ var AllConnections = React.createClass({
 			});
 
 			//if rejected acceptance, remove from array of connections
-			this.connectionRefUpdates.on("child_removed", snap=>{
+			this.connectionRefUpdate.on("child_removed", snap=>{
 				var userChangedKey = snap.ref.key;
 				var index = -1;
 				for(var i = 0; i < this.state.connections.length; i++){
@@ -73,11 +73,8 @@ var AllConnections = React.createClass({
 	},
 
 	componentWillUnmount: function(){
-		if(this.otherConnectionRef){
-			this.otherConnectionRef.off();
-		}
 		this.connectionRef.off();
-		this.connectionRefUpdates.off();
+		this.connectionRefUpdate.off();
 		this.unsubscribe();
 	},
 

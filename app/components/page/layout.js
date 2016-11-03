@@ -11,7 +11,8 @@ var Layout = React.createClass({
         return {
             isLoggedIn: (null != firebase.auth().currentUser),
             recruiter: false,
-            imgURL: ""
+            imgURL: "",
+            requests: []
         }
     },
 
@@ -31,6 +32,35 @@ var Layout = React.createClass({
                 this.setState({imgURL: user.imageURL});
                 this.setState({recruiter: (user == null || !user.recruiter) ? false : true});
             });
+
+
+            this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
+            this.connectionRef.on("child_added", snap=>{
+                if(snap.val()){
+                    this.state.requests.push(snap.ref.key);
+                    this.setState({requests: this.state.requests});
+                }
+            });
+
+            this.connectionRefUpdate = firebase.database().ref().child('connections/' + user.uid);
+            this.connectionRefUpdate.on("child_changed", snap=>{
+                if(snap.val().status == 'accepted'){
+                    var index = this.state.requests.indexOf(snap.ref.key);
+                    if(index >= 0){
+                        this.state.requests.splice(index, 1);
+                        this.setState({requests: this.state.requests});
+                    }
+                }
+            });
+
+            this.connectionRefUpdate = firebase.database().ref().child('connections/' + user.uid);
+            this.connectionRefUpdate.on("child_removed", snap=>{
+                var index = this.state.requests.indexOf(snap.ref.key);
+                if(index >= 0){
+                    this.state.requests.splice(index, 1);
+                    this.setState({requests: this.state.requests});
+                }
+            });
         });
     },
 
@@ -49,15 +79,23 @@ var Layout = React.createClass({
 
         var navClassName;
 
+        var style;
+        if(this.state.requests.length > 0){
+            style={
+                color: 'red'
+            }
+        }else{
+            style={}
+        }
+
         //if the user is logged in, show the logout and profile link
         if(this.state.isLoggedIn) {
             loginOrOut = <li><Link to="/logout" className="navbar-brand"><span className="glyphicon glyphicon-off"></span></Link></li>;
-            //profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand">{this.state.name ? this.state.name : "Profile" } </Link></li>;
             profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand"><img src={this.state.imgURL} className="img-circle" width="20" height="20" style={{objectFit: 'cover'}}/></Link></li>;
             signUp = null;
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog"></span></Link></li>;
-            requests = <li><Link to="/requests" className="navbar-brand">Requests</Link></li>;
-            connections = <li><Link to="/connections" className="navbar-brand">Connections</Link></li>;
+            requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell' style={style}></span></Link></li>;
+            connections = <li><Link to="/connections" className="navbar-brand"><span className='glyphicon glyphicon-globe'></span></Link></li>;
             search = <Search />
 
         //if the user is not logged in, show the login and signup links

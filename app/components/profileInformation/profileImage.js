@@ -63,7 +63,10 @@ var UploadImage = React.createClass({
         var showUpload;
         //shows an upload image option if currentuser
         if(this.props.isCurrentUser){
-            showUpload = <input type="file" accept="image/*" onChange={this.handleUploadImage}/>
+            showUpload = <label className="btn btn-file btn-link">
+                            <span className='glyphicon glyphicon-paperclip'></span>
+                            <input type="file" accept="image/*" onChange={this.handleUploadImage} style={{display: 'none'}} />
+                        </label>
         }else{
             showUpload = <div></div>
         }

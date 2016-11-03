@@ -70,6 +70,7 @@ var Profile = React.createClass({
 					<Connection pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
 				</center>
 				<br />
+				
 				<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 				<Projects pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 				<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
