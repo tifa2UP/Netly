@@ -73,7 +73,7 @@ var UploadImage = React.createClass({
 
         return (
             <div>
-                <img src={this.state.userData.imageURL} className="img-circle" alt="" width="200" height="200" style={{objectFit: 'cover'}}/><br />
+                <img src={this.state.userData.imageURL} className="img-circle" alt="" width="200" height="200" style={{objectFit: 'cover', border: "1px solid #B5A4A4"}}/><br />
                 {showUpload}
                 <br />
             </div>

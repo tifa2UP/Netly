@@ -13,6 +13,10 @@ var Search = React.createClass({
         }
     },
 
+    handleAdvancedSearchForm: function(){
+        hashHistory.push('/advanced');
+    },
+
     componentWillMount:function(){
         this.setState({isRecruiter: this.props.isRecruiter});
     },
@@ -24,7 +28,7 @@ var Search = React.createClass({
     render: function () {
         var advancedSearch;
         if(this.props.isRecruiter){
-            advancedSearch = <button className="btn btn-link"><Link style={{color: "white"}} to="#">Advanced Search</Link></button>;
+            advancedSearch = <button className="btn btn-link" onClick={this.handleAdvancedSearchForm}><Link style={{color: "white"}} to="#">Advanced Search</Link></button>;
         }else{
             advancedSearch = null;
         }

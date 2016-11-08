@@ -14,6 +14,7 @@ var Profile = require('../components/profileInformation/profile.js');
 var AwaitingAcceptance = require('../components/connection/awaiting_acceptance.js');
 var Connections = require('../components/connection/index.js');
 var SearchResults = require('../components/page/results.js');
+var AdvancedSearch = require('../components/page/advanced.js');
 
 var requireAuth = require('./require_auth.js')
 
@@ -29,6 +30,7 @@ var routes = (
 			<Route path="requests" component={AwaitingAcceptance} onEnter={requireAuth}/>
 			<Route path="connections" component={Connections} onEnter={requireAuth}/>
 			<Route path="results/:name" component={SearchResults} onEnter={requireAuth}/>
+			<Route path="advanced" component={AdvancedSearch} onEnter={requireAuth}/>
 		</Route>
 	</Router>
 );

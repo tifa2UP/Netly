@@ -118,7 +118,7 @@ var AwaitingAcceptance = React.createClass({
 			showRequests = 
 				this.state.requesters.map((user,index) => (
         			<div key={index}>
-       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> 
+       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover', border: "1px solid #B5A4A4"}}/> 
        					{user.first + " " + user.last}</h4></Link>
         				{this.showAwaitingAcceptance(user)}
         				<br />
