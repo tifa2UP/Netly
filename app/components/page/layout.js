@@ -22,7 +22,6 @@ var Layout = React.createClass({
 
         this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
             this.setState({isLoggedIn: (null != user)});
-            this.setState({recruiter: this.state.isLoggedIn == false ? false : null});
             this.setState({name: user.displayName});
             this.setState({user_id: user.uid});
 
@@ -30,7 +29,7 @@ var Layout = React.createClass({
             this.userRef.on("value", snap => {
                 var user = snap.val();
                 this.setState({imgURL: user.imageURL});
-                this.setState({recruiter: (user == null || !user.recruiter) ? false : true});
+                this.setState({recruiter: user.recruiter});
             });
 
 
@@ -79,6 +78,8 @@ var Layout = React.createClass({
 
         var navClassName;
 
+        console.log(this.state.recruiter);
+
         var style;
         if(this.state.requests.length > 0){
             style={
@@ -96,7 +97,7 @@ var Layout = React.createClass({
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog"></span></Link></li>;
             requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell' style={style}></span></Link></li>;
             connections = <li><Link to="/connections" className="navbar-brand"><span className='glyphicon glyphicon-globe'></span></Link></li>;
-            search = <Search />
+            search = <Search isRecruiter={this.state.recruiter}/>
 
         //if the user is not logged in, show the login and signup links
         } else {

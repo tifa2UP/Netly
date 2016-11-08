@@ -212,7 +212,7 @@ var Education = React.createClass({
 				<div>
 					{this.state.educations.map((education,index) => (
 			        	<div key={index}>
-			       			<h4>{education.school} <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
+			       			<h4><strong>{education.school}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
 			       			<h5>{education.degree}: {education.major}</h5>
 			       			<h6>{education.startDate} - {education.endDate}</h6>
 			       		</div>
@@ -224,8 +224,8 @@ var Education = React.createClass({
 				<div>
 					{this.state.educations.map((education,index) => (
 			        	<div key={index}>
-			       			<h4>{education.school}</h4>
-			       			<h5>{education.major}</h5>
+			       			<h4><strong>{education.school}</strong></h4>
+			       			<h5>{education.degree}: {education.major}</h5>
 			       			<h6>{education.startDate} - {education.endDate}</h6>
 			       		</div>
 			   		))}

@@ -80,9 +80,9 @@ var Profile = React.createClass({
 				<hr/>
 				<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 				<hr/>
-				<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<hr/>
 				<Skills pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+				<hr/>
+				<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 				<hr/>
 			</div>
 		);

@@ -13,13 +13,29 @@ var Search = React.createClass({
         }
     },
 
+    componentWillMount:function(){
+        this.setState({isRecruiter: this.props.isRecruiter});
+    },
+
+    componentWillReceiveProps: function(nextProps){
+        this.setState({isRecruiter: nextProps.isRecruiter});
+    },
+
     render: function () {
+        var advancedSearch;
+        if(this.props.isRecruiter){
+            advancedSearch = <button className="btn btn-link"><Link style={{color: "white"}} to="#">Advanced Search</Link></button>;
+        }else{
+            advancedSearch = null;
+        }
+
         return (
             <form className="navbar-form pull-left" onChange={this.handleSearch}>
                 <div className="form-group">
                     <input type="text" className="form-control" ref="search" placeholder="Search for people"/>
                 </div>
                 <button className="btn btn-default"><span className='glyphicon glyphicon-search'></span></button>
+                {advancedSearch}
             </form>
         )
     }

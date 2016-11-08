@@ -112,9 +112,18 @@ var Project = React.createClass({
 	},
 
 	handleClickSave: function(){
+		var url;
+		var pattern = /^https?:\/\//i;
+
+		if(pattern.test(this.refs.url.value)){
+			url = this.refs.url.value;
+		}else{
+			url = "http://" + this.refs.url.value;
+		}
+
 		var projectData = {
 			name: this.refs.name.value,
-			url: this.refs.url.value,
+			url: url,
 			startDate: this.refs.startDate.value,
 			endDate: this.refs.endDate.value,
 			description: this.refs.description.value
@@ -211,7 +220,7 @@ var Project = React.createClass({
 				<div>
 					{this.state.projects.map((project,index) => (
 			        	<div key={index}>
-			       			<h4>{project.name} <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
+			       			<h4><strong>{project.name}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
 			       			<h5><a href={project.url}>{project.url}</a></h5>
 			       			<h6>{project.startDate} - {project.endDate}</h6>
 			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{project.description}</pre></h6>
@@ -224,7 +233,7 @@ var Project = React.createClass({
 				<div>
 					{this.state.projects.map((project,index) => (
 			        	<div key={index}>
-			       			<h4>{project.name}</h4>
+			       			<h4><strong>{project.name}</strong></h4>
 			       			<h5><a href={project.url}>{project.url}</a></h5>
 			       			<h6>{project.startDate} - {project.endDate}</h6>
 			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{project.description}</pre></h6>

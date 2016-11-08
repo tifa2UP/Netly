@@ -79,10 +79,14 @@ var Interests = React.createClass({
 		return(
 			<div>
 				<h3>Interests</h3>
-				<textarea className="form-control" rows="6" style={{width: '100%'}} ref="newInterests" defaultValue={this.state.interests} />
+				<textarea className="form-control" rows="6" style={{width: '100%'}} ref="newInterests" defaultValue={this.state.interests}  placeholder="Ex. Hiking, singing, cooking"/>
 				<br/>
-				<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
-				<button className="btn btn-default" onClick={this.handleClickCancel}>Cancel</button>
+				<center>
+					<div className="btn btn-toolbar">
+						<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
+						<button className="btn btn-default" onClick={this.handleClickCancel}>Cancel</button>
+					</div>
+				</center>
 			</div>
 		);
 	},
@@ -98,7 +102,6 @@ var Interests = React.createClass({
 		return (
 			<div>
 				{partToShow}
-				<br />
 			</div>
 
 		);

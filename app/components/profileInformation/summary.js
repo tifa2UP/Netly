@@ -72,7 +72,7 @@ var Summary = React.createClass({
 		return(
 			<div>
 				<h2 style={{color: "#0077B5"}}>Summary {editButton}</h2>
-				<pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{this.state.summary}</pre>
+				<pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", background: "none", whiteSpace: "pre-wrap"}}>{this.state.summary}</pre>
 			</div>
 		);
 	},
@@ -103,7 +103,6 @@ var Summary = React.createClass({
 		return (
 			<div>
 				{partToShow}
-				<br />
 			</div>
 
 		);

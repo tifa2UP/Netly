@@ -211,7 +211,7 @@ var Experience = React.createClass({
 				<div>
 					{this.state.experiences.map((experience,index) => (
 			        	<div key={index}>
-			       			<h4>{experience.employer} <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
+			       			<h4><strong>{experience.employer}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
 			       			<h5>{experience.position}</h5>
 			       			<h6>{experience.startDate} - {experience.endDate}</h6>
 			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{experience.description}</pre></h6>
@@ -224,7 +224,7 @@ var Experience = React.createClass({
 				<div>
 					{this.state.experiences.map((experience,index) => (
 			        	<div key={index}>
-			       			<h4>{experience.employer}</h4>
+			       			<h4><strong>{experience.employer}</strong></h4>
 			       			<h5>{experience.position}</h5>
 			       			<h6>{experience.startDate} - {experience.endDate}</h6>
 			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{experience.description}</pre></h6>
