@@ -5,106 +5,258 @@ var hashHistory = require('react-router').hashHistory;
 
 var Education = React.createClass({
 	getInitialState: function(){
-		return{isCurrentUser: false, editing: false};
+		return{isCurrentUser: false, editing: false, educations: [], id: this.props.pageID};
 	},
 
 	componentWillMount: function(){
-        this.userRef = firebase.database().ref().child('users/'+this.props.pageID);
-        this.userRef.on("value", snap => {
-        	var user = snap.val();
-			if(user.education){
-				this.setState({education: user.education});
-			}else{
-				this.setState({education: ""});
+        this.educationRef = firebase.database().ref().child('user-education/'+this.props.pageID);
+        this.educationRef.on("child_added", snap => {
+        	var education = snap.val();
+			if(education){
+				education.key = snap.ref.key;
+				this.state.educations.push(education);
+				this.setState({educations: this.state.educations});
+			}
+        });
+
+        this.educationRefChanged = firebase.database().ref().child('user-education/'+this.props.pageID);
+        this.educationRefChanged.on("child_changed", snap => {
+        	var education = snap.val();
+			if(education){
+				education.key = snap.ref.key;
+
+				var index;
+				for(var i = 0; i < this.state.educations.length; i++){
+					if(this.state.educations[i].key == education.key){
+						index = i;
+					}
+				}
+
+				this.state.educations.splice(index, 1, education);
+				this.setState({educations: this.state.educations});
+			}
+        });
+
+        this.educationRefRemoved = firebase.database().ref().child('user-education/'+this.props.pageID);
+        this.educationRefRemoved.on("child_removed", snap => {
+        	var education = snap.val();
+			if(education){
+				this.state.educations.push(education);
+				this.setState({educations: this.state.educations});
 			}
         });
 	},
 
 	componentWillReceiveProps: function(nextProps){
-		this.userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
-        this.userRef.on("value", snap => {
-        	var user = snap.val();
-			if(user.education){
-				this.setState({education: user.education});
-			}else{
-				this.setState({education: ""});
-			}
-        });
+		if(nextProps.pageID != this.state.id){
+			this.educationRef.off(); //turn off the educationRef in compWillMount-listen only from one.
+			this.educationRefChanged.off();
+			this.educationRefRemoved.off();
+			this.setState({educations: []});
+
+			this.educationRef = firebase.database().ref().child('user-education/'+ nextProps.pageID);
+	        this.educationRef.on("child_added", snap => {
+	        	var education = snap.val();
+				if(education){
+					education.key = snap.ref.key;
+					this.state.educations.push(education);
+					this.setState({educations: this.state.educations});
+				}
+	        });
+
+	        this.educationRefChanged = firebase.database().ref().child('user-education/' + nextProps.pageID);
+	        this.educationRefChanged.on("child_changed", snap => {
+	        	var education = snap.val();
+				if(education){
+					education.key = snap.ref.key;
+
+					var index;
+					for(var i = 0; i < this.state.educations.length; i++){
+						if(this.state.educations[i].key == education.key){
+							index = i;
+						}
+					}
+					
+					this.state.educations.splice(index, 1, education);
+					this.setState({educations: this.state.educations});
+				}
+	        });
+
+	        this.educationRefChanged = firebase.database().ref().child('user-education/' + nextProps.pageID);
+	        this.educationRefChanged.on("child_removed", snap => {
+	        	var education = snap.val();
+				if(education){
+					education.key = snap.ref.key;
+
+					var index;
+					for(var i = 0; i < this.state.educations.length; i++){
+						if(this.state.educations[i].key == education.key){
+							index = i;
+						}
+					}
+					
+					this.state.educations.splice(index, 1);
+					this.setState({educations: this.state.educations});
+				}
+	        });
+	    }
 	},
 
-	handleClickEdit: function(){
+	handleClickAdd: function(){
+		this.setState({adding: true});
+	},
+
+	handleClickEdit: function(index){
 		this.setState({editing: true});
+		this.setState({indexToEdit: index});
 	},
 
 	handleClickSave: function(){
-		this.setState({editing: false});
-		var newEducation = this.refs.newEducation.value;
+		var educationData = {
+			school: this.refs.school.value,
+			degree: this.refs.degree.value,
+			major: this.refs.major.value,
+			startDate: this.refs.startDate.value,
+			endDate: this.refs.endDate.value
+		}
 
-        this.userRef.once("value", snap => {
-        	var user = snap.val();
-			var userInfo = {};
-            for(var i in user){
-                userInfo[i] = user[i];
-            }
-			userInfo.education = newEducation;
-			var updates = {};
-			updates['users/' + this.props.pageID] = userInfo;
-			firebase.database().ref().update(updates);
-        });
+		if(this.state.editing){
+			var educationUpdate = {};
+			educationUpdate['/user-education/' + this.props.pageID + '/' + this.state.educations[this.state.indexToEdit].key] = educationData;
+			firebase.database().ref().update(educationUpdate);
+		}else{
+			var newEducationKey = firebase.database().ref().child('education').push().key;
+			firebase.database().ref('/user-education/' + this.props.pageID + '/' + newEducationKey).set(educationData);
+		}
+		
+		this.setState({editing: false});
+		this.setState({adding: false});
+
+	},
+
+	handleRemoveExisting: function(){
+		var educationRef = firebase.database().ref('user-education/' + this.props.pageID + '/' + this.state.educations[this.state.indexToEdit].key);
+		educationRef.remove();
+
+		this.setState({editing: false});
+		this.setState({adding: false});
 	},
 
 	handleClickCancel: function(){
 		this.setState({editing: false});
+		this.setState({adding: false});
 	},
 
-
-	defaultEducation: function(){
-		var editButton;
+	educationHeading: function(){
 		if(this.props.isCurrentUser){
-			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil"></span></button>;
+			return <h2 style={{color: "#0077B5"}}>Education <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus"></span></button></h2>
 		}else{
-			editButton = <div></div>;
+			return <h2 style={{color: "#0077B5"}}>Education</h2>
 		}
+	},
 
+	addingEducation: function(){
 		return(
-			<div>
-				<h3>Education {editButton}</h3>
-				<pre>{this.state.education}</pre>
+			<div className="col-md-12">
+				<div className="col-md-8">
+					<input type="text" ref="school" className="form-control" placeholder="School"/><br />
+					<input type="text" ref="degree" className="form-control" placeholder="Degree"/><br />
+					<input type="text" ref="major" className="form-control" placeholder="Field of Study"/><br />
+					<div className="input-group">
+						<input type="month" ref="startDate" className="form-control"/>
+						<span className="input-group-addon">-</span>
+						<input type="month" ref="endDate" className="form-control"/>
+					</div>
+
+					<center>
+						<div className="btn btn-toolbar">
+							<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
+							<button className="btn btn-default" onClick={this.handleClickCancel}>Cancel</button>
+						</div>
+					</center><br/>
+				</div>
 			</div>
-		);
+		)
 	},
 
 	editingEducation: function(){
+		var indexedSchool = this.state.educations[this.state.indexToEdit];
+
 		return(
-			<div>
-				<h3>Education</h3>
-				<textarea rows="6" style={{width: '100%'}} ref="newEducation" defaultValue={this.state.education} />
-				<br/>
-				<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
-				<button className="btn btn-default" onClick={this.handleClickCancel}>Cancel</button>
+			<div className="col-md-12">
+				<div className="col-md-8">
+					<input type="text" ref="school" className="form-control" defaultValue={indexedSchool.school} /><br />
+					<input type="text" ref="degree" className="form-control" defaultValue={indexedSchool.degree}/><br />
+					<input type="text" ref="major" className="form-control" defaultValue={indexedSchool.major}/><br />
+					<div className="input-group">
+						<input type="month" ref="startDate" className="form-control" defaultValue={indexedSchool.startDate}/>
+						<span className="input-group-addon">-</span>
+						<input type="month" ref="endDate" className="form-control" defaultValue={indexedSchool.endDate}/>
+					</div>
+
+					<center>
+						<div className="btn btn-toolbar">
+							<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
+							<button className="btn btn-default" onClick={this.handleClickCancel}>Cancel</button>
+							<button className="btn btn-link" onClick={this.handleRemoveExisting}>Remove this school</button>
+						</div>
+					</center><br/>
+				</div>
 			</div>
-		);
+		)
+	},
+
+	defaultEducation: function(){
+		if(this.props.isCurrentUser){
+			return(
+				<div>
+					{this.state.educations.map((education,index) => (
+			        	<div key={index}>
+			       			<h4>{education.school} <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
+			       			<h5>{education.degree}: {education.major}</h5>
+			       			<h6>{education.startDate} - {education.endDate}</h6>
+			       		</div>
+			   		))}
+				</div>
+			)
+		}else{
+			return(
+				<div>
+					{this.state.educations.map((education,index) => (
+			        	<div key={index}>
+			       			<h4>{education.school}</h4>
+			       			<h5>{education.major}</h5>
+			       			<h6>{education.startDate} - {education.endDate}</h6>
+			       		</div>
+			   		))}
+				</div>
+			)
+		}
 	},
 
 	render: function(){
-		var partToShow;
-		if(this.state.editing){
-			partToShow = this.editingEducation();
+		var show;
+
+		if(this.state.adding){
+			show = this.addingEducation();
+		}else if(this.state.editing){
+			show = this.editingEducation();
 		}else{
-			partToShow = this.defaultEducation();
+			show = this.defaultEducation();
 		}
 
 		return (
 			<div>
-				{partToShow}
-				<br />
+				{this.educationHeading()}
+				{show}
 			</div>
-
-		);
+		)
 	},
 
 	componentWillUnmount: function(){
-		this.userRef.off();
+		this.educationRef.off();
+		this.educationRefChanged.off();
+		this.educationRefRemoved.off();
 	},
 });
 

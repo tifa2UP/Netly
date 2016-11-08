@@ -74,8 +74,8 @@ var Skills = React.createClass({
 
 		return(
 			<div>
-				<h3>Skills {editButton}</h3>
-				<pre>{this.state.skills}</pre>
+				<h2 style={{color: "#0077B5"}}>Skills {editButton}</h2>
+				<pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{this.state.skills}</pre>
 			</div>
 		);
 	},
@@ -83,10 +83,14 @@ var Skills = React.createClass({
 		return(
 			<div>
 				<h3>Skills</h3>
-				<textarea rows="6" style={{width: '100%'}} ref="newSkills" defaultValue={this.state.skills} />
+				<textarea className="form-control" rows="6" style={{width: '100%'}} ref="newSkills" defaultValue={this.state.skills} />
 				<br/>
-				<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
-				<button className="btn btn-default" onClick={this.handleClickCancel}>Cancel</button>
+				<center>
+					<div className="btn btn-toolbar">
+						<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
+						<button className="btn btn-default" onClick={this.handleClickCancel}>Cancel</button>
+					</div>
+				</center>
 			</div>
 		);
 	},

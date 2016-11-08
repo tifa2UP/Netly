@@ -71,12 +71,19 @@ var Profile = React.createClass({
 				</center>
 				<br />
 				
+				<hr/>
 				<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<Projects pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+				<hr/>
 				<Experience pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+				<hr/>
+				<Projects pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+				<hr/>
+				<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+				<hr/>
+				<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+				<hr/>
 				<Skills pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+				<hr/>
 			</div>
 		);
 	}
