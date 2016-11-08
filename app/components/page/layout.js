@@ -22,6 +22,7 @@ var Layout = React.createClass({
 
         this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
             this.setState({isLoggedIn: (null != user)});
+            this.setState({recruiter: this.state.isLoggedIn == false ? false : null});
             this.setState({name: user.displayName});
             this.setState({user_id: user.uid});
 
@@ -29,7 +30,7 @@ var Layout = React.createClass({
             this.userRef.on("value", snap => {
                 var user = snap.val();
                 this.setState({imgURL: user.imageURL});
-                this.setState({recruiter: user.recruiter});
+                this.setState({recruiter: (user == null || !user.recruiter) ? false : true});
             });
 
 
@@ -77,8 +78,6 @@ var Layout = React.createClass({
         var search;
 
         var navClassName;
-
-        console.log(this.state.recruiter);
 
         var style;
         if(this.state.requests.length > 0){
