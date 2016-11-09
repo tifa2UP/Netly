@@ -41,7 +41,16 @@ var Project = React.createClass({
         this.projectRefRemoved.on("child_removed", snap => {
         	var project = snap.val();
 			if(project){
-				this.state.projects.push(project);
+				project.key = snap.ref.key;
+				
+				var index;
+				for(var i = 0; i < this.state.projects.length; i++){
+					if(this.state.projects[i].key == project.key){
+						index = i;
+					}
+				}
+
+				this.state.projects.splice(index, 1);
 				this.setState({projects: this.state.projects});
 			}
         });
@@ -69,7 +78,6 @@ var Project = React.createClass({
 	        	var project = snap.val();
 				if(project){
 					project.key = snap.ref.key;
-
 					var index;
 					for(var i = 0; i < this.state.projects.length; i++){
 						if(this.state.projects[i].key == project.key){
@@ -82,8 +90,8 @@ var Project = React.createClass({
 				}
 	        });
 
-	        this.projectRefChanged = firebase.database().ref().child('user-project/' + nextProps.pageID);
-	        this.projectRefChanged.on("child_removed", snap => {
+	        this.projectRefRemoved = firebase.database().ref().child('user-project/' + nextProps.pageID);
+	        this.projectRefRemoved.on("child_removed", snap => {
 	        	var project = snap.val();
 				if(project){
 					project.key = snap.ref.key;

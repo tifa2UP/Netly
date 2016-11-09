@@ -41,7 +41,16 @@ var Education = React.createClass({
         this.educationRefRemoved.on("child_removed", snap => {
         	var education = snap.val();
 			if(education){
-				this.state.educations.push(education);
+				education.key = snap.ref.key;
+				
+				var index;
+				for(var i = 0; i < this.state.educations.length; i++){
+					if(this.state.educations[i].key == education.key){
+						index = i;
+					}
+				}
+
+				this.state.educations.splice(index, 1);
 				this.setState({educations: this.state.educations});
 			}
         });
@@ -82,8 +91,8 @@ var Education = React.createClass({
 				}
 	        });
 
-	        this.educationRefChanged = firebase.database().ref().child('user-education/' + nextProps.pageID);
-	        this.educationRefChanged.on("child_removed", snap => {
+	        this.educationRefRemoved = firebase.database().ref().child('user-education/' + nextProps.pageID);
+	        this.educationRefRemoved.on("child_removed", snap => {
 	        	var education = snap.val();
 				if(education){
 					education.key = snap.ref.key;

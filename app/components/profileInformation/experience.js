@@ -41,7 +41,16 @@ var Experience = React.createClass({
         this.experienceRefRemoved.on("child_removed", snap => {
         	var experience = snap.val();
 			if(experience){
-				this.state.experiences.push(experience);
+				experience.key = snap.ref.key;
+
+				var index;
+				for(var i = 0; i < this.state.experiences.length; i++){
+					if(this.state.experiences[i].key == experience.key){
+						index = i;
+					}
+				}
+
+				this.state.experiences.splice(index, 1);
 				this.setState({experiences: this.state.experiences});
 			}
         });
