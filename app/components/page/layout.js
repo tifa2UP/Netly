@@ -93,7 +93,7 @@ var Layout = React.createClass({
             loginOrOut = <li><Link to="/logout" className="navbar-brand"><span className="glyphicon glyphicon-off"></span></Link></li>;
             profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand"><img src={this.state.imgURL} className="img-circle" width="20" height="20" style={{objectFit: 'cover'}}/></Link></li>;
             signUp = null;
-            accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog"></span></Link></li>;
+            accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog" title="Settings"></span></Link></li>;
             requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell' style={style}></span></Link></li>;
             connections = <li><Link to="/connections" className="navbar-brand"><span className='glyphicon glyphicon-globe'></span></Link></li>;
             search = <Search isRecruiter={this.state.recruiter}/>
