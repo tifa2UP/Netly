@@ -158,7 +158,7 @@ var Education = React.createClass({
 
 	educationHeading: function(){
 		if(this.props.isCurrentUser){
-			return <h2 style={{color: "#0077B5"}}>Education <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus"></span></button></h2>
+			return <h2 style={{color: "#0077B5"}}>Education <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title ="Add Education"></span></button></h2>
 		}else{
 			return <h2 style={{color: "#0077B5"}}>Education</h2>
 		}
@@ -173,7 +173,7 @@ var Education = React.createClass({
 					<input type="text" ref="major" className="form-control" placeholder="Field of Study"/><br />
 					<div className="input-group">
 						<input type="month" ref="startDate" className="form-control"/>
-						<span className="input-group-addon">-</span>
+						<span className="input-group-addon" >-</span>
 						<input type="month" ref="endDate" className="form-control"/>
 					</div>
 
@@ -199,7 +199,7 @@ var Education = React.createClass({
 					<input type="text" ref="major" className="form-control" defaultValue={indexedSchool.major}/><br />
 					<div className="input-group">
 						<input type="month" ref="startDate" className="form-control" defaultValue={indexedSchool.startDate}/>
-						<span className="input-group-addon">-</span>
+						<span className="input-group-addon" title ="Add Education">-</span>
 						<input type="month" ref="endDate" className="form-control" defaultValue={indexedSchool.endDate}/>
 					</div>
 
@@ -221,7 +221,7 @@ var Education = React.createClass({
 				<div>
 					{this.state.educations.map((education,index) => (
 			        	<div key={index}>
-			       			<h4><strong>{education.school}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
+			       			<h4><strong>{education.school}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil" title ="Edit Education"></span></button></h4>
 			       			<h5>{education.degree}: {education.major}</h5>
 			       			<h6>{education.startDate} - {education.endDate}</h6>
 			       		</div>

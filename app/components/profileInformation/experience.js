@@ -158,7 +158,7 @@ var Experience = React.createClass({
 
 	experienceHeading: function(){
 		if(this.props.isCurrentUser){
-			return <h2 style={{color: "#0077B5"}}>Experience <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus"></span></button></h2>
+			return <h2 style={{color: "#0077B5"}}>Experience <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title ="Add Experience"></span></button></h2>
 		}else{
 			return <h2 style={{color: "#0077B5"}}>Experience</h2>
 		}
@@ -197,7 +197,7 @@ var Experience = React.createClass({
 					<input type="text" ref="position" className="form-control" defaultValue={indexedExperience.position}/><br />
 					<div className="input-group">
 						<input type="month" ref="startDate" className="form-control" defaultValue={indexedExperience.startDate}/>
-						<span className="input-group-addon">-</span>
+						<span className="input-group-addon" title= "Edit Experience">-</span>
 						<input type="month" ref="endDate" className="form-control" defaultValue={indexedExperience.endDate}/>
 					</div><br/>
 					<textarea className="form-control" rows="6" style={{width: '100%'}} ref="description" defaultValue={indexedExperience.description}/><br/>
@@ -220,7 +220,9 @@ var Experience = React.createClass({
 				<div>
 					{this.state.experiences.map((experience,index) => (
 			        	<div key={index}>
-			       			<h4><strong>{experience.employer}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
+						<span className="input-group-addon" >-</span>
+						<span className="input-group-addon" >-</span>
+			       			<h4><strong>{experience.employer}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil" title = "Edit Experience"></span></button></h4>
 			       			<h5>{experience.position}</h5>
 			       			<h6>{experience.startDate} - {experience.endDate}</h6>
 			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{experience.description}</pre></h6>

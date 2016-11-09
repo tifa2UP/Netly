@@ -62,7 +62,7 @@ var Interests = React.createClass({
 	defaultInterests: function(){
 		var editButton;
 		if(this.props.isCurrentUser){
-			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil"></span></button>;
+			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil" title= "Edit Interests"></span></button>;
 		}else{
 			editButton = <div></div>;
 		}

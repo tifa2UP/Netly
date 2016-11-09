@@ -64,7 +64,7 @@ var Skills = React.createClass({
     defaultSkills: function(){
 		var editButton;
 		if(this.props.isCurrentUser){
-			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil"></span></button>;
+			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil" title="Edit Skills"></span></button>;
 		}else{
 			editButton = <div></div>;
 		}
