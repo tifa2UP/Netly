@@ -27749,16 +27749,16 @@
 	var NewUser = __webpack_require__(241);
 	var SessionUser = __webpack_require__(242);
 	var Home = __webpack_require__(243);
-	var Logout = __webpack_require__(244);
-	var Layout = __webpack_require__(245);
-	var AccountSettings = __webpack_require__(247);
-	var Profile = __webpack_require__(250);
-	var AwaitingAcceptance = __webpack_require__(259);
-	var Connections = __webpack_require__(260);
-	var SearchResults = __webpack_require__(261);
-	var AdvancedSearch = __webpack_require__(262);
+	var Logout = __webpack_require__(245);
+	var Layout = __webpack_require__(246);
+	var AccountSettings = __webpack_require__(248);
+	var Profile = __webpack_require__(251);
+	var AwaitingAcceptance = __webpack_require__(260);
+	var Connections = __webpack_require__(261);
+	var SearchResults = __webpack_require__(262);
+	var AdvancedSearch = __webpack_require__(263);
 
-	var requireAuth = __webpack_require__(263);
+	var requireAuth = __webpack_require__(264);
 
 	var routes = React.createElement(
 		Router,
@@ -28087,6 +28087,7 @@
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
+	var Reply = __webpack_require__(244);
 
 	var Home = React.createClass({
 		displayName: 'Home',
@@ -28279,7 +28280,8 @@
 							post.likes,
 							')'
 						)
-					)
+					),
+					React.createElement(Reply, { post_id: post.post_id })
 				))
 			);
 		}
@@ -28289,6 +28291,109 @@
 
 /***/ },
 /* 244 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ReactDOM = __webpack_require__(34);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	//customize date for rendering
+	var dateTimeCustomization = {
+	    weekday: "long", month: "short",
+	    day: "numeric", hour: "2-digit", minute: "2-digit"
+	};
+
+	var Reply = React.createClass({
+	    displayName: 'Reply',
+
+	    getInitialState: function () {
+	        return { replies: [] };
+	    },
+	    //just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"
+	    handleKeyPress: function (e) {
+	        if (e.key == 'Enter') {
+	            try {
+	                this.handlePostReply();
+	            } catch (e) {};
+	        }
+	    },
+	    componentWillMount: function () {
+	        this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id);
+	        this.postReplyRef.on('child_added', snap => {
+	            this.state.replies.push(snap.val());
+	            this.setState({ replies: this.state.replies });
+	        });
+	    },
+
+	    componentWillReceiveProps: function (nextProps) {
+	        this.postReplyRef.off();
+	        this.state.replies.splice(0, this.state.replies.length);
+
+	        this.postReplyRef = firebase.database().ref('post-reply').child(nextProps.post_id);
+	        this.postReplyRef.on('child_added', snap => {
+	            this.state.replies.push(snap.val());
+	            this.setState({ replies: this.state.replies });
+	        });
+	    },
+
+	    handlePostReply: function () {
+	        var postReplyKey = firebase.database().ref().child('reply').push().key;
+	        var reply = {
+	            post_id: this.props.post_id,
+	            user_name: firebase.auth().currentUser.displayName,
+	            user_id: firebase.auth().currentUser.uid,
+	            body: this.refs.theReply.value,
+	            post_time: firebase.database.ServerValue.TIMESTAMP
+	        };
+
+	        firebase.database().ref('post-reply/' + this.props.post_id + "/" + postReplyKey).set(reply);
+
+	        this.refs.theReply.value = "";
+	    },
+
+	    render: function () {
+	        return React.createElement(
+	            'div',
+	            null,
+	            this.state.replies.map((reply, index) => React.createElement(
+	                'div',
+	                { key: index },
+	                React.createElement(
+	                    Link,
+	                    { to: "/users/" + reply.user_id },
+	                    ' ',
+	                    reply.user_name,
+	                    ' '
+	                ),
+	                ' on ',
+	                new Date(reply.post_time).toLocaleTimeString("en-US", dateTimeCustomization),
+	                ' ',
+	                React.createElement('br', null),
+	                React.createElement(
+	                    'blockquote',
+	                    null,
+	                    '"',
+	                    reply.body,
+	                    '"',
+	                    React.createElement('br', null)
+	                )
+	            )),
+	            React.createElement('input', { type: 'text', onKeyPress: this.handleKeyPress, ref: 'theReply', className: 'form-control', placeholder: 'Reply', id: 'reply' }),
+	            React.createElement(
+	                'button',
+	                { type: 'button', className: 'btn btn-primary', onClick: this.handlePostReply },
+	                'Submit'
+	            )
+	        );
+	    }
+	});
+
+	module.exports = Reply;
+
+/***/ },
+/* 245 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28317,14 +28422,14 @@
 	module.exports = Logout;
 
 /***/ },
-/* 245 */
+/* 246 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
-	var Search = __webpack_require__(246);
+	var Search = __webpack_require__(247);
 
 	var Layout = React.createClass({
 	    displayName: 'Layout',
@@ -28438,7 +28543,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/accountSettings', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-cog' })
+	                    React.createElement('span', { className: 'glyphicon glyphicon-cog', title: 'Settings' })
 	                )
 	            );
 	            requests = React.createElement(
@@ -28541,7 +28646,7 @@
 	module.exports = Layout;
 
 /***/ },
-/* 246 */
+/* 247 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28610,15 +28715,15 @@
 	module.exports = Search;
 
 /***/ },
-/* 247 */
+/* 248 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
-	var DeleteAccount = __webpack_require__(248);
-	var UpdatePassword = __webpack_require__(249);
+	var DeleteAccount = __webpack_require__(249);
+	var UpdatePassword = __webpack_require__(250);
 
 	var AccountSettings = React.createClass({
 		displayName: 'AccountSettings',
@@ -28766,7 +28871,7 @@
 	module.exports = AccountSettings;
 
 /***/ },
-/* 248 */
+/* 249 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28860,7 +28965,7 @@
 	module.exports = DeleteAccount;
 
 /***/ },
-/* 249 */
+/* 250 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28959,7 +29064,7 @@
 	module.exports = UpdatePassword;
 
 /***/ },
-/* 250 */
+/* 251 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -28968,14 +29073,14 @@
 	var hashHistory = __webpack_require__(177).hashHistory;
 
 	//profile components
-	var Summary = __webpack_require__(251);
-	var Education = __webpack_require__(252);
-	var Projects = __webpack_require__(253);
-	var Interests = __webpack_require__(254);
-	var Experience = __webpack_require__(255);
-	var Skills = __webpack_require__(256);
-	var ProfileImage = __webpack_require__(257);
-	var Connection = __webpack_require__(258);
+	var Summary = __webpack_require__(252);
+	var Education = __webpack_require__(253);
+	var Projects = __webpack_require__(254);
+	var Interests = __webpack_require__(255);
+	var Experience = __webpack_require__(256);
+	var Skills = __webpack_require__(257);
+	var ProfileImage = __webpack_require__(258);
+	var Connection = __webpack_require__(259);
 
 	var Profile = React.createClass({
 		displayName: 'Profile',
@@ -29063,7 +29168,7 @@
 	module.exports = Profile;
 
 /***/ },
-/* 251 */
+/* 252 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29210,7 +29315,7 @@
 	module.exports = Summary;
 
 /***/ },
-/* 252 */
+/* 253 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -29597,7 +29702,7 @@
 	module.exports = Education;
 
 /***/ },
-/* 253 */
+/* 254 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30016,7 +30121,7 @@
 	module.exports = Project;
 
 /***/ },
-/* 254 */
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30162,7 +30267,7 @@
 	module.exports = Interests;
 
 /***/ },
-/* 255 */
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30565,7 +30670,7 @@
 	module.exports = Experience;
 
 /***/ },
-/* 256 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30713,7 +30818,7 @@
 	module.exports = Skills;
 
 /***/ },
-/* 257 */
+/* 258 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30807,7 +30912,7 @@
 	module.exports = UploadImage;
 
 /***/ },
-/* 258 */
+/* 259 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -30975,7 +31080,7 @@
 	module.exports = Connection;
 
 /***/ },
-/* 259 */
+/* 260 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -31151,7 +31256,7 @@
 	module.exports = AwaitingAcceptance;
 
 /***/ },
-/* 260 */
+/* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -31287,7 +31392,7 @@
 	module.exports = AllConnections;
 
 /***/ },
-/* 261 */
+/* 262 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -31384,7 +31489,7 @@
 	module.exports = Results;
 
 /***/ },
-/* 262 */
+/* 263 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -31573,7 +31678,7 @@
 	module.exports = AdvancedSearch;
 
 /***/ },
-/* 263 */
+/* 264 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);

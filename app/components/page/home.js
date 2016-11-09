@@ -3,6 +3,7 @@ var ReactDOM = require('react-dom');
 var firebase = require('firebase');
 var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
+var Reply = require('./reply.js');
 
 var Home = React.createClass({
 
@@ -158,6 +159,7 @@ var Home = React.createClass({
         					"{post.body}"<br />
         					<button className="btn btn-default" onClick={this.handleLike.bind(null, post)}><span className="glyphicon glyphicon-thumbs-up"></span> ({post.likes})</button>
         				</blockquote>
+        				<Reply post_id={post.post_id}/>
         			</div>
    				))}
 			</div>
