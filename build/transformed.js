@@ -27756,8 +27756,9 @@
 	var AwaitingAcceptance = __webpack_require__(259);
 	var Connections = __webpack_require__(260);
 	var SearchResults = __webpack_require__(261);
+	var AdvancedSearch = __webpack_require__(262);
 
-	var requireAuth = __webpack_require__(262);
+	var requireAuth = __webpack_require__(263);
 
 	var routes = React.createElement(
 		Router,
@@ -27773,7 +27774,8 @@
 			React.createElement(Route, { path: 'users/:id', component: Profile, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'requests', component: AwaitingAcceptance, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'connections', component: Connections, onEnter: requireAuth }),
-			React.createElement(Route, { path: 'results/:name', component: SearchResults, onEnter: requireAuth })
+			React.createElement(Route, { path: 'results/:name', component: SearchResults, onEnter: requireAuth }),
+			React.createElement(Route, { path: 'advanced', component: AdvancedSearch, onEnter: requireAuth })
 		)
 	);
 
@@ -27830,12 +27832,8 @@
 						last: lastName,
 						recruiter: recruiter,
 						imageURL: "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7",
-						summary: "",
-						projects: "",
-						skills: "",
-						education: "",
-						experience: "",
-						interests: ""
+						interests: "",
+						skills: ""
 					};
 
 					firebase.database().ref('users/' + firebase.auth().currentUser.uid).set(userData);
@@ -28461,7 +28459,7 @@
 	                    React.createElement('span', { className: 'glyphicon glyphicon-globe' })
 	                )
 	            );
-	            search = React.createElement(Search, null);
+	            search = React.createElement(Search, { isRecruiter: this.state.recruiter });
 
 	            //if the user is not logged in, show the login and signup links
 	        } else {
@@ -28563,10 +28561,37 @@
 	        }
 	    },
 
+	    handleAdvancedSearchForm: function () {
+	        hashHistory.push('/advanced');
+	    },
+
+	    componentWillMount: function () {
+	        this.setState({ isRecruiter: this.props.isRecruiter });
+	    },
+
+	    componentWillReceiveProps: function (nextProps) {
+	        this.setState({ isRecruiter: nextProps.isRecruiter });
+	    },
+
 	    render: function () {
+	        var advancedSearch;
+	        if (this.props.isRecruiter) {
+	            advancedSearch = React.createElement(
+	                'button',
+	                { className: 'btn btn-link', onClick: this.handleAdvancedSearchForm },
+	                React.createElement(
+	                    Link,
+	                    { style: { color: "white" }, to: '#' },
+	                    'Advanced Search'
+	                )
+	            );
+	        } else {
+	            advancedSearch = null;
+	        }
+
 	        return React.createElement(
 	            'form',
-	            { className: 'navbar-form pull-left', onSubmit: this.handleSearch },
+	            { className: 'navbar-form pull-left', onChange: this.handleSearch },
 	            React.createElement(
 	                'div',
 	                { className: 'form-group' },
@@ -28576,7 +28601,8 @@
 	                'button',
 	                { className: 'btn btn-default' },
 	                React.createElement('span', { className: 'glyphicon glyphicon-search' })
-	            )
+	            ),
+	            advancedSearch
 	        );
 	    }
 	});
@@ -29017,12 +29043,19 @@
 					React.createElement(Connection, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser, currentUserID: this.state.currentUserID })
 				),
 				React.createElement('br', null),
+				React.createElement('hr', null),
 				React.createElement(Summary, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Projects, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Education, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Interests, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement('hr', null),
 				React.createElement(Experience, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement(Skills, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser })
+				React.createElement('hr', null),
+				React.createElement(Projects, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement('hr', null),
+				React.createElement(Education, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement('hr', null),
+				React.createElement(Skills, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement('hr', null),
+				React.createElement(Interests, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+				React.createElement('hr', null)
 			);
 		}
 	});
@@ -29114,14 +29147,14 @@
 				'div',
 				null,
 				React.createElement(
-					'h3',
-					null,
+					'h2',
+					{ style: { color: "#0077B5" } },
 					'Summary ',
 					editButton
 				),
 				React.createElement(
 					'pre',
-					null,
+					{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", background: "none", whiteSpace: "pre-wrap" } },
 					this.state.summary
 				)
 			);
@@ -29136,17 +29169,24 @@
 					null,
 					'Summary'
 				),
-				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newSummary', defaultValue: this.state.summary }),
-				React.createElement('br', null),
+				React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'newSummary', defaultValue: this.state.summary }),
 				React.createElement(
-					'button',
-					{ className: 'btn btn-primary', onClick: this.handleClickSave },
-					'Save'
-				),
-				React.createElement(
-					'button',
-					{ className: 'btn btn-default', onClick: this.handleClickCancel },
-					'Cancel'
+					'center',
+					null,
+					React.createElement(
+						'div',
+						{ className: 'btn btn-toolbar' },
+						React.createElement(
+							'button',
+							{ className: 'btn btn-primary', onClick: this.handleClickSave },
+							'Save'
+						),
+						React.createElement(
+							'button',
+							{ className: 'btn btn-default', onClick: this.handleClickCancel },
+							'Cancel'
+						)
+					)
 				)
 			);
 		},
@@ -29162,8 +29202,7 @@
 			return React.createElement(
 				'div',
 				null,
-				partToShow,
-				React.createElement('br', null)
+				partToShow
 			);
 		}
 	});
@@ -29183,129 +29222,375 @@
 		displayName: 'Education',
 
 		getInitialState: function () {
-			return { isCurrentUser: false, editing: false };
+			return { isCurrentUser: false, editing: false, educations: [], id: this.props.pageID };
 		},
 
 		componentWillMount: function () {
-			this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-			this.userRef.on("value", snap => {
-				var user = snap.val();
-				if (user.education) {
-					this.setState({ education: user.education });
-				} else {
-					this.setState({ education: "" });
+			this.educationRef = firebase.database().ref().child('user-education/' + this.props.pageID);
+			this.educationRef.on("child_added", snap => {
+				var education = snap.val();
+				if (education) {
+					education.key = snap.ref.key;
+					this.state.educations.push(education);
+					this.setState({ educations: this.state.educations });
+				}
+			});
+
+			this.educationRefChanged = firebase.database().ref().child('user-education/' + this.props.pageID);
+			this.educationRefChanged.on("child_changed", snap => {
+				var education = snap.val();
+				if (education) {
+					education.key = snap.ref.key;
+
+					var index;
+					for (var i = 0; i < this.state.educations.length; i++) {
+						if (this.state.educations[i].key == education.key) {
+							index = i;
+						}
+					}
+
+					this.state.educations.splice(index, 1, education);
+					this.setState({ educations: this.state.educations });
+				}
+			});
+
+			this.educationRefRemoved = firebase.database().ref().child('user-education/' + this.props.pageID);
+			this.educationRefRemoved.on("child_removed", snap => {
+				var education = snap.val();
+				if (education) {
+					education.key = snap.ref.key;
+
+					var index;
+					for (var i = 0; i < this.state.educations.length; i++) {
+						if (this.state.educations[i].key == education.key) {
+							index = i;
+						}
+					}
+
+					this.state.educations.splice(index, 1);
+					this.setState({ educations: this.state.educations });
 				}
 			});
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-			this.userRef.on("value", snap => {
-				var user = snap.val();
-				if (user.education) {
-					this.setState({ education: user.education });
-				} else {
-					this.setState({ education: "" });
-				}
-			});
+			if (nextProps.pageID != this.state.id) {
+				this.educationRef.off(); //turn off the educationRef in compWillMount-listen only from one.
+				this.educationRefChanged.off();
+				this.educationRefRemoved.off();
+				this.setState({ educations: [] });
+
+				this.educationRef = firebase.database().ref().child('user-education/' + nextProps.pageID);
+				this.educationRef.on("child_added", snap => {
+					var education = snap.val();
+					if (education) {
+						education.key = snap.ref.key;
+						this.state.educations.push(education);
+						this.setState({ educations: this.state.educations });
+					}
+				});
+
+				this.educationRefChanged = firebase.database().ref().child('user-education/' + nextProps.pageID);
+				this.educationRefChanged.on("child_changed", snap => {
+					var education = snap.val();
+					if (education) {
+						education.key = snap.ref.key;
+
+						var index;
+						for (var i = 0; i < this.state.educations.length; i++) {
+							if (this.state.educations[i].key == education.key) {
+								index = i;
+							}
+						}
+
+						this.state.educations.splice(index, 1, education);
+						this.setState({ educations: this.state.educations });
+					}
+				});
+
+				this.educationRefRemoved = firebase.database().ref().child('user-education/' + nextProps.pageID);
+				this.educationRefRemoved.on("child_removed", snap => {
+					var education = snap.val();
+					if (education) {
+						education.key = snap.ref.key;
+
+						var index;
+						for (var i = 0; i < this.state.educations.length; i++) {
+							if (this.state.educations[i].key == education.key) {
+								index = i;
+							}
+						}
+
+						this.state.educations.splice(index, 1);
+						this.setState({ educations: this.state.educations });
+					}
+				});
+			}
 		},
 
-		handleClickEdit: function () {
+		handleClickAdd: function () {
+			this.setState({ adding: true });
+		},
+
+		handleClickEdit: function (index) {
 			this.setState({ editing: true });
+			this.setState({ indexToEdit: index });
 		},
 
 		handleClickSave: function () {
-			this.setState({ editing: false });
-			var newEducation = this.refs.newEducation.value;
+			var educationData = {
+				school: this.refs.school.value,
+				degree: this.refs.degree.value,
+				major: this.refs.major.value,
+				startDate: this.refs.startDate.value,
+				endDate: this.refs.endDate.value
+			};
 
-			this.userRef.once("value", snap => {
-				var user = snap.val();
-				var userInfo = {};
-				for (var i in user) {
-					userInfo[i] = user[i];
-				}
-				userInfo.education = newEducation;
-				var updates = {};
-				updates['users/' + this.props.pageID] = userInfo;
-				firebase.database().ref().update(updates);
-			});
+			if (this.state.editing) {
+				var educationUpdate = {};
+				educationUpdate['/user-education/' + this.props.pageID + '/' + this.state.educations[this.state.indexToEdit].key] = educationData;
+				firebase.database().ref().update(educationUpdate);
+			} else {
+				var newEducationKey = firebase.database().ref().child('education').push().key;
+				firebase.database().ref('/user-education/' + this.props.pageID + '/' + newEducationKey).set(educationData);
+			}
+
+			this.setState({ editing: false });
+			this.setState({ adding: false });
+		},
+
+		handleRemoveExisting: function () {
+			var educationRef = firebase.database().ref('user-education/' + this.props.pageID + '/' + this.state.educations[this.state.indexToEdit].key);
+			educationRef.remove();
+
+			this.setState({ editing: false });
+			this.setState({ adding: false });
 		},
 
 		handleClickCancel: function () {
 			this.setState({ editing: false });
+			this.setState({ adding: false });
 		},
 
-		defaultEducation: function () {
-			var editButton;
+		educationHeading: function () {
 			if (this.props.isCurrentUser) {
-				editButton = React.createElement(
-					'button',
-					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+				return React.createElement(
+					'h2',
+					{ style: { color: "#0077B5" } },
+					'Education ',
+					React.createElement(
+						'button',
+						{ className: 'btn btn-default', onClick: this.handleClickAdd },
+						React.createElement('span', { className: 'glyphicon glyphicon-plus' })
+					)
 				);
 			} else {
-				editButton = React.createElement('div', null);
+				return React.createElement(
+					'h2',
+					{ style: { color: "#0077B5" } },
+					'Education'
+				);
 			}
+		},
 
+		addingEducation: function () {
 			return React.createElement(
 				'div',
-				null,
+				{ className: 'col-md-12' },
 				React.createElement(
-					'h3',
-					null,
-					'Education ',
-					editButton
-				),
-				React.createElement(
-					'pre',
-					null,
-					this.state.education
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('input', { type: 'text', ref: 'school', className: 'form-control', placeholder: 'School' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'degree', className: 'form-control', placeholder: 'Degree' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'major', className: 'form-control', placeholder: 'Field of Study' }),
+					React.createElement('br', null),
+					React.createElement(
+						'div',
+						{ className: 'input-group' },
+						React.createElement('input', { type: 'month', ref: 'startDate', className: 'form-control' }),
+						React.createElement(
+							'span',
+							{ className: 'input-group-addon' },
+							'-'
+						),
+						React.createElement('input', { type: 'month', ref: 'endDate', className: 'form-control' })
+					),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							)
+						)
+					),
+					React.createElement('br', null)
 				)
 			);
 		},
 
 		editingEducation: function () {
+			var indexedSchool = this.state.educations[this.state.indexToEdit];
+
 			return React.createElement(
 				'div',
-				null,
+				{ className: 'col-md-12' },
 				React.createElement(
-					'h3',
-					null,
-					'Education'
-				),
-				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newEducation', defaultValue: this.state.education }),
-				React.createElement('br', null),
-				React.createElement(
-					'button',
-					{ className: 'btn btn-primary', onClick: this.handleClickSave },
-					'Save'
-				),
-				React.createElement(
-					'button',
-					{ className: 'btn btn-default', onClick: this.handleClickCancel },
-					'Cancel'
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('input', { type: 'text', ref: 'school', className: 'form-control', defaultValue: indexedSchool.school }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'degree', className: 'form-control', defaultValue: indexedSchool.degree }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'major', className: 'form-control', defaultValue: indexedSchool.major }),
+					React.createElement('br', null),
+					React.createElement(
+						'div',
+						{ className: 'input-group' },
+						React.createElement('input', { type: 'month', ref: 'startDate', className: 'form-control', defaultValue: indexedSchool.startDate }),
+						React.createElement(
+							'span',
+							{ className: 'input-group-addon' },
+							'-'
+						),
+						React.createElement('input', { type: 'month', ref: 'endDate', className: 'form-control', defaultValue: indexedSchool.endDate })
+					),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-link', onClick: this.handleRemoveExisting },
+								'Remove this school'
+							)
+						)
+					),
+					React.createElement('br', null)
 				)
 			);
 		},
 
-		render: function () {
-			var partToShow;
-			if (this.state.editing) {
-				partToShow = this.editingEducation();
+		defaultEducation: function () {
+			if (this.props.isCurrentUser) {
+				return React.createElement(
+					'div',
+					null,
+					this.state.educations.map((education, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								education.school
+							),
+							' ',
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickEdit.bind(null, index) },
+								React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							education.degree,
+							': ',
+							education.major
+						),
+						React.createElement(
+							'h6',
+							null,
+							education.startDate,
+							' - ',
+							education.endDate
+						)
+					))
+				);
 			} else {
-				partToShow = this.defaultEducation();
+				return React.createElement(
+					'div',
+					null,
+					this.state.educations.map((education, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								education.school
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							education.degree,
+							': ',
+							education.major
+						),
+						React.createElement(
+							'h6',
+							null,
+							education.startDate,
+							' - ',
+							education.endDate
+						)
+					))
+				);
+			}
+		},
+
+		render: function () {
+			var show;
+
+			if (this.state.adding) {
+				show = this.addingEducation();
+			} else if (this.state.editing) {
+				show = this.editingEducation();
+			} else {
+				show = this.defaultEducation();
 			}
 
 			return React.createElement(
 				'div',
 				null,
-				partToShow,
-				React.createElement('br', null)
+				this.educationHeading(),
+				show
 			);
 		},
 
 		componentWillUnmount: function () {
-			this.userRef.off();
+			this.educationRef.off();
+			this.educationRefChanged.off();
+			this.educationRefRemoved.off();
 		}
 	});
 
@@ -29320,137 +29605,415 @@
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
 
-	var Projects = React.createClass({
-		displayName: 'Projects',
+	var Project = React.createClass({
+		displayName: 'Project',
 
 		getInitialState: function () {
-			return { isCurrentUser: false, editing: false };
+			return { isCurrentUser: false, editing: false, projects: [], id: this.props.pageID };
 		},
 
 		componentWillMount: function () {
-			this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-			this.userRef.on("value", snap => {
-				var user = snap.val();
-				if (user.projects) {
-					this.setState({ projects: user.projects });
-				} else {
-					this.setState({ projects: "" });
+			this.projectRef = firebase.database().ref().child('user-project/' + this.props.pageID);
+			this.projectRef.on("child_added", snap => {
+				var project = snap.val();
+				if (project) {
+					project.key = snap.ref.key;
+					this.state.projects.push(project);
+					this.setState({ projects: this.state.projects });
+				}
+			});
+
+			this.projectRefChanged = firebase.database().ref().child('user-project/' + this.props.pageID);
+			this.projectRefChanged.on("child_changed", snap => {
+				var project = snap.val();
+				if (project) {
+					project.key = snap.ref.key;
+
+					var index;
+					for (var i = 0; i < this.state.projects.length; i++) {
+						if (this.state.projects[i].key == project.key) {
+							index = i;
+						}
+					}
+
+					this.state.projects.splice(index, 1, project);
+					this.setState({ projects: this.state.projects });
+				}
+			});
+
+			this.projectRefRemoved = firebase.database().ref().child('user-project/' + this.props.pageID);
+			this.projectRefRemoved.on("child_removed", snap => {
+				var project = snap.val();
+				if (project) {
+					project.key = snap.ref.key;
+
+					var index;
+					for (var i = 0; i < this.state.projects.length; i++) {
+						if (this.state.projects[i].key == project.key) {
+							index = i;
+						}
+					}
+
+					this.state.projects.splice(index, 1);
+					this.setState({ projects: this.state.projects });
 				}
 			});
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-			this.userRef.on("value", snap => {
-				var user = snap.val();
-				if (user.projects) {
-					this.setState({ projects: user.projects });
-				} else {
-					this.setState({ projects: "" });
-				}
-			});
+			if (nextProps.pageID != this.state.id) {
+				this.projectRef.off(); //turn off the projectRef in compWillMount-listen only from one.
+				this.projectRefChanged.off();
+				this.projectRefRemoved.off();
+				this.setState({ projects: [] });
+
+				this.projectRef = firebase.database().ref().child('user-project/' + nextProps.pageID);
+				this.projectRef.on("child_added", snap => {
+					var project = snap.val();
+					if (project) {
+						project.key = snap.ref.key;
+						this.state.projects.push(project);
+						this.setState({ projects: this.state.projects });
+					}
+				});
+
+				this.projectRefChanged = firebase.database().ref().child('user-project/' + nextProps.pageID);
+				this.projectRefChanged.on("child_changed", snap => {
+					var project = snap.val();
+					if (project) {
+						project.key = snap.ref.key;
+						var index;
+						for (var i = 0; i < this.state.projects.length; i++) {
+							if (this.state.projects[i].key == project.key) {
+								index = i;
+							}
+						}
+
+						this.state.projects.splice(index, 1, project);
+						this.setState({ projects: this.state.projects });
+					}
+				});
+
+				this.projectRefRemoved = firebase.database().ref().child('user-project/' + nextProps.pageID);
+				this.projectRefRemoved.on("child_removed", snap => {
+					var project = snap.val();
+					if (project) {
+						project.key = snap.ref.key;
+
+						var index;
+						for (var i = 0; i < this.state.projects.length; i++) {
+							if (this.state.projects[i].key == project.key) {
+								index = i;
+							}
+						}
+
+						this.state.projects.splice(index, 1);
+						this.setState({ projects: this.state.projects });
+					}
+				});
+			}
 		},
 
-		handleClickEdit: function () {
+		handleClickAdd: function () {
+			this.setState({ adding: true });
+		},
+
+		handleClickEdit: function (index) {
 			this.setState({ editing: true });
+			this.setState({ indexToEdit: index });
 		},
 
 		handleClickSave: function () {
-			this.setState({ editing: false });
-			var newProjects = this.refs.newProjects.value;
+			var url;
+			var pattern = /^https?:\/\//i;
 
-			this.userRef.once("value", snap => {
-				var user = snap.val();
-				var userInfo = {};
-				for (var i in user) {
-					userInfo[i] = user[i];
-				}
-				userInfo.projects = newProjects;
-				var updates = {};
-				updates['users/' + this.props.pageID] = userInfo;
-				firebase.database().ref().update(updates);
-			});
+			if (pattern.test(this.refs.url.value)) {
+				url = this.refs.url.value;
+			} else {
+				url = "http://" + this.refs.url.value;
+			}
+
+			var projectData = {
+				name: this.refs.name.value,
+				url: url,
+				startDate: this.refs.startDate.value,
+				endDate: this.refs.endDate.value,
+				description: this.refs.description.value
+			};
+
+			if (this.state.editing) {
+				var projectUpdate = {};
+				projectUpdate['/user-project/' + this.props.pageID + '/' + this.state.projects[this.state.indexToEdit].key] = projectData;
+				firebase.database().ref().update(projectUpdate);
+			} else {
+				var newProjectKey = firebase.database().ref().child('project').push().key;
+				firebase.database().ref('/user-project/' + this.props.pageID + '/' + newProjectKey).set(projectData);
+			}
+
+			this.setState({ editing: false });
+			this.setState({ adding: false });
 		},
 
-		componentWillUnmount: function () {
-			this.userRef.off();
+		handleRemoveExisting: function () {
+			var projectRef = firebase.database().ref('user-project/' + this.props.pageID + '/' + this.state.projects[this.state.indexToEdit].key);
+			projectRef.remove();
+
+			this.setState({ editing: false });
+			this.setState({ adding: false });
 		},
 
 		handleClickCancel: function () {
 			this.setState({ editing: false });
+			this.setState({ adding: false });
 		},
 
-		defaultProjects: function () {
-			var editButton;
+		projectHeading: function () {
 			if (this.props.isCurrentUser) {
-				editButton = React.createElement(
-					'button',
-					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+				return React.createElement(
+					'h2',
+					{ style: { color: "#0077B5" } },
+					'Projects ',
+					React.createElement(
+						'button',
+						{ className: 'btn btn-default', onClick: this.handleClickAdd },
+						React.createElement('span', { className: 'glyphicon glyphicon-plus' })
+					)
 				);
 			} else {
-				editButton = React.createElement('div', null);
+				return React.createElement(
+					'h2',
+					{ style: { color: "#0077B5" } },
+					'Projects'
+				);
 			}
+		},
 
+		addingProject: function () {
 			return React.createElement(
 				'div',
-				null,
+				{ className: 'col-md-12' },
 				React.createElement(
-					'h3',
-					null,
-					'Projects ',
-					editButton
-				),
-				React.createElement(
-					'pre',
-					null,
-					this.state.projects
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('input', { type: 'text', ref: 'name', className: 'form-control', placeholder: 'Project Name' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'url', className: 'form-control', placeholder: 'Project URL' }),
+					React.createElement('br', null),
+					React.createElement(
+						'div',
+						{ className: 'input-group' },
+						React.createElement('input', { type: 'month', ref: 'startDate', className: 'form-control' }),
+						React.createElement(
+							'span',
+							{ className: 'input-group-addon' },
+							'-'
+						),
+						React.createElement('input', { type: 'month', ref: 'endDate', className: 'form-control' })
+					),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'description', placeholder: 'Description' }),
+					React.createElement('br', null),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							)
+						)
+					),
+					React.createElement('br', null)
 				)
 			);
 		},
 
-		editingProjects: function () {
+		editingProject: function () {
+			var indexedProject = this.state.projects[this.state.indexToEdit];
+
 			return React.createElement(
 				'div',
-				null,
+				{ className: 'col-md-12' },
 				React.createElement(
-					'h3',
-					null,
-					'Projects'
-				),
-				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newProjects', defaultValue: this.state.projects }),
-				React.createElement('br', null),
-				React.createElement(
-					'button',
-					{ className: 'btn btn-primary', onClick: this.handleClickSave },
-					'Save'
-				),
-				React.createElement(
-					'button',
-					{ className: 'btn btn-default', onClick: this.handleClickCancel },
-					'Cancel'
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('input', { type: 'text', ref: 'name', className: 'form-control', defaultValue: indexedProject.name }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'url', className: 'form-control', defaultValue: indexedProject.url }),
+					React.createElement('br', null),
+					React.createElement(
+						'div',
+						{ className: 'input-group' },
+						React.createElement('input', { type: 'month', ref: 'startDate', className: 'form-control', defaultValue: indexedProject.startDate }),
+						React.createElement(
+							'span',
+							{ className: 'input-group-addon' },
+							'-'
+						),
+						React.createElement('input', { type: 'month', ref: 'endDate', className: 'form-control', defaultValue: indexedProject.endDate })
+					),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'description', defaultValue: indexedProject.description }),
+					React.createElement('br', null),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-link', onClick: this.handleRemoveExisting },
+								'Remove this project'
+							)
+						)
+					),
+					React.createElement('br', null)
 				)
 			);
+		},
+
+		defaultProject: function () {
+			if (this.props.isCurrentUser) {
+				return React.createElement(
+					'div',
+					null,
+					this.state.projects.map((project, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								project.name
+							),
+							' ',
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickEdit.bind(null, index) },
+								React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							React.createElement(
+								'a',
+								{ href: project.url },
+								project.url
+							)
+						),
+						React.createElement(
+							'h6',
+							null,
+							project.startDate,
+							' - ',
+							project.endDate
+						),
+						React.createElement(
+							'h6',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								project.description
+							)
+						)
+					))
+				);
+			} else {
+				return React.createElement(
+					'div',
+					null,
+					this.state.projects.map((project, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								project.name
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							React.createElement(
+								'a',
+								{ href: project.url },
+								project.url
+							)
+						),
+						React.createElement(
+							'h6',
+							null,
+							project.startDate,
+							' - ',
+							project.endDate
+						),
+						React.createElement(
+							'h6',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								project.description
+							)
+						)
+					))
+				);
+			}
 		},
 
 		render: function () {
-			var partToShow;
-			if (this.state.editing) {
-				partToShow = this.editingProjects();
+			var show;
+
+			if (this.state.adding) {
+				show = this.addingProject();
+			} else if (this.state.editing) {
+				show = this.editingProject();
 			} else {
-				partToShow = this.defaultProjects();
+				show = this.defaultProject();
 			}
 
 			return React.createElement(
 				'div',
 				null,
-				partToShow,
-				React.createElement('br', null)
+				this.projectHeading(),
+				show
 			);
+		},
+
+		componentWillUnmount: function () {
+			this.projectRef.off();
+			this.projectRefChanged.off();
+			this.projectRefRemoved.off();
 		}
 	});
 
-	module.exports = Projects;
+	module.exports = Project;
 
 /***/ },
 /* 254 */
@@ -29535,14 +30098,14 @@
 				'div',
 				null,
 				React.createElement(
-					'h3',
-					null,
+					'h2',
+					{ style: { color: "#0077B5" } },
 					'Interests ',
 					editButton
 				),
 				React.createElement(
 					'pre',
-					null,
+					{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
 					this.state.interests
 				)
 			);
@@ -29557,17 +30120,25 @@
 					null,
 					'Interests'
 				),
-				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newInterests', defaultValue: this.state.interests }),
+				React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'newInterests', defaultValue: this.state.interests, placeholder: 'Ex. Hiking, singing, cooking' }),
 				React.createElement('br', null),
 				React.createElement(
-					'button',
-					{ className: 'btn btn-primary', onClick: this.handleClickSave },
-					'Save'
-				),
-				React.createElement(
-					'button',
-					{ className: 'btn btn-default', onClick: this.handleClickCancel },
-					'Cancel'
+					'center',
+					null,
+					React.createElement(
+						'div',
+						{ className: 'btn btn-toolbar' },
+						React.createElement(
+							'button',
+							{ className: 'btn btn-primary', onClick: this.handleClickSave },
+							'Save'
+						),
+						React.createElement(
+							'button',
+							{ className: 'btn btn-default', onClick: this.handleClickCancel },
+							'Cancel'
+						)
+					)
 				)
 			);
 		},
@@ -29583,8 +30154,7 @@
 			return React.createElement(
 				'div',
 				null,
-				partToShow,
-				React.createElement('br', null)
+				partToShow
 			);
 		}
 	});
@@ -29595,7 +30165,6 @@
 /* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
 	var React = __webpack_require__(1);
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
@@ -29605,125 +30174,391 @@
 		displayName: 'Experience',
 
 		getInitialState: function () {
-			return { isCurrentUser: false, editing: false };
+			return { isCurrentUser: false, editing: false, experiences: [], id: this.props.pageID };
 		},
 
 		componentWillMount: function () {
-			this.userRef = firebase.database().ref().child('users/' + this.props.pageID);
-			this.userRef.on("value", snap => {
-				var user = snap.val();
-				if (user.experience) {
-					this.setState({ experience: user.experience });
-				} else {
-					this.setState({ experience: "" });
+			this.experienceRef = firebase.database().ref().child('user-experience/' + this.props.pageID);
+			this.experienceRef.on("child_added", snap => {
+				var experience = snap.val();
+				if (experience) {
+					experience.key = snap.ref.key;
+					this.state.experiences.push(experience);
+					this.setState({ experiences: this.state.experiences });
+				}
+			});
+
+			this.experienceRefChanged = firebase.database().ref().child('user-experience/' + this.props.pageID);
+			this.experienceRefChanged.on("child_changed", snap => {
+				var experience = snap.val();
+				if (experience) {
+					experience.key = snap.ref.key;
+
+					var index;
+					for (var i = 0; i < this.state.experiences.length; i++) {
+						if (this.state.experiences[i].key == experience.key) {
+							index = i;
+						}
+					}
+
+					this.state.experiences.splice(index, 1, experience);
+					this.setState({ experiences: this.state.experiences });
+				}
+			});
+
+			this.experienceRefRemoved = firebase.database().ref().child('user-experience/' + this.props.pageID);
+			this.experienceRefRemoved.on("child_removed", snap => {
+				var experience = snap.val();
+				if (experience) {
+					experience.key = snap.ref.key;
+
+					var index;
+					for (var i = 0; i < this.state.experiences.length; i++) {
+						if (this.state.experiences[i].key == experience.key) {
+							index = i;
+						}
+					}
+
+					this.state.experiences.splice(index, 1);
+					this.setState({ experiences: this.state.experiences });
 				}
 			});
 		},
 
 		componentWillReceiveProps: function (nextProps) {
-			this.userRef = firebase.database().ref().child('users/' + nextProps.pageID);
-			this.userRef.on("value", snap => {
-				var user = snap.val();
-				if (user.experience) {
-					this.setState({ experience: user.experience });
-				} else {
-					this.setState({ experience: "" });
-				}
-			});
+			if (nextProps.pageID != this.state.id) {
+				this.experienceRef.off(); //turn off the experienceRef in compWillMount-listen only from one.
+				this.experienceRefChanged.off();
+				this.experienceRefRemoved.off();
+				this.setState({ educations: [] });
+
+				this.experienceRef = firebase.database().ref().child('user-experience/' + nextProps.pageID);
+				this.experienceRef.on("child_added", snap => {
+					var experience = snap.val();
+					if (experience) {
+						experience.key = snap.ref.key;
+						this.state.experiences.push(experience);
+						this.setState({ experiences: this.state.experiences });
+					}
+				});
+
+				this.experienceRefChanged = firebase.database().ref().child('user-experience/' + nextProps.pageID);
+				this.experienceRefChanged.on("child_changed", snap => {
+					var experience = snap.val();
+					if (experience) {
+						experience.key = snap.ref.key;
+
+						var index;
+						for (var i = 0; i < this.state.experiences.length; i++) {
+							if (this.state.experiences[i].key == experience.key) {
+								index = i;
+							}
+						}
+
+						this.state.experiences.splice(index, 1, experience);
+						this.setState({ experiences: this.state.experiences });
+					}
+				});
+
+				this.experienceRefChanged = firebase.database().ref().child('user-experience/' + nextProps.pageID);
+				this.experienceRefChanged.on("child_removed", snap => {
+					var experience = snap.val();
+					if (experience) {
+						experience.key = snap.ref.key;
+
+						var index;
+						for (var i = 0; i < this.state.experiences.length; i++) {
+							if (this.state.experiences[i].key == experience.key) {
+								index = i;
+							}
+						}
+
+						this.state.experiences.splice(index, 1);
+						this.setState({ experiences: this.state.experiences });
+					}
+				});
+			}
 		},
 
-		handleClickEdit: function () {
+		handleClickAdd: function () {
+			this.setState({ adding: true });
+		},
+
+		handleClickEdit: function (index) {
 			this.setState({ editing: true });
+			this.setState({ indexToEdit: index });
 		},
 
 		handleClickSave: function () {
-			this.setState({ editing: false });
-			var newExperience = this.refs.newExperience.value;
+			var experienceData = {
+				employer: this.refs.employer.value,
+				position: this.refs.position.value,
+				startDate: this.refs.startDate.value,
+				endDate: this.refs.endDate.value,
+				description: this.refs.description.value
+			};
 
-			this.userRef.once("value", snap => {
-				var user = snap.val();
-				var userInfo = {};
-				for (var i in user) {
-					userInfo[i] = user[i];
-				}
-				userInfo.experience = newExperience;
-				var updates = {};
-				updates['users/' + this.props.pageID] = userInfo;
-				firebase.database().ref().update(updates);
-			});
+			if (this.state.editing) {
+				var experienceUpdate = {};
+				experienceUpdate['/user-experience/' + this.props.pageID + '/' + this.state.experiences[this.state.indexToEdit].key] = experienceData;
+				firebase.database().ref().update(experienceUpdate);
+			} else {
+				var newExperienceKey = firebase.database().ref().child('experience').push().key;
+				firebase.database().ref('/user-experience/' + this.props.pageID + '/' + newExperienceKey).set(experienceData);
+			}
+
+			this.setState({ editing: false });
+			this.setState({ adding: false });
+		},
+
+		handleRemoveExisting: function () {
+			var experienceRef = firebase.database().ref('user-experience/' + this.props.pageID + '/' + this.state.experiences[this.state.indexToEdit].key);
+			experienceRef.remove();
+
+			this.setState({ editing: false });
+			this.setState({ adding: false });
 		},
 
 		handleClickCancel: function () {
 			this.setState({ editing: false });
+			this.setState({ adding: false });
 		},
 
-		defaultExperience: function () {
-			var editButton;
+		experienceHeading: function () {
 			if (this.props.isCurrentUser) {
-				editButton = React.createElement(
-					'button',
-					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+				return React.createElement(
+					'h2',
+					{ style: { color: "#0077B5" } },
+					'Experience ',
+					React.createElement(
+						'button',
+						{ className: 'btn btn-default', onClick: this.handleClickAdd },
+						React.createElement('span', { className: 'glyphicon glyphicon-plus' })
+					)
 				);
 			} else {
-				editButton = React.createElement('div', null);
+				return React.createElement(
+					'h2',
+					{ style: { color: "#0077B5" } },
+					'Experience'
+				);
 			}
+		},
 
+		addingExperience: function () {
 			return React.createElement(
 				'div',
-				null,
+				{ className: 'col-md-12' },
 				React.createElement(
-					'h3',
-					null,
-					'Experience ',
-					editButton
-				),
-				React.createElement(
-					'pre',
-					null,
-					this.state.experience
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('input', { type: 'text', ref: 'employer', className: 'form-control', placeholder: 'Company Name' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'position', className: 'form-control', placeholder: 'Position' }),
+					React.createElement('br', null),
+					React.createElement(
+						'div',
+						{ className: 'input-group' },
+						React.createElement('input', { type: 'month', ref: 'startDate', className: 'form-control' }),
+						React.createElement(
+							'span',
+							{ className: 'input-group-addon' },
+							'-'
+						),
+						React.createElement('input', { type: 'month', ref: 'endDate', className: 'form-control' })
+					),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'description', placeholder: 'Description' }),
+					React.createElement('br', null),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							)
+						)
+					),
+					React.createElement('br', null)
 				)
 			);
 		},
 
 		editingExperience: function () {
+			var indexedExperience = this.state.experiences[this.state.indexToEdit];
+
 			return React.createElement(
 				'div',
-				null,
+				{ className: 'col-md-12' },
 				React.createElement(
-					'h3',
-					null,
-					'Experience'
-				),
-				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newExperience', defaultValue: this.state.experience }),
-				React.createElement('br', null),
-				React.createElement(
-					'button',
-					{ className: 'btn btn-primary', onClick: this.handleClickSave },
-					'Save'
-				),
-				React.createElement(
-					'button',
-					{ className: 'btn btn-default', onClick: this.handleClickCancel },
-					'Cancel'
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('input', { type: 'text', ref: 'employer', className: 'form-control', defaultValue: indexedExperience.employer }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'position', className: 'form-control', defaultValue: indexedExperience.position }),
+					React.createElement('br', null),
+					React.createElement(
+						'div',
+						{ className: 'input-group' },
+						React.createElement('input', { type: 'month', ref: 'startDate', className: 'form-control', defaultValue: indexedExperience.startDate }),
+						React.createElement(
+							'span',
+							{ className: 'input-group-addon' },
+							'-'
+						),
+						React.createElement('input', { type: 'month', ref: 'endDate', className: 'form-control', defaultValue: indexedExperience.endDate })
+					),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'description', defaultValue: indexedExperience.description }),
+					React.createElement('br', null),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-link', onClick: this.handleRemoveExisting },
+								'Remove this experience'
+							)
+						)
+					),
+					React.createElement('br', null)
 				)
 			);
 		},
 
-		render: function () {
-			var partToShow;
-			if (this.state.editing) {
-				partToShow = this.editingExperience();
+		defaultExperience: function () {
+			if (this.props.isCurrentUser) {
+				return React.createElement(
+					'div',
+					null,
+					this.state.experiences.map((experience, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								experience.employer
+							),
+							' ',
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickEdit.bind(null, index) },
+								React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							experience.position
+						),
+						React.createElement(
+							'h6',
+							null,
+							experience.startDate,
+							' - ',
+							experience.endDate
+						),
+						React.createElement(
+							'h6',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								experience.description
+							)
+						)
+					))
+				);
 			} else {
-				partToShow = this.defaultExperience();
+				return React.createElement(
+					'div',
+					null,
+					this.state.experiences.map((experience, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								experience.employer
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							experience.position
+						),
+						React.createElement(
+							'h6',
+							null,
+							experience.startDate,
+							' - ',
+							experience.endDate
+						),
+						React.createElement(
+							'h6',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								experience.description
+							)
+						)
+					))
+				);
+			}
+		},
+
+		render: function () {
+			var show;
+
+			if (this.state.adding) {
+				show = this.addingExperience();
+			} else if (this.state.editing) {
+				show = this.editingExperience();
+			} else {
+				show = this.defaultExperience();
 			}
 
 			return React.createElement(
 				'div',
 				null,
-				partToShow,
-				React.createElement('br', null)
+				this.experienceHeading(),
+				show
 			);
+		},
+
+		componentWillUnmount: function () {
+			this.experienceRef.off();
+			this.experienceRefChanged.off();
+			this.experienceRefRemoved.off();
 		}
 	});
 
@@ -29797,6 +30632,7 @@
 		handleClickCancel: function () {
 			this.setState({ editing: false });
 		},
+
 		defaultSkills: function () {
 			var editButton;
 			if (this.props.isCurrentUser) {
@@ -29813,18 +30649,19 @@
 				'div',
 				null,
 				React.createElement(
-					'h3',
-					null,
+					'h2',
+					{ style: { color: "#0077B5" } },
 					'Skills ',
 					editButton
 				),
 				React.createElement(
 					'pre',
-					null,
+					{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
 					this.state.skills
 				)
 			);
 		},
+
 		editingSkills: function () {
 			return React.createElement(
 				'div',
@@ -29834,17 +30671,25 @@
 					null,
 					'Skills'
 				),
-				React.createElement('textarea', { rows: '6', style: { width: '100%' }, ref: 'newSkills', defaultValue: this.state.skills }),
+				React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'newSkills', defaultValue: this.state.skills, placeholder: 'Ex. Microsoft Office, Java, Git' }),
 				React.createElement('br', null),
 				React.createElement(
-					'button',
-					{ className: 'btn btn-primary', onClick: this.handleClickSave },
-					'Save'
-				),
-				React.createElement(
-					'button',
-					{ className: 'btn btn-default', onClick: this.handleClickCancel },
-					'Cancel'
+					'center',
+					null,
+					React.createElement(
+						'div',
+						{ className: 'btn btn-toolbar' },
+						React.createElement(
+							'button',
+							{ className: 'btn btn-primary', onClick: this.handleClickSave },
+							'Save'
+						),
+						React.createElement(
+							'button',
+							{ className: 'btn btn-default', onClick: this.handleClickCancel },
+							'Cancel'
+						)
+					)
 				)
 			);
 		},
@@ -29860,8 +30705,7 @@
 			return React.createElement(
 				'div',
 				null,
-				partToShow,
-				React.createElement('br', null)
+				partToShow
 			);
 		}
 	});
@@ -29952,7 +30796,7 @@
 	        return React.createElement(
 	            'div',
 	            null,
-	            React.createElement('img', { src: this.state.userData.imageURL, className: 'img-circle', alt: '', width: '200', height: '200', style: { objectFit: 'cover' } }),
+	            React.createElement('img', { src: this.state.userData.imageURL, className: 'img-circle', alt: '', width: '200', height: '200', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
 	            React.createElement('br', null),
 	            showUpload,
 	            React.createElement('br', null)
@@ -30278,7 +31122,7 @@
 						React.createElement(
 							'h4',
 							null,
-							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover' } }),
+							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
 							user.first + " " + user.last
 						)
 					),
@@ -30414,7 +31258,7 @@
 						React.createElement(
 							'h4',
 							null,
-							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover' } }),
+							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
 							user.first + " " + user.last
 						)
 					),
@@ -30526,7 +31370,7 @@
 						React.createElement(
 							'h4',
 							null,
-							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover' } }),
+							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
 							user.first + " " + user.last
 						)
 					),
@@ -30541,6 +31385,195 @@
 
 /***/ },
 /* 262 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var ReactDOM = __webpack_require__(34);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var AdvancedSearch = React.createClass({
+		displayName: 'AdvancedSearch',
+
+		getInitialState: function () {
+			return { results: [] };
+		},
+
+		handleSearch: function () {
+			this.state.results.splice(0, this.state.results.length);
+			this.setState({ results: this.state.results });
+
+			this.userRef = firebase.database().ref().child('users');
+			this.userRef.on("child_added", snap => {
+				var user = snap.val();
+
+				if (user.interests.toLowerCase().indexOf(this.refs.interests.value.toLowerCase()) >= 0 && user.skills.toLowerCase().indexOf(this.refs.skills.value.toLowerCase()) >= 0) {
+					user.id = snap.ref.key;
+
+					//if any experience fields && any education fields were filled out
+					if ((this.refs.company.value || this.refs.position.value || this.refs.yearsOfExperience.value) && (this.refs.school.value || this.refs.degree.value || this.refs.major.value)) {
+						this.experienceRef = firebase.database().ref().child('user-experience/' + user.id);
+						this.experienceRef.on("child_added", snap => {
+							var experienceUser = snap.val();
+
+							if (experienceUser.employer.toLowerCase().indexOf(this.refs.company.value.toLowerCase()) >= 0 && experienceUser.position.toLowerCase().indexOf(this.refs.position.value.toLowerCase()) >= 0) {
+								var numYears = parseInt(experienceUser.endDate.substring(0, 4)) - parseInt(experienceUser.startDate.substring(0, 4));
+								var numMonths = parseInt(experienceUser.endDate.substring(5, 7)) - parseInt(experienceUser.startDate.substring(5, 7));
+								if (numMonths < 0) {
+									numYears -= 1;
+								}
+
+								if (numYears >= this.refs.yearsOfExperience.value) {
+									this.educationRef = firebase.database().ref().child('user-education/' + user.id);
+									this.educationRef.on("child_added", snap => {
+										var educationUser = snap.val();
+
+										if (educationUser.school.toLowerCase().indexOf(this.refs.school.value.toLowerCase()) >= 0 && educationUser.major.toLowerCase().indexOf(this.refs.major.value.toLowerCase()) >= 0 && educationUser.degree.toLowerCase().indexOf(this.refs.degree.value.toLowerCase()) >= 0) {
+											if (this.state.results.indexOf(user) < 0) {
+												this.state.results.push(user);
+												this.setState({ results: this.state.results });
+											}
+										}
+									});
+								}
+							}
+						});
+						//if any education fields were filled out
+					} else if (this.refs.school.value || this.refs.degree.value || this.refs.major.value) {
+						this.educationRef = firebase.database().ref().child('user-education/' + user.id);
+						this.educationRef.on("child_added", snap => {
+							var educationUser = snap.val();
+
+							if (educationUser.school.toLowerCase().indexOf(this.refs.school.value.toLowerCase()) >= 0 && educationUser.major.toLowerCase().indexOf(this.refs.major.value.toLowerCase()) >= 0 && educationUser.degree.toLowerCase().indexOf(this.refs.degree.value.toLowerCase()) >= 0) {
+								this.state.results.push(user);
+								this.setState({ results: this.state.results });
+							}
+						});
+						//if any experience fields were filled out
+					} else if (this.refs.company.value || this.refs.position.value || this.refs.yearsOfExperience.value) {
+						this.experienceRef = firebase.database().ref().child('user-experience/' + user.id);
+						this.experienceRef.on("child_added", snap => {
+							var experienceUser = snap.val();
+
+							if (experienceUser.employer.toLowerCase().indexOf(this.refs.company.value.toLowerCase()) >= 0 && experienceUser.position.toLowerCase().indexOf(this.refs.position.value.toLowerCase()) >= 0) {
+								var numYears = parseInt(experienceUser.endDate.substring(0, 4)) - parseInt(experienceUser.startDate.substring(0, 4));
+								var numMonths = parseInt(experienceUser.endDate.substring(5, 7)) - parseInt(experienceUser.startDate.substring(5, 7));
+								if (numMonths < 0) {
+									numYears -= 1;
+								}
+								if (numYears >= this.refs.yearsOfExperience.value) {
+									this.state.results.push(user);
+									this.setState({ results: this.state.results });
+								}
+							}
+						});
+						//if neither education nor experience fields were filled out
+					} else {
+						this.state.results.push(user);
+						this.setState({ results: this.state.results });
+					}
+				}
+			});
+		},
+
+		componentWillUnmount: function () {
+			if (typeof this.userRef == 'function') {
+				this.userRef.off();
+			}
+			if (typeof this.experienceRef == 'function') {
+				this.experienceRef.off();
+			}
+			if (typeof this.eduationRef == 'function') {
+				this.educationRef.off();
+			}
+		},
+
+		render: function () {
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'div',
+					{ className: 'col-md-5' },
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'h1',
+							null,
+							'Advanced Search'
+						)
+					),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'company', placeholder: 'Company', className: 'form-control' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'position', placeholder: 'Position', className: 'form-control' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'number', ref: 'yearsOfExperience', placeholder: 'Years of Work Experience', className: 'form-control', min: '0' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'school', placeholder: 'School', className: 'form-control' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'degree', placeholder: 'Degree, ex. B.S.', className: 'form-control' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'major', placeholder: 'Field of Study, ex. Software Engineering', className: 'form-control' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'interests', placeholder: 'Interests, ex. Hiking', className: 'form-control' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'skills', placeholder: 'Skills, ex. Java', className: 'form-control' }),
+					React.createElement('br', null),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'button',
+							{ className: 'btn btn-primary', onClick: this.handleSearch },
+							'Go'
+						)
+					)
+				),
+				React.createElement('div', { className: 'col-md-2' }),
+				React.createElement(
+					'div',
+					{ className: 'col-md-5' },
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'h1',
+							null,
+							'Search Results'
+						),
+						'Your search returned ',
+						this.state.results.length,
+						' results:'
+					),
+					React.createElement('br', null),
+					this.state.results.map((user, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							Link,
+							{ to: "users/" + user.id },
+							React.createElement(
+								'h4',
+								null,
+								React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
+								user.first + " " + user.last
+							)
+						),
+						React.createElement('br', null),
+						React.createElement('br', null)
+					))
+				)
+			);
+		}
+	});
+
+	module.exports = AdvancedSearch;
+
+/***/ },
+/* 263 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);
