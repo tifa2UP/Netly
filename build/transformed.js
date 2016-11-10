@@ -28496,6 +28496,7 @@
 
 	    componentWillReceiveProps: function (nextProps) {
 	        var that = this;
+	        //this.state.requests.splice(0, this.state.requests.length);
 
 	        this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
 	            this.setState({ isLoggedIn: null != user });
@@ -28513,8 +28514,10 @@
 	            this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
 	            this.connectionRef.on("child_added", snap => {
 	                if (snap.val()) {
-	                    this.state.requests.push(snap.ref.key);
-	                    this.setState({ requests: this.state.requests });
+	                    if (this.state.requests.indexOf(snap.ref.key) < 0) {
+	                        this.state.requests.push(snap.ref.key);
+	                        this.setState({ requests: this.state.requests });
+	                    }
 	                }
 	            });
 
@@ -28558,12 +28561,41 @@
 	        var navClassName;
 
 	        var style;
+	        var div;
 	        if (this.state.requests.length > 0) {
 	            style = {
-	                color: 'red'
+	                //color: 'red',
+	                //border: '1px solid black',
+	                //position: 'absolute',
+	                //top: '15',
+	                //right: '10'
 	            };
 	        } else {
 	            style = {};
+	        }
+
+	        var divStyle = {
+	            fontSize: '10px',
+	            textAlign: 'center',
+	            color: 'white',
+	            width: '15px',
+	            height: '15px',
+	            position: 'relative',
+	            backgroundColor: 'red',
+	            borderRadius: '5px',
+	            top: '-30px',
+	            right: '-10px',
+	            zIndex: '1'
+	        };
+
+	        if (this.state.requests.length > 0) {
+	            div = React.createElement(
+	                'div',
+	                { style: divStyle },
+	                this.state.requests.length
+	            );
+	        } else {
+	            div = null;
 	        }
 
 	        //if the user is logged in, show the logout and profile link
@@ -28602,7 +28634,8 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/requests', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-bell', title: 'Requests', style: style })
+	                    React.createElement('span', { className: 'glyphicon glyphicon-bell', title: 'Requests', style: style }),
+	                    div
 	                )
 	            );
 	            connections = React.createElement(

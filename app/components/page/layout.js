@@ -66,6 +66,7 @@ var Layout = React.createClass({
 
     componentWillReceiveProps: function(nextProps){
         var that = this;
+        //this.state.requests.splice(0, this.state.requests.length);
 
         this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
             this.setState({isLoggedIn: (null != user)});
@@ -80,12 +81,13 @@ var Layout = React.createClass({
                 this.setState({recruiter: (user == null || !user.recruiter) ? false : true});
             });
 
-
             this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
             this.connectionRef.on("child_added", snap=>{
                 if(snap.val()){
-                    this.state.requests.push(snap.ref.key);
-                    this.setState({requests: this.state.requests});
+                    if(this.state.requests.indexOf(snap.ref.key) < 0){
+                        this.state.requests.push(snap.ref.key);
+                        this.setState({requests: this.state.requests});
+                    }
                 }
             });
 
@@ -129,13 +131,39 @@ var Layout = React.createClass({
         var navClassName;
 
         var style;
+        var div;
         if(this.state.requests.length > 0){
             style={
-                color: 'red'
+                //color: 'red',
+                //border: '1px solid black',
+                //position: 'absolute',
+                //top: '15',
+                //right: '10'
             }
         }else{
             style={}
         }
+
+        var divStyle={
+            fontSize: '10px',
+            textAlign: 'center',
+            color: 'white',
+            width: '15px',
+            height: '15px',
+            position: 'relative',
+            backgroundColor: 'red',
+            borderRadius: '5px',
+            top: '-30px',
+            right: '-10px',
+            zIndex: '1'
+        }
+
+        if(this.state.requests.length > 0){
+            div = <div style={divStyle}>{this.state.requests.length}</div>
+        }else{
+            div= null;
+        }
+
 
         //if the user is logged in, show the logout and profile link
         if(this.state.isLoggedIn) {
@@ -143,7 +171,7 @@ var Layout = React.createClass({
             profile = <li><Link to={"/users/" + this.state.user_id} title="Profile" className="navbar-brand"><img src={this.state.imgURL} className="img-circle" width="20" height="20" style={{objectFit: 'cover'}}/></Link></li>;
             signUp = null;
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog" title="Settings"></span></Link></li>;
-            requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell' title="Requests" style={style}></span></Link></li>;
+            requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell' title="Requests" style={style}></span>{div}</Link></li>;
             connections = <li><Link to="/connections" className="navbar-brand"><span className='glyphicon glyphicon-globe' title="Connections"></span></Link></li>;
             companies = <Link to="/companies" className="navbar-brand"><span className='glyphicon glyphicon-briefcase' title="Companies"></span></Link>;
             search = <Search isRecruiter={this.state.recruiter}/>
