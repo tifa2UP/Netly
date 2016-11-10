@@ -64,14 +64,14 @@ var Summary = React.createClass({
 	defaultSummary: function(){
 		var editButton;
 		if(this.props.isCurrentUser){
-			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil"></span></button>;
+			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil" title="Edit About Me"></span></button>;
 		}else{
 			editButton = <div></div>;
 		}
 
 		return(
 			<div>
-				<h2 style={{color: "#0077B5"}}>Summary {editButton}</h2>
+				<h2 style={{color: "#0077B5"}}>About {editButton}</h2>
 				<pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", background: "none", whiteSpace: "pre-wrap"}}>{this.state.summary}</pre>
 			</div>
 		);
@@ -80,7 +80,7 @@ var Summary = React.createClass({
 	editingSummary: function(){
 		return(
 			<div>
-				<h3>Summary</h3>
+				<h3>About</h3>
 				<textarea className="form-control" rows="6" style={{width: '100%'}} ref="newSummary" defaultValue={this.state.summary} />
 				<center>
 					<div className="btn btn-toolbar">

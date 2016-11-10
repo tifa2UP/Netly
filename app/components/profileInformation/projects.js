@@ -166,7 +166,7 @@ var Project = React.createClass({
 
 	projectHeading: function(){
 		if(this.props.isCurrentUser){
-			return <h2 style={{color: "#0077B5"}}>Projects <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus"></span></button></h2>
+			return <h2 style={{color: "#0077B5"}}>Projects <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Project"></span></button></h2>
 		}else{
 			return <h2 style={{color: "#0077B5"}}>Projects</h2>
 		}
@@ -228,7 +228,7 @@ var Project = React.createClass({
 				<div>
 					{this.state.projects.map((project,index) => (
 			        	<div key={index}>
-			       			<h4><strong>{project.name}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
+			       			<h4><strong>{project.name}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil" title="Edit Project"></span></button></h4>
 			       			<h5><a href={project.url}>{project.url}</a></h5>
 			       			<h6>{project.startDate} - {project.endDate}</h6>
 			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{project.description}</pre></h6>

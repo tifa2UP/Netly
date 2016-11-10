@@ -75,6 +75,7 @@ var Layout = React.createClass({
         var accountSettings;
         var requests;
         var connections;
+        var companies;
         var search;
 
         var navClassName;
@@ -90,12 +91,13 @@ var Layout = React.createClass({
 
         //if the user is logged in, show the logout and profile link
         if(this.state.isLoggedIn) {
-            loginOrOut = <li><Link to="/logout" className="navbar-brand"><span className="glyphicon glyphicon-off"></span></Link></li>;
-            profile = <li><Link to={"/users/" + this.state.user_id} className="navbar-brand"><img src={this.state.imgURL} className="img-circle" width="20" height="20" style={{objectFit: 'cover'}}/></Link></li>;
+            loginOrOut = <li><Link to="/logout" className="navbar-brand"><span className="glyphicon glyphicon-off" title="Logout"></span></Link></li>;
+            profile = <li><Link to={"/users/" + this.state.user_id} title="Profile" className="navbar-brand"><img src={this.state.imgURL} className="img-circle" width="20" height="20" style={{objectFit: 'cover'}}/></Link></li>;
             signUp = null;
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog" title="Settings"></span></Link></li>;
-            requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell' style={style}></span></Link></li>;
-            connections = <li><Link to="/connections" className="navbar-brand"><span className='glyphicon glyphicon-globe'></span></Link></li>;
+            requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell' title="Requests" style={style}></span></Link></li>;
+            connections = <li><Link to="/connections" className="navbar-brand"><span className='glyphicon glyphicon-globe' title="Connections"></span></Link></li>;
+            companies = <Link to="/companies" className="navbar-brand"><span className='glyphicon glyphicon-briefcase' title="Companies"></span></Link>;
             search = <Search isRecruiter={this.state.recruiter}/>
 
         //if the user is not logged in, show the login and signup links
@@ -106,6 +108,7 @@ var Layout = React.createClass({
             accountSettings = null;
             requests = null;
             connections = null;
+            companies = null;
             search = null;
         }
 
@@ -122,8 +125,9 @@ var Layout = React.createClass({
                     <div className="container">
                         <div className="navbar-header">
                             <Link to="/" className="navbar-brand">
-                                <span className="glyphicon glyphicon-home"></span>
+                                <span className="glyphicon glyphicon-home" title="Home"></span>
                             </Link>
+                            {companies}
                         </div>
                         {search}
                         <ul className="nav navbar-nav pull-right">

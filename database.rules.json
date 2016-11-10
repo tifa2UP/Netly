@@ -11,7 +11,7 @@
         }	
     },
     "users":{
-        ".indexOn": "first"
+        ".indexOn": ["last", "recruiter"]
     }
   }
 }

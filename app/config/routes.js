@@ -15,6 +15,7 @@ var AwaitingAcceptance = require('../components/connection/awaiting_acceptance.j
 var Connections = require('../components/connection/index.js');
 var SearchResults = require('../components/page/results.js');
 var AdvancedSearch = require('../components/page/advanced.js');
+var Companies = require('../components/page/companies.js');
 
 var requireAuth = require('./require_auth.js')
 
@@ -26,11 +27,12 @@ var routes = (
 			<Route path="signup" component={NewUser}/>
 			<Route path="logout" component={Logout}/>
 			<Route path="accountSettings" component={AccountSettings} onEnter={requireAuth}/>
-			<Route path="users/:id" component={Profile} onEnter={requireAuth} />
+			<Route path="users/:id" component={Profile} onEnter={requireAuth}/>
 			<Route path="requests" component={AwaitingAcceptance} onEnter={requireAuth}/>
 			<Route path="connections" component={Connections} onEnter={requireAuth}/>
 			<Route path="results/:name" component={SearchResults} onEnter={requireAuth}/>
 			<Route path="advanced" component={AdvancedSearch} onEnter={requireAuth}/>
+			<Companies path="companies" component={Companies} onEnter={requireAuth}/>
 		</Route>
 	</Router>
 );

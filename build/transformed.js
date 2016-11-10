@@ -27753,12 +27753,13 @@
 	var Layout = __webpack_require__(246);
 	var AccountSettings = __webpack_require__(248);
 	var Profile = __webpack_require__(251);
-	var AwaitingAcceptance = __webpack_require__(260);
-	var Connections = __webpack_require__(261);
-	var SearchResults = __webpack_require__(262);
-	var AdvancedSearch = __webpack_require__(263);
+	var AwaitingAcceptance = __webpack_require__(261);
+	var Connections = __webpack_require__(262);
+	var SearchResults = __webpack_require__(263);
+	var AdvancedSearch = __webpack_require__(264);
+	var Companies = __webpack_require__(265);
 
-	var requireAuth = __webpack_require__(264);
+	var requireAuth = __webpack_require__(266);
 
 	var routes = React.createElement(
 		Router,
@@ -27775,7 +27776,8 @@
 			React.createElement(Route, { path: 'requests', component: AwaitingAcceptance, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'connections', component: Connections, onEnter: requireAuth }),
 			React.createElement(Route, { path: 'results/:name', component: SearchResults, onEnter: requireAuth }),
-			React.createElement(Route, { path: 'advanced', component: AdvancedSearch, onEnter: requireAuth })
+			React.createElement(Route, { path: 'advanced', component: AdvancedSearch, onEnter: requireAuth }),
+			React.createElement(Companies, { path: 'companies', component: Companies, onEnter: requireAuth })
 		)
 	);
 
@@ -28503,6 +28505,7 @@
 	        var accountSettings;
 	        var requests;
 	        var connections;
+	        var companies;
 	        var search;
 
 	        var navClassName;
@@ -28524,7 +28527,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/logout', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-off' })
+	                    React.createElement('span', { className: 'glyphicon glyphicon-off', title: 'Logout' })
 	                )
 	            );
 	            profile = React.createElement(
@@ -28532,7 +28535,7 @@
 	                null,
 	                React.createElement(
 	                    Link,
-	                    { to: "/users/" + this.state.user_id, className: 'navbar-brand' },
+	                    { to: "/users/" + this.state.user_id, title: 'Profile', className: 'navbar-brand' },
 	                    React.createElement('img', { src: this.state.imgURL, className: 'img-circle', width: '20', height: '20', style: { objectFit: 'cover' } })
 	                )
 	            );
@@ -28552,7 +28555,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/requests', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-bell', style: style })
+	                    React.createElement('span', { className: 'glyphicon glyphicon-bell', title: 'Requests', style: style })
 	                )
 	            );
 	            connections = React.createElement(
@@ -28561,8 +28564,13 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/connections', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-globe' })
+	                    React.createElement('span', { className: 'glyphicon glyphicon-globe', title: 'Connections' })
 	                )
+	            );
+	            companies = React.createElement(
+	                Link,
+	                { to: '/companies', className: 'navbar-brand' },
+	                React.createElement('span', { className: 'glyphicon glyphicon-briefcase', title: 'Companies' })
 	            );
 	            search = React.createElement(Search, { isRecruiter: this.state.recruiter });
 
@@ -28590,6 +28598,7 @@
 	            accountSettings = null;
 	            requests = null;
 	            connections = null;
+	            companies = null;
 	            search = null;
 	        }
 
@@ -28615,8 +28624,9 @@
 	                        React.createElement(
 	                            Link,
 	                            { to: '/', className: 'navbar-brand' },
-	                            React.createElement('span', { className: 'glyphicon glyphicon-home' })
-	                        )
+	                            React.createElement('span', { className: 'glyphicon glyphicon-home', title: 'Home' })
+	                        ),
+	                        companies
 	                    ),
 	                    search,
 	                    React.createElement(
@@ -28705,7 +28715,7 @@
 	            React.createElement(
 	                'button',
 	                { className: 'btn btn-default' },
-	                React.createElement('span', { className: 'glyphicon glyphicon-search' })
+	                React.createElement('span', { className: 'glyphicon glyphicon-search', title: 'Search' })
 	            ),
 	            advancedSearch
 	        );
@@ -29081,6 +29091,7 @@
 	var Skills = __webpack_require__(257);
 	var ProfileImage = __webpack_require__(258);
 	var Connection = __webpack_require__(259);
+	var JobListings = __webpack_require__(260);
 
 	var Profile = React.createClass({
 		displayName: 'Profile',
@@ -29133,6 +29144,35 @@
 		},
 
 		render: function () {
+			var show;
+			if (this.state.recruiter) {
+				show = React.createElement(
+					'div',
+					null,
+					React.createElement(Summary, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement('hr', null),
+					React.createElement(JobListings, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement('hr', null)
+				);
+			} else {
+				show = React.createElement(
+					'div',
+					null,
+					React.createElement(Summary, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement('hr', null),
+					React.createElement(Experience, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement('hr', null),
+					React.createElement(Projects, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement('hr', null),
+					React.createElement(Education, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement('hr', null),
+					React.createElement(Skills, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement('hr', null),
+					React.createElement(Interests, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement('hr', null)
+				);
+			}
+
 			return React.createElement(
 				'div',
 				null,
@@ -29149,18 +29189,7 @@
 				),
 				React.createElement('br', null),
 				React.createElement('hr', null),
-				React.createElement(Summary, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement('hr', null),
-				React.createElement(Experience, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement('hr', null),
-				React.createElement(Projects, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement('hr', null),
-				React.createElement(Education, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement('hr', null),
-				React.createElement(Skills, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement('hr', null),
-				React.createElement(Interests, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-				React.createElement('hr', null)
+				show
 			);
 		}
 	});
@@ -29242,7 +29271,7 @@
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+					React.createElement('span', { className: 'glyphicon glyphicon-pencil', title: 'Edit About Me' })
 				);
 			} else {
 				editButton = React.createElement('div', null);
@@ -29254,7 +29283,7 @@
 				React.createElement(
 					'h2',
 					{ style: { color: "#0077B5" } },
-					'Summary ',
+					'About ',
 					editButton
 				),
 				React.createElement(
@@ -29272,7 +29301,7 @@
 				React.createElement(
 					'h3',
 					null,
-					'Summary'
+					'About'
 				),
 				React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'newSummary', defaultValue: this.state.summary }),
 				React.createElement(
@@ -29486,7 +29515,7 @@
 					React.createElement(
 						'button',
 						{ className: 'btn btn-default', onClick: this.handleClickAdd },
-						React.createElement('span', { className: 'glyphicon glyphicon-plus' })
+						React.createElement('span', { className: 'glyphicon glyphicon-plus', title: 'Add Education' })
 					)
 				);
 			} else {
@@ -29619,7 +29648,7 @@
 							React.createElement(
 								'button',
 								{ className: 'btn btn-default', onClick: this.handleClickEdit.bind(null, index) },
-								React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+								React.createElement('span', { className: 'glyphicon glyphicon-pencil', title: 'Edit Education' })
 							)
 						),
 						React.createElement(
@@ -29881,7 +29910,7 @@
 					React.createElement(
 						'button',
 						{ className: 'btn btn-default', onClick: this.handleClickAdd },
-						React.createElement('span', { className: 'glyphicon glyphicon-plus' })
+						React.createElement('span', { className: 'glyphicon glyphicon-plus', title: 'Add Project' })
 					)
 				);
 			} else {
@@ -30016,7 +30045,7 @@
 							React.createElement(
 								'button',
 								{ className: 'btn btn-default', onClick: this.handleClickEdit.bind(null, index) },
-								React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+								React.createElement('span', { className: 'glyphicon glyphicon-pencil', title: 'Edit Project' })
 							)
 						),
 						React.createElement(
@@ -30193,7 +30222,7 @@
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+					React.createElement('span', { className: 'glyphicon glyphicon-pencil', title: 'Edit Interests' })
 				);
 			} else {
 				editButton = React.createElement('div', null);
@@ -30335,7 +30364,7 @@
 				this.experienceRef.off(); //turn off the experienceRef in compWillMount-listen only from one.
 				this.experienceRefChanged.off();
 				this.experienceRefRemoved.off();
-				this.setState({ educations: [] });
+				this.setState({ experiences: [] });
 
 				this.experienceRef = firebase.database().ref().child('user-experience/' + nextProps.pageID);
 				this.experienceRef.on("child_added", snap => {
@@ -30438,7 +30467,7 @@
 					React.createElement(
 						'button',
 						{ className: 'btn btn-default', onClick: this.handleClickAdd },
-						React.createElement('span', { className: 'glyphicon glyphicon-plus' })
+						React.createElement('span', { className: 'glyphicon glyphicon-plus', title: 'Add Experience' })
 					)
 				);
 			} else {
@@ -30573,7 +30602,7 @@
 							React.createElement(
 								'button',
 								{ className: 'btn btn-default', onClick: this.handleClickEdit.bind(null, index) },
-								React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+								React.createElement('span', { className: 'glyphicon glyphicon-pencil', title: 'Edit Experience' })
 							)
 						),
 						React.createElement(
@@ -30744,7 +30773,7 @@
 				editButton = React.createElement(
 					'button',
 					{ className: 'btn btn-default', onClick: this.handleClickEdit },
-					React.createElement('span', { className: 'glyphicon glyphicon-pencil' })
+					React.createElement('span', { className: 'glyphicon glyphicon-pencil', title: 'Edit Skills' })
 				);
 			} else {
 				editButton = React.createElement('div', null);
@@ -31088,6 +31117,543 @@
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
 
+	var JobListings = React.createClass({
+		displayName: 'JobListings',
+
+		getInitialState: function () {
+			return { isCurrentUser: false, editing: false, joblistings: [], id: this.props.pageID };
+		},
+
+		componentWillMount: function () {
+			this.joblistingRef = firebase.database().ref().child('user-joblisting/' + this.props.pageID);
+			this.joblistingRef.on("child_added", snap => {
+				var joblisting = snap.val();
+				if (joblisting) {
+					joblisting.key = snap.ref.key;
+					this.state.joblistings.push(joblisting);
+					this.setState({ joblistings: this.state.joblistings });
+				}
+			});
+
+			this.joblistingRefChanged = firebase.database().ref().child('user-joblisting/' + this.props.pageID);
+			this.joblistingRefChanged.on("child_changed", snap => {
+				var joblisting = snap.val();
+				if (joblisting) {
+					joblisting.key = snap.ref.key;
+
+					var index;
+					for (var i = 0; i < this.state.joblistings.length; i++) {
+						if (this.state.joblistings[i].key == joblisting.key) {
+							index = i;
+						}
+					}
+
+					this.state.joblistings.splice(index, 1, joblisting);
+					this.setState({ joblistings: this.state.joblistings });
+				}
+			});
+
+			this.joblistingRefRemoved = firebase.database().ref().child('user-joblisting/' + this.props.pageID);
+			this.joblistingRefRemoved.on("child_removed", snap => {
+				var joblisting = snap.val();
+				if (joblisting) {
+					joblisting.key = snap.ref.key;
+
+					var index;
+					for (var i = 0; i < this.state.joblistings.length; i++) {
+						if (this.state.joblistings[i].key == joblisting.key) {
+							index = i;
+						}
+					}
+
+					this.state.joblistings.splice(index, 1);
+					this.setState({ joblistings: this.state.joblistings });
+				}
+			});
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			if (nextProps.pageID != this.state.id) {
+				this.joblistingRef.off(); //turn off the joblistingRef in compWillMount-listen only from one.
+				this.joblistingRefChanged.off();
+				this.joblistingRefRemoved.off();
+				this.setState({ joblistings: [] });
+
+				this.joblistingRef = firebase.database().ref().child('user-joblisting/' + nextProps.pageID);
+				this.joblistingRef.on("child_added", snap => {
+					var joblisting = snap.val();
+					if (joblisting) {
+						joblisting.key = snap.ref.key;
+						this.state.joblistings.push(joblisting);
+						this.setState({ joblistings: this.state.joblistings });
+					}
+				});
+
+				this.joblistingRefChanged = firebase.database().ref().child('user-joblisting/' + nextProps.pageID);
+				this.joblistingRefChanged.on("child_changed", snap => {
+					var joblisting = snap.val();
+					if (joblisting) {
+						joblisting.key = snap.ref.key;
+
+						var index;
+						for (var i = 0; i < this.state.joblistings.length; i++) {
+							if (this.state.joblistings[i].key == joblisting.key) {
+								index = i;
+							}
+						}
+
+						this.state.joblistings.splice(index, 1, joblisting);
+						this.setState({ joblistings: this.state.joblistings });
+					}
+				});
+
+				this.joblistingRefChanged = firebase.database().ref().child('user-joblisting/' + nextProps.pageID);
+				this.joblistingRefChanged.on("child_removed", snap => {
+					var joblisting = snap.val();
+					if (joblisting) {
+						joblisting.key = snap.ref.key;
+
+						var index;
+						for (var i = 0; i < this.state.joblistings.length; i++) {
+							if (this.state.joblistings[i].key == joblisting.key) {
+								index = i;
+							}
+						}
+
+						this.state.joblistings.splice(index, 1);
+						this.setState({ joblistings: this.state.joblistings });
+					}
+				});
+			}
+		},
+
+		handleClickAdd: function () {
+			this.setState({ adding: true });
+		},
+
+		handleClickEdit: function (index) {
+			this.setState({ editing: true });
+			this.setState({ indexToEdit: index });
+		},
+
+		handleClickSave: function () {
+			var joblistingData = {
+				position: this.refs.position.value,
+				industry: this.refs.industry.value,
+				employmentType: this.refs.employmentType.value,
+				experienceLevel: this.refs.experienceLevel.value,
+				payrate: this.refs.payrate.value,
+				location: this.refs.location.value,
+				description: this.refs.description.value,
+				responsibilities: this.refs.responsibilities.value,
+				qualitifications: this.refs.qualitifications.value
+			};
+
+			if (this.state.editing) {
+				var joblistingUpdate = {};
+				joblistingUpdate['/user-joblisting/' + this.props.pageID + '/' + this.state.joblistings[this.state.indexToEdit].key] = joblistingData;
+				firebase.database().ref().update(joblistingUpdate);
+			} else {
+				var newExperienceKey = firebase.database().ref().child('joblisting').push().key;
+				firebase.database().ref('/user-joblisting/' + this.props.pageID + '/' + newExperienceKey).set(joblistingData);
+			}
+
+			this.setState({ editing: false });
+			this.setState({ adding: false });
+		},
+
+		handleRemoveExisting: function () {
+			var joblistingRef = firebase.database().ref('user-joblisting/' + this.props.pageID + '/' + this.state.joblistings[this.state.indexToEdit].key);
+			joblistingRef.remove();
+
+			this.setState({ editing: false });
+			this.setState({ adding: false });
+		},
+
+		handleClickCancel: function () {
+			this.setState({ editing: false });
+			this.setState({ adding: false });
+		},
+
+		joblistingHeading: function () {
+			if (this.props.isCurrentUser) {
+				return React.createElement(
+					'h2',
+					{ style: { color: "#0077B5" } },
+					'Job Listings ',
+					React.createElement(
+						'button',
+						{ className: 'btn btn-default', onClick: this.handleClickAdd },
+						React.createElement('span', { className: 'glyphicon glyphicon-plus', title: 'Add New Listing' })
+					)
+				);
+			} else {
+				return React.createElement(
+					'h2',
+					{ style: { color: "#0077B5" } },
+					'Job Listings'
+				);
+			}
+		},
+
+		addingExperience: function () {
+			return React.createElement(
+				'div',
+				{ className: 'col-md-12' },
+				React.createElement(
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('input', { type: 'text', ref: 'position', className: 'form-control', placeholder: 'Position' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'industry', className: 'form-control', placeholder: 'Industry' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'employmentType', className: 'form-control', placeholder: 'Employment Type' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'experienceLevel', className: 'form-control', placeholder: 'Experience Level' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'payrate', className: 'form-control', placeholder: 'Pay Rate' }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'location', className: 'form-control', placeholder: 'Location' }),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'description', placeholder: 'Job Description' }),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'responsibilities', placeholder: 'Responsibilities' }),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'qualitifications', placeholder: 'Qualifications' }),
+					React.createElement('br', null),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							)
+						)
+					),
+					React.createElement('br', null)
+				)
+			);
+		},
+
+		editingExperience: function () {
+			var indexedExperience = this.state.joblistings[this.state.indexToEdit];
+
+			return React.createElement(
+				'div',
+				{ className: 'col-md-12' },
+				React.createElement(
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('input', { type: 'text', ref: 'position', className: 'form-control', defaultValue: indexedExperience.position }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'industry', className: 'form-control', defaultValue: indexedExperience.industry }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'employmentType', className: 'form-control', defaultValue: indexedExperience.employmentType }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'experienceLevel', className: 'form-control', defaultValue: indexedExperience.experienceLevel }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'payrate', className: 'form-control', defaultValue: indexedExperience.payrate }),
+					React.createElement('br', null),
+					React.createElement('input', { type: 'text', ref: 'location', className: 'form-control', defaultValue: indexedExperience.location }),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'description', defaultValue: indexedExperience.description }),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'responsibilities', defaultValue: indexedExperience.responsibilities }),
+					React.createElement('br', null),
+					React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'qualitifications', defaultValue: indexedExperience.qualitifications }),
+					React.createElement('br', null),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-link', onClick: this.handleRemoveExisting },
+								'Remove this listing'
+							)
+						)
+					),
+					React.createElement('br', null)
+				)
+			);
+		},
+
+		defaultExperience: function () {
+			if (this.props.isCurrentUser) {
+				return React.createElement(
+					'div',
+					null,
+					this.state.joblistings.map((joblisting, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							'h3',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								index + 1,
+								'. ',
+								joblisting.position
+							),
+							' ',
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickEdit.bind(null, index) },
+								React.createElement('span', { className: 'glyphicon glyphicon-pencil', title: 'Edit Listing' })
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Industry: ',
+							joblisting.industry
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Employment Type: ',
+							joblisting.employmentType
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Experience Level: ',
+							joblisting.experienceLevel
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Pay Rate: ',
+							joblisting.payrate
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Location: ',
+							joblisting.location
+						),
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								'Job Description'
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								joblisting.description
+							)
+						),
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								'Responsibilities'
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								joblisting.responsibilities
+							)
+						),
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								'Qualifications'
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								joblisting.qualitifications
+							)
+						)
+					))
+				);
+			} else {
+				return React.createElement(
+					'div',
+					null,
+					this.state.joblistings.map((joblisting, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							'h3',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								index + 1,
+								'. ',
+								joblisting.position
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Industry: ',
+							joblisting.industry
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Employment Type: ',
+							joblisting.employmentType
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Experience Level: ',
+							joblisting.experienceLevel
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Pay Rate: ',
+							joblisting.payrate
+						),
+						React.createElement(
+							'h5',
+							null,
+							'Location: ',
+							joblisting.location
+						),
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								'Job Description'
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								joblisting.description
+							)
+						),
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								'Responsibilities'
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								joblisting.responsibilities
+							)
+						),
+						React.createElement(
+							'h4',
+							null,
+							React.createElement(
+								'strong',
+								null,
+								'Qualifications'
+							)
+						),
+						React.createElement(
+							'h5',
+							null,
+							React.createElement(
+								'pre',
+								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+								joblisting.qualitifications
+							)
+						)
+					))
+				);
+			}
+		},
+
+		render: function () {
+			var show;
+
+			if (this.state.adding) {
+				show = this.addingExperience();
+			} else if (this.state.editing) {
+				show = this.editingExperience();
+			} else {
+				show = this.defaultExperience();
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				this.joblistingHeading(),
+				show
+			);
+		},
+
+		componentWillUnmount: function () {
+			this.joblistingRef.off();
+			this.joblistingRefChanged.off();
+			this.joblistingRefRemoved.off();
+		}
+	});
+
+	module.exports = JobListings;
+
+/***/ },
+/* 261 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
 	var AwaitingAcceptance = React.createClass({
 		displayName: 'AwaitingAcceptance',
 
@@ -31256,7 +31822,7 @@
 	module.exports = AwaitingAcceptance;
 
 /***/ },
-/* 261 */
+/* 262 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -31392,7 +31958,7 @@
 	module.exports = AllConnections;
 
 /***/ },
-/* 262 */
+/* 263 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -31489,7 +32055,7 @@
 	module.exports = Results;
 
 /***/ },
-/* 263 */
+/* 264 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -31678,7 +32244,90 @@
 	module.exports = AdvancedSearch;
 
 /***/ },
-/* 264 */
+/* 265 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var Companies = React.createClass({
+		displayName: 'Companies',
+
+		getInitialState: function () {
+			return {
+				currentUserID: "",
+				companies: []
+			};
+		},
+
+		componentWillMount: function () {
+			this.companyRef = firebase.database().ref('users').orderByChild("recruiter").equalTo(true);
+			this.companyRef.on("child_added", snap => {
+				company = snap.val();
+				company.user_id = snap.ref.key;
+				this.state.companies.push(company);
+				this.setState({ companies: this.state.companies });
+			});
+		},
+
+		componentWillUnmount: function () {
+			this.companyRef.off();
+		},
+
+		render: function () {
+			var showCompanies;
+			if (this.state.companies.length == 0) {
+				showCompanies = React.createElement(
+					'div',
+					null,
+					React.createElement(
+						'center',
+						null,
+						'We currently have no companies!'
+					)
+				);
+			} else {
+				showCompanies = this.state.companies.map((user, index) => React.createElement(
+					'div',
+					{ key: index },
+					React.createElement(
+						Link,
+						{ to: "users/" + user.user_id },
+						React.createElement(
+							'h4',
+							null,
+							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
+							user.first + " " + user.last
+						)
+					),
+					React.createElement('br', null),
+					React.createElement('br', null)
+				));
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				React.createElement(
+					'center',
+					null,
+					React.createElement(
+						'h1',
+						null,
+						'Companies'
+					)
+				),
+				showCompanies
+			);
+		}
+	});
+
+	module.exports = Companies;
+
+/***/ },
+/* 266 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);

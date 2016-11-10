@@ -12,6 +12,7 @@ var Experience = require('./experience.js');
 var Skills = require('./skills.js');
 var ProfileImage = require('./profileImage.js');
 var Connection = require('./connection.js');
+var JobListings = require('./joblisting.js');
 
 var Profile = React.createClass({
 	getInitialState: function(){
@@ -61,7 +62,32 @@ var Profile = React.createClass({
 		this.unsubscribe();
 	},
 
-	render: function(){	
+	render: function(){
+		var show;
+		if(this.state.recruiter){
+			show = 	<div>
+						<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
+						<JobListings pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
+					</div>;
+		}else{
+			show = 	<div>
+						<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
+						<Experience pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
+						<Projects pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
+						<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
+						<Skills pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
+						<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
+					</div>
+		}
+
 		return (
 			<div>
 				<center>
@@ -72,18 +98,7 @@ var Profile = React.createClass({
 				<br />
 				
 				<hr/>
-				<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<hr/>
-				<Experience pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<hr/>
-				<Projects pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<hr/>
-				<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<hr/>
-				<Skills pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<hr/>
-				<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-				<hr/>
+				{show}
 			</div>
 		);
 	}

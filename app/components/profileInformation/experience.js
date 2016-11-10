@@ -61,7 +61,7 @@ var Experience = React.createClass({
 			this.experienceRef.off(); //turn off the experienceRef in compWillMount-listen only from one.
 			this.experienceRefChanged.off();
 			this.experienceRefRemoved.off();
-			this.setState({educations: []});
+			this.setState({experiences: []});
 
 			this.experienceRef = firebase.database().ref().child('user-experience/'+ nextProps.pageID);
 	        this.experienceRef.on("child_added", snap => {
@@ -158,7 +158,7 @@ var Experience = React.createClass({
 
 	experienceHeading: function(){
 		if(this.props.isCurrentUser){
-			return <h2 style={{color: "#0077B5"}}>Experience <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus"></span></button></h2>
+			return <h2 style={{color: "#0077B5"}}>Experience <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Experience"></span></button></h2>
 		}else{
 			return <h2 style={{color: "#0077B5"}}>Experience</h2>
 		}
@@ -220,7 +220,7 @@ var Experience = React.createClass({
 				<div>
 					{this.state.experiences.map((experience,index) => (
 			        	<div key={index}>
-			       			<h4><strong>{experience.employer}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil"></span></button></h4>
+			       			<h4><strong>{experience.employer}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil" title="Edit Experience"></span></button></h4>
 			       			<h5>{experience.position}</h5>
 			       			<h6>{experience.startDate} - {experience.endDate}</h6>
 			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{experience.description}</pre></h6>
