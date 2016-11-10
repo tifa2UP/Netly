@@ -130,19 +130,7 @@ var Layout = React.createClass({
 
         var navClassName;
 
-        var style;
         var div;
-        if(this.state.requests.length > 0){
-            style={
-                //color: 'red',
-                //border: '1px solid black',
-                //position: 'absolute',
-                //top: '15',
-                //right: '10'
-            }
-        }else{
-            style={}
-        }
 
         var divStyle={
             fontSize: '10px',
@@ -171,7 +159,7 @@ var Layout = React.createClass({
             profile = <li><Link to={"/users/" + this.state.user_id} title="Profile" className="navbar-brand"><img src={this.state.imgURL} className="img-circle" width="20" height="20" style={{objectFit: 'cover'}}/></Link></li>;
             signUp = null;
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog" title="Settings"></span></Link></li>;
-            requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell' title="Requests" style={style}></span>{div}</Link></li>;
+            requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell' title="Requests"></span>{div}</Link></li>;
             connections = <li><Link to="/connections" className="navbar-brand"><span className='glyphicon glyphicon-globe' title="Connections"></span></Link></li>;
             companies = <Link to="/companies" className="navbar-brand"><span className='glyphicon glyphicon-briefcase' title="Companies"></span></Link>;
             search = <Search isRecruiter={this.state.recruiter}/>

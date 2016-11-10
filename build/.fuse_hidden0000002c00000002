@@ -28560,7 +28560,19 @@
 
 	        var navClassName;
 
+	        var style;
 	        var div;
+	        if (this.state.requests.length > 0) {
+	            style = {
+	                //color: 'red',
+	                //border: '1px solid black',
+	                //position: 'absolute',
+	                //top: '15',
+	                //right: '10'
+	            };
+	        } else {
+	            style = {};
+	        }
 
 	        var divStyle = {
 	            fontSize: '10px',
@@ -28622,7 +28634,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/requests', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-bell', title: 'Requests' }),
+	                    React.createElement('span', { className: 'glyphicon glyphicon-bell', title: 'Requests', style: style }),
 	                    div
 	                )
 	            );
