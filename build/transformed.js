@@ -28483,8 +28483,54 @@
 	                }
 	            });
 
+	            this.connectionRefRemoved = firebase.database().ref().child('connections/' + user.uid);
+	            this.connectionRefRemoved.on("child_removed", snap => {
+	                var index = this.state.requests.indexOf(snap.ref.key);
+	                if (index >= 0) {
+	                    this.state.requests.splice(index, 1);
+	                    this.setState({ requests: this.state.requests });
+	                }
+	            });
+	        });
+	    },
+
+	    componentWillReceiveProps: function (nextProps) {
+	        var that = this;
+
+	        this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
+	            this.setState({ isLoggedIn: null != user });
+	            this.setState({ recruiter: this.state.isLoggedIn == false ? false : null });
+	            this.setState({ name: user.displayName });
+	            this.setState({ user_id: user.uid });
+
+	            this.userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
+	            this.userRef.on("value", snap => {
+	                var user = snap.val();
+	                this.setState({ imgURL: user.imageURL });
+	                this.setState({ recruiter: user == null || !user.recruiter ? false : true });
+	            });
+
+	            this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
+	            this.connectionRef.on("child_added", snap => {
+	                if (snap.val()) {
+	                    this.state.requests.push(snap.ref.key);
+	                    this.setState({ requests: this.state.requests });
+	                }
+	            });
+
 	            this.connectionRefUpdate = firebase.database().ref().child('connections/' + user.uid);
-	            this.connectionRefUpdate.on("child_removed", snap => {
+	            this.connectionRefUpdate.on("child_changed", snap => {
+	                if (snap.val().status == 'accepted') {
+	                    var index = this.state.requests.indexOf(snap.ref.key);
+	                    if (index >= 0) {
+	                        this.state.requests.splice(index, 1);
+	                        this.setState({ requests: this.state.requests });
+	                    }
+	                }
+	            });
+
+	            this.connectionRefRemoved = firebase.database().ref().child('connections/' + user.uid);
+	            this.connectionRefRemoved.on("child_removed", snap => {
 	                var index = this.state.requests.indexOf(snap.ref.key);
 	                if (index >= 0) {
 	                    this.state.requests.splice(index, 1);
@@ -28495,6 +28541,7 @@
 	    },
 
 	    componentWillUnmount: function () {
+	        console.log("unmounted");
 	        this.unsubscribe();
 	    },
 
