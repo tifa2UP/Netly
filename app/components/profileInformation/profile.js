@@ -13,6 +13,7 @@ var Skills = require('./skills.js');
 var ProfileImage = require('./profileImage.js');
 var Connection = require('./connection.js');
 var JobListings = require('./joblisting.js');
+var Endorsements = require('./endorsements.js');
 
 var Profile = React.createClass({
 	getInitialState: function(){
@@ -70,6 +71,8 @@ var Profile = React.createClass({
 						<hr/>
 						<JobListings pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 						<hr/>
+						<Endorsements pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
 					</div>;
 		}else{
 			show = 	<div>
@@ -84,6 +87,8 @@ var Profile = React.createClass({
 						<Skills pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 						<hr/>
 						<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<hr/>
+						<Endorsements pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 						<hr/>
 					</div>
 		}
