@@ -8,8 +8,7 @@ var Skills = React.createClass({
 		return {isCurrentUser: false, editing: false};
 	},
 
-	componentWillMount: function()
-	{
+	componentWillMount: function(){
 		this.userRef = firebase.database().ref().child('users/'+this.props.pageID);
         this.userRef.on("value", snap => {
         	var user = snap.val();
@@ -21,8 +20,7 @@ var Skills = React.createClass({
         });
 	},
 
-	componentWillReceiveProps: function(nextProps)
-	{
+	componentWillReceiveProps: function(nextProps){
 		this.userRef = firebase.database().ref().child('users/'+ nextProps.pageID);
         this.userRef.on("value", snap => {
         	var user = snap.val();
@@ -34,13 +32,11 @@ var Skills = React.createClass({
         });
 	},
 
-	handleClickEdit: function()
-	{
+	handleClickEdit: function(){
 		this.setState({editing:true});
 	},
     
-    handleClickSave: function()
-    {
+    handleClickSave: function(){
         this.setState({editing: false});
 		var newSkills = this.refs.newSkills.value;
 
@@ -64,34 +60,40 @@ var Skills = React.createClass({
 	handleClickCancel: function(){
 		this.setState({editing: false});
 	},
+
     defaultSkills: function(){
 		var editButton;
 		if(this.props.isCurrentUser){
-			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil"></span></button>;
+			editButton = <button className="btn btn-default" onClick={this.handleClickEdit}><span className="glyphicon glyphicon-pencil" title="Edit Skills"></span></button>;
 		}else{
 			editButton = <div></div>;
 		}
 
 		return(
 			<div>
-				<h3>Skills {editButton}</h3>
-				<pre>{this.state.skills}</pre>
+				<h2 style={{color: "#0077B5"}}>Skills {editButton}</h2>
+				<pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{this.state.skills}</pre>
 			</div>
 		);
 	},
+
     editingSkills: function(){
 		return(
 			<div>
 				<h3>Skills</h3>
-				<textarea rows="6" style={{width: '100%'}} ref="newSkills" defaultValue={this.state.skills} />
+				<textarea className="form-control" rows="6" style={{width: '100%'}} ref="newSkills" defaultValue={this.state.skills}  placeholder="Ex. Microsoft Office, Java, Git"/>
 				<br/>
-				<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
-				<button className="btn btn-default" onClick={this.handleClickCancel}>Cancel</button>
+				<center>
+					<div className="btn btn-toolbar">
+						<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
+						<button className="btn btn-default" onClick={this.handleClickCancel}>Cancel</button>
+					</div>
+				</center>
 			</div>
 		);
 	},
     
-render: function(){
+	render: function(){
 		var partToShow;
 		if(this.state.editing){
 			partToShow = this.editingSkills();
@@ -102,7 +104,6 @@ render: function(){
 		return (
 			<div>
 				{partToShow}
-				<br />
 			</div>
 
 		);

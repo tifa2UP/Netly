@@ -6,7 +6,12 @@
     	".indexOn": "user_id"
     },
     "connections":{
-    	".indexOn": "status"
+        "$userid": {
+            ".indexOn": "status"
+        }	
+    },
+    "users":{
+        ".indexOn": ["last", "recruiter"]
     }
   }
 }

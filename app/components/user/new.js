@@ -42,12 +42,9 @@ var SignUpForm = React.createClass({
   					first: firstName,
   					last: lastName,
   					recruiter: recruiter,
-  					summary: "",
-  					projects: "",
-  					skills: "",
-  					education: "",
-  					experience: "",
-  					interests: ""
+  					imageURL: "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7",
+  					interests: "",
+  					skills: ""
   				};
 
   				firebase.database().ref('users/' + firebase.auth().currentUser.uid).set(userData);

@@ -17,8 +17,8 @@ var AwaitingAcceptance = React.createClass({
 			this.setState({currentUserID: user.uid});
 
 			//get connections whose status is awaiting acceptance
-			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('awaiting-acceptance');
-			connectionRef.on("child_added", snap=>{
+			this.connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID).orderByChild('status').equalTo('awaiting-acceptance');
+			this.connectionRef.on("child_added", snap=>{
 				var requesterID = snap.ref.key;
 				var requesterRef = firebase.database().ref().child('users/' + requesterID);
 				requesterRef.once("value", snap=>{
@@ -28,42 +28,17 @@ var AwaitingAcceptance = React.createClass({
 						last: userData.last,
 						hasProfileImage: userData.hasProfileImage,
 						user_id: snap.ref.key,
-						url: "",
+						imageURL: userData.imageURL,
 					};
-
-					//gets the user's profile image url & updates the state
-					if(userInfo.hasProfileImage){
-	                    var userImageRef = firebase.storage().ref().child('images/users/' + userInfo.user_id + '/profilepic.jpg');
-	                    userImageRef.getDownloadURL().then(function(url){
-	                        userInfo.url = url;
-	                        var updatedRequesters = Array.prototype.slice.call(that.state.requesters);
-	                        updatedRequesters.push(userInfo);
-	                        that.setState({requesters: updatedRequesters});
-	                    }).catch(function(error){
-	                        var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                        defaultRef.getDownloadURL().then(function(url){
-	                        	userInfo.url = url;
-	                        	var updatedRequesters = that.state.requesters.slice();
-	                        	updatedRequesters.push(userInfo);
-	                        	that.setState({requesters: updatedRequesters});
-	                        });
-	                    });
-	                }else{
-	                    var defaultRef = firebase.storage().ref().child('images/' + 'default.jpg');
-	                    defaultRef.getDownloadURL().then(function(url){
-	                        userInfo.url = url;
-	                        var updatedRequesters = that.state.requesters.slice();
-	                        updatedRequesters.push(userInfo);
-	                        that.setState({requesters: updatedRequesters});
-	                    });
-	                }
-
+					var updatedRequesters = that.state.requesters.slice();
+	                updatedRequesters.push(userInfo);
+	                that.setState({requesters: updatedRequesters});
 				});
 			});
 
 			//if status was updated, remove from array of requesters
-			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
-			connectionRef.on("child_changed", snap=>{
+			this.connectionRefUpdate = firebase.database().ref().child('connections/' + this.state.currentUserID);
+			this.connectionRefUpdate.on("child_changed", snap=>{
 				var userChangedKey = snap.ref.key;
 				var index = -1;
 				for(var i = 0; i < this.state.requesters.length; i++){
@@ -80,8 +55,8 @@ var AwaitingAcceptance = React.createClass({
 			});
 
 			//if rejected acceptance, remove from array of requesters
-			var connectionRef = firebase.database().ref().child('connections/' + this.state.currentUserID);
-			connectionRef.on("child_removed", snap=>{
+			//var connectionRefRemove = firebase.database().ref().child('connections/' + this.state.currentUserID);
+			this.connectionRefUpdate.on("child_removed", snap=>{
 				var userChangedKey = snap.ref.key;
 				var index = -1;
 				for(var i = 0; i < this.state.requesters.length; i++){
@@ -100,6 +75,8 @@ var AwaitingAcceptance = React.createClass({
 	},
 
 	componentWillUnmount: function(){
+		this.connectionRef.off();
+		this.connectionRefUpdate.off();
 		this.unsubscribe();
 	},
 
@@ -141,8 +118,8 @@ var AwaitingAcceptance = React.createClass({
 			showRequests = 
 				this.state.requesters.map((user,index) => (
         			<div key={index}>
-       					<Link to={"users/" + user.user_id}><img src={user.url} className="img-circle" alt="" width="50" height="50" style={{objectFit: 'cover'}}/> 
-       					{user.first + " " + user.last}</Link>
+       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover', border: "1px solid #B5A4A4"}}/> 
+       					{user.first + " " + user.last}</h4></Link>
         				{this.showAwaitingAcceptance(user)}
         				<br />
         			</div>
