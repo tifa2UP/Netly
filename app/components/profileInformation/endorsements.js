@@ -4,20 +4,44 @@ var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
 
 var endorsement = React.createClass({
+// is current user is being passed as a prop in the other pages but not being called in getinitialstate,
+// I'll check the other pages later
+// note: some of these initialstates aren't being used, I was just playing around trying to get stuff to work
 	getInitialState: function(){
-		return{logged_in_user_name: '', logged_in_user_id: '', isCurrentUser: false, editing: false, endorsements: [], id: this.props.pageID};
+		return{
+			logged_in_user_name: '', 
+			logged_in_user_id: '', 
+			isConnected:false, 
+			isCurrentUser: this.props.isCurrentUser, 
+			endorsed:false, 
+			editing: false, 
+			endorsements: [], 
+			id: this.props.pageID};
 	},
 
-	componentWillMount: function(){
-		var that = this;
+// do not use componentwillmount, because of async calls to firebase, the user may have already navigated 
+// out or changed states clientside causing duplicate or inconsitent rendering.
 
+	componentDidMount: function(){
+// var that = this is a workaround for scope. can avoided if using es6
+		var that = this;
+		
+// had to add this to get logged in user id and name since the prop passed in from profile can be of any user.
+// suggest adding prop "logged_in_user_id" at login so auth doesn't need to be called when needed.
         this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
             this.setState({
 				logged_in_user_id: user.uid,
 				logged_in_user_name: user.displayName});
 			});
-		
+
+// use search results.js for an example of how to return a list of connections to set isConnected
+// then search endoresements and compare to logged_in_user_id and set endorsed to true or false
+// after that, fix the buttons so the state is correct when showing/allowing editing etc.
+// later add a handler for "enter" key
+
+// only need one ref, can attach multiple handlers to it. Ref can also be navigated using child/parent.			
         this.endorsementRef = firebase.database().ref().child('user-endorsement/'+this.props.pageID);
+		
         this.endorsementRef.on("child_added", snap => {
         	var endorsement = snap.val();
 			if(endorsement){
@@ -27,97 +51,38 @@ var endorsement = React.createClass({
 			}
         });
 
-        this.endorsementRefChanged = firebase.database().ref().child('user-endorsement/'+this.props.pageID);
-        this.endorsementRefChanged.on("child_changed", snap => {
+        this.endorsementRef.on("child_changed", snap => {
         	var endorsement = snap.val();
 			if(endorsement){
 				endorsement.key = snap.ref.key;
-
 				var index;
 				for(var i = 0; i < this.state.endorsements.length; i++){
 					if(this.state.endorsements[i].key == endorsement.key){
 						index = i;
 					}
 				}
-
 				this.state.endorsements.splice(index, 1, endorsement);
 				this.setState({endorsements: this.state.endorsements});
 			}
         });
 
-        this.endorsementRefRemoved = firebase.database().ref().child('user-endorsement/'+this.props.pageID);
-        this.endorsementRefRemoved.on("child_removed", snap => {
+        this.endorsementRef.on("child_removed", snap => {
         	var endorsement = snap.val();
 			if(endorsement){
 				endorsement.key = snap.ref.key;
-				
 				var index;
 				for(var i = 0; i < this.state.endorsements.length; i++){
 					if(this.state.endorsements[i].key == endorsement.key){
 						index = i;
 					}
 				}
-
 				this.state.endorsements.splice(index, 1);
 				this.setState({endorsements: this.state.endorsements});
 			}
         });
 	},
 
-	componentWillReceiveProps: function(nextProps){
-		if(nextProps.pageID != this.state.id){
-			this.endorsementRef.off(); //turn off the endorsementRef in compWillMount-listen only from one.
-			this.endorsementRefChanged.off();
-			this.endorsementRefRemoved.off();
-			this.setState({endorsements: []});
-
-			this.endorsementRef = firebase.database().ref().child('user-endorsement/'+ nextProps.pageID);
-	        this.endorsementRef.on("child_added", snap => {
-	        	var endorsement = snap.val();
-				if(endorsement){
-					endorsement.key = snap.ref.key;
-					this.state.endorsements.push(endorsement);
-					this.setState({endorsements: this.state.endorsements});
-				}
-	        });
-
-	        this.endorsementRefChanged = firebase.database().ref().child('user-endorsement/' + nextProps.pageID);
-	        this.endorsementRefChanged.on("child_changed", snap => {
-	        	var endorsement = snap.val();
-				if(endorsement){
-					endorsement.key = snap.ref.key;
-
-					var index;
-					for(var i = 0; i < this.state.endorsements.length; i++){
-						if(this.state.endorsements[i].key == endorsement.key){
-							index = i;
-						}
-					}
-					
-					this.state.endorsements.splice(index, 1, endorsement);
-					this.setState({endorsements: this.state.endorsements});
-				}
-	        });
-
-	        this.endorsementRefRemoved = firebase.database().ref().child('user-endorsement/' + nextProps.pageID);
-	        this.endorsementRefRemoved.on("child_removed", snap => {
-	        	var endorsement = snap.val();
-				if(endorsement){
-					endorsement.key = snap.ref.key;
-
-					var index;
-					for(var i = 0; i < this.state.endorsements.length; i++){
-						if(this.state.endorsements[i].key == endorsement.key){
-							index = i;
-						}
-					}
-					
-					this.state.endorsements.splice(index, 1);
-					this.setState({endorsements: this.state.endorsements});
-				}
-	        });
-	    }
-	},
+// dont need componentwillreceiveprops. it was redundant
 
 	handleClickAdd: function(){
 		this.setState({adding: true});
@@ -163,11 +128,21 @@ var endorsement = React.createClass({
 		this.setState({adding: false});
 	},
 
+// not used yet
+	toggleEndorsed: function(){
+		this.setState({endorsed: !endorsed});
+	},
+	
 	endorsementHeading: function(){
-		if(this.props.isCurrentUser){
+		if(this.props.isCurrentUser || (this.state.isConnected && this.state.endorsed)){
 				return <h2 style={{color: "#0077B5"}}>Endorsements</h2>	
 		}else{
-				return <h2 style={{color: "#0077B5"}}>Endorsements <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add endorsement"></span></button></h2>
+				return <h2 style={{color: "#0077B5"}}>Endorsements 
+					<button className="btn btn-default" onClick={this.handleClickAdd}>
+						<span className="glyphicon glyphicon-plus" title="Add endorsement">
+						</span>
+					</button>
+				</h2>
 		}
 	},
 
@@ -206,6 +181,8 @@ var endorsement = React.createClass({
 		)
 	},
 
+// add logic here for checking if the logged in user owns any of the endoresements and is "Connected" 
+// so he/she may have access to the edit button
 	defaultendorsement: function(){
 		if(this.props.isCurrentUser){
 			return(
@@ -213,7 +190,7 @@ var endorsement = React.createClass({
 					{this.state.endorsements.map((endorsement,index) => (
 			        	<div key={index}>
 			       			<Link to={"/users/"+ endorsement.endorsedById}>{endorsement.endorsedBy}</Link>
-			       			<h5>{endorsement.msg} {endorsement.msg}</h5>
+			       			<h5>{endorsement.msg}</h5>
 			       		</div>
 			   		))}
 				</div>
@@ -224,7 +201,12 @@ var endorsement = React.createClass({
 					{this.state.endorsements.map((endorsement,index) => (
 			        	<div key={index}>
 							<Link to={"/users/"+ endorsement.endorsedById}>{endorsement.endorsedBy}</Link>
-			       			<h5>{endorsement.msg} <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil" title="Edit endorsement"></span></button></h5>
+			       			<h5>
+								{endorsement.msg} 
+								<button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}>
+								<span className="glyphicon glyphicon-pencil" title="Edit endorsement"></span>
+								</button>
+							</h5>
 			       		</div>
 			   		))}
 				</div>
@@ -250,11 +232,10 @@ var endorsement = React.createClass({
 			</div>
 		)
 	},
-
+	
+// only need to unmount one ref that is used by multiple handlers
 	componentWillUnmount: function(){
-		this.endorsementRef.off();
-		this.endorsementRefChanged.off();
-		this.endorsementRefRemoved.off();	
+		this.endorsementRef.off();	
         this.unsubscribe();
 	},
 });
