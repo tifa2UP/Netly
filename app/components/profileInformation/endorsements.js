@@ -19,10 +19,7 @@ var endorsement = React.createClass({
 			id: this.props.pageID};
 	},
 
-// do not use componentwillmount, because of async calls to firebase, the user may have already navigated 
-// out or changed states clientside causing duplicate or inconsitent rendering.
-
-	componentDidMount: function(){
+	componentWillMount: function(){
 // var that = this is a workaround for scope. can avoided if using es6
 		var that = this;
 		
@@ -82,7 +79,7 @@ var endorsement = React.createClass({
         });
 	},
 
-// dont need componentwillreceiveprops. it was redundant
+// dont need componentwillreceiveprops. the handers are redundant since no props are passed
 
 	handleClickAdd: function(){
 		this.setState({adding: true});
