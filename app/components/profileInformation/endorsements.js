@@ -19,17 +19,23 @@ var endorsement = React.createClass({
 			id: this.props.pageID};
 	},
 
+
 	componentWillMount: function(){
+	        this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+            this.setState({
+				logged_in_user_id: user.uid,
+				logged_in_user_name: user.displayName});
+			});
+		},
+
+// need to use componentdidmount to get endorsements because the check for iscurrentusers will cause a rerender (and delete the endoresements) on change. either from f5 or changing profiles
+	componentDidMount: function(){
 // var that = this is a workaround for scope. can avoided if using es6
 		var that = this;
 		
 // had to add this to get logged in user id and name since the prop passed in from profile can be of any user.
 // suggest adding prop "logged_in_user_id" at login so auth doesn't need to be called when needed.
-        this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-            this.setState({
-				logged_in_user_id: user.uid,
-				logged_in_user_name: user.displayName});
-			});
+
 
 // use search results.js for an example of how to return a list of connections to set isConnected
 // then search endoresements and compare to logged_in_user_id and set endorsed to true or false
