@@ -4,53 +4,57 @@ var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
 
 var endorsement = React.createClass({
-// is current user is being passed as a prop in the other pages but not being called in getinitialstate,
-// I'll check the other pages later
-// note: some of these initialstates aren't being used, I was just playing around trying to get stuff to work
 	getInitialState: function(){
 		return{
 			logged_in_user_name: '', 
 			logged_in_user_id: '', 
 			isConnected:false, 
-			isCurrentUser: this.props.isCurrentUser, 
+			isCurrentUser: "", 
 			endorsed:false, 
 			editing: false, 
 			endorsements: [], 
-			id: this.props.pageID};
+			currentUserID: "",
+			id: this.props.pageID,
+			pageID: ""};
 	},
-
-
+	
 	componentWillMount: function(){
-	        this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-            this.setState({
-				logged_in_user_id: user.uid,
-				logged_in_user_name: user.displayName});
+		this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+			this.setState({logged_in_user_id: user.uid});
+			
+			this.userRef = firebase.database().ref().child('users/'+this.state.logged_in_user_id);
+			this.userRef.on("value", snap=>{
+				var user = snap.val();
+				this.setState({logged_in_user_name: user.first + " " + user.last});
 			});
-		},
-
-// need to use componentdidmount to get endorsements because the check for iscurrentusers will cause a rerender (and delete the endoresements) on change. either from f5 or changing profiles
+			
+			this.connectionRef = firebase.database().ref().child('connections/'+this.props.pageID+"/"+user.uid);
+			this.connectionRef.once("value", snap=>{
+				var connection = snap.val();
+				if(connection && connection.status=="accepted"){
+					this.setState({isConnected: true});
+				}
+			});
+        });
+	},
+	
 	componentDidMount: function(){
-// var that = this is a workaround for scope. can avoided if using es6
-		var that = this;
-		
-// had to add this to get logged in user id and name since the prop passed in from profile can be of any user.
-// suggest adding prop "logged_in_user_id" at login so auth doesn't need to be called when needed.
-
-
-// use search results.js for an example of how to return a list of connections to set isConnected
-// then search endoresements and compare to logged_in_user_id and set endorsed to true or false
-// after that, fix the buttons so the state is correct when showing/allowing editing etc.
-// later add a handler for "enter" key
-
-// only need one ref, can attach multiple handlers to it. Ref can also be navigated using child/parent.			
-        this.endorsementRef = firebase.database().ref().child('user-endorsement/'+this.props.pageID);
-		
-        this.endorsementRef.on("child_added", snap => {
+		this.endorsementRef = firebase.database().ref().child('user-endorsement/'+this.props.pageID);
+		this.endorsementRef.on("child_added", snap => {
         	var endorsement = snap.val();
 			if(endorsement){
 				endorsement.key = snap.ref.key;
 				this.state.endorsements.push(endorsement);
 				this.setState({endorsements: this.state.endorsements});
+			}
+			
+			var index; // get index of endorsement by logged in user
+			for(var i = 0; i < this.state.endorsements.length; i++){
+				if(this.state.endorsements[i].endorsedById == this.state.logged_in_user_id){
+					index = i;
+					console.log("match at index: "+i);
+					this.setState({endorsed: true});
+				}
 			}
         });
 
@@ -80,13 +84,30 @@ var endorsement = React.createClass({
 					}
 				}
 				this.state.endorsements.splice(index, 1);
-				this.setState({endorsements: this.state.endorsements});
+			}
+			
+			var match = false;
+			for(var i = 0; i < this.state.endorsements.length; i++){
+				if(this.state.endorsements[i].endorsedById == this.state.logged_in_user_id){
+					index = i;
+					console.log("match at index: "+i);
+					match = true;
+					//this.setState({endorsed: true});
+				}
+			}
+			if(!match){
+					this.setState({endorsed: false});
+					console.log("no match");
 			}
         });
 	},
 
-// dont need componentwillreceiveprops. the handers are redundant since no props are passed
 
+	
+	getIndexOfEndorsement: function(){
+
+	},
+	
 	handleClickAdd: function(){
 		this.setState({adding: true});
 	},
@@ -113,6 +134,7 @@ var endorsement = React.createClass({
 			firebase.database().ref('/user-endorsement/' + this.props.pageID + '/' + newendorsementKey).set(endorsementData);
 		}
 		
+		this.setState({endorsed: true});
 		this.setState({editing: false});
 		this.setState({adding: false});
 
@@ -122,6 +144,7 @@ var endorsement = React.createClass({
 		var endorsementRef = firebase.database().ref('user-endorsement/' + this.props.pageID + '/' + this.state.endorsements[this.state.indexToEdit].key);
 		endorsementRef.remove();
 
+		this.setState({endorsed: false});
 		this.setState({editing: false});
 		this.setState({adding: false});
 	},
@@ -131,13 +154,8 @@ var endorsement = React.createClass({
 		this.setState({adding: false});
 	},
 
-// not used yet
-	toggleEndorsed: function(){
-		this.setState({endorsed: !endorsed});
-	},
-	
 	endorsementHeading: function(){
-		if(this.props.isCurrentUser || (this.state.isConnected && this.state.endorsed)){
+		if(!this.state.isConnected || this.state.endorsed){
 				return <h2 style={{color: "#0077B5"}}>Endorsements</h2>	
 		}else{
 				return <h2 style={{color: "#0077B5"}}>Endorsements 
@@ -184,16 +202,23 @@ var endorsement = React.createClass({
 		)
 	},
 
-// add logic here for checking if the logged in user owns any of the endoresements and is "Connected" 
-// so he/she may have access to the edit button
 	defaultendorsement: function(){
-		if(this.props.isCurrentUser){
+	
+		console.log("this.state.logged_in_user_id: " + this.state.logged_in_user_id);
+		console.log("this.state.isConnected: " + this.state.isConnected);
+		console.log("this.state.endorsed: " + this.state.endorsed);
+		if(this.state.isConnected){
 			return(
 				<div>
 					{this.state.endorsements.map((endorsement,index) => (
 			        	<div key={index}>
-			       			<Link to={"/users/"+ endorsement.endorsedById}>{endorsement.endorsedBy}</Link>
-			       			<h5>{endorsement.msg}</h5>
+							<Link to={"/users/"+ endorsement.endorsedById}>{endorsement.endorsedBy}</Link>
+								<blockquote>
+									"{endorsement.msg}"
+								</blockquote>
+								{ (this.state.endorsed && endorsement.endorsedById==this.state.logged_in_user_id) ? <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}>
+								<span className="glyphicon glyphicon-pencil" title="Edit endorsement"></span>
+								</button> : null }
 			       		</div>
 			   		))}
 				</div>
@@ -203,13 +228,10 @@ var endorsement = React.createClass({
 				<div>
 					{this.state.endorsements.map((endorsement,index) => (
 			        	<div key={index}>
-							<Link to={"/users/"+ endorsement.endorsedById}>{endorsement.endorsedBy}</Link>
-			       			<h5>
-								{endorsement.msg} 
-								<button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}>
-								<span className="glyphicon glyphicon-pencil" title="Edit endorsement"></span>
-								</button>
-							</h5>
+			       			<Link to={"/users/"+ endorsement.endorsedById}>{endorsement.endorsedBy}</Link>
+							<blockquote>
+								"{endorsement.msg}"
+							</blockquote>
 			       		</div>
 			   		))}
 				</div>
@@ -238,7 +260,9 @@ var endorsement = React.createClass({
 	
 // only need to unmount one ref that is used by multiple handlers
 	componentWillUnmount: function(){
+		this.userRef.off();	
 		this.endorsementRef.off();	
+		this.connectionRef.off();
         this.unsubscribe();
 	},
 });
