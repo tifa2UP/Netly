@@ -158,18 +158,17 @@ var Home = React.createClass({
         }
 
         return (
-            <div>
-                <h1>Connection Feed</h1><br />
-                <input type="text" ref="body" placeholder="What are you thinking about?" onKeyPress={this.handleKeyPress} className="form-control"/><br />
+            <div >
+                <input type="text" ref="body" placeholder="What are you thinking about?" onKeyPress={this.handleKeyPress} className="form-control update-post"/><br />
                 <center><button className="btn btn-primary" onClick={this.handlePost}>Post</button></center><br />
                 {reversedPost.map((post,index) => (
-                    <div key={index}>
+                    <div key={index} className="post">
                         On {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}, <Link to={"/users/"+post.user_id}>{post.user_name}</Link> said
                         <blockquote>
                             "{post.body}"<br />
                             <button className="btn btn-default" onClick={this.handleLike.bind(null, post)}><span className="glyphicon glyphicon-thumbs-up"></span> ({post.likes})</button>
                         </blockquote>
-                        <Reply post_id={post.post_id}/>
+                        <Reply post_id={post.post_id} />
                     </div>
                 ))}
             </div>

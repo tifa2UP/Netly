@@ -28223,7 +28223,7 @@
 					'Connection Feed'
 				),
 				React.createElement('br', null),
-				React.createElement('input', { type: 'text', ref: 'body', placeholder: 'What are you thinking about?', onKeyPress: this.handleKeyPress, className: 'form-control' }),
+				React.createElement('input', { type: 'text', ref: 'body', placeholder: 'What are you thinking about?', onKeyPress: this.handleKeyPress, className: 'form-control update-post' }),
 				React.createElement('br', null),
 				React.createElement(
 					'center',
