@@ -71,8 +71,9 @@ var Summary = React.createClass({
 
 		return(
 			<div>
-				<h2 style={{color: "#0077B5"}}>About {editButton}</h2>
-				<pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", background: "none", whiteSpace: "pre-wrap"}}>{this.state.summary}</pre>
+				<h4>Summary {editButton}</h4>
+				{this.state.summary}
+				<hr></hr>
 			</div>
 		);
 	},

@@ -2,8 +2,6 @@ var React = require('react');
 var firebase = require('firebase');
 var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
-
-//profile components
 var Summary = require('./summary.js');
 var Education = require('./education.js');
 var Projects = require('./projects.js');
@@ -19,8 +17,8 @@ var Profile = React.createClass({
 		return {user_name: "", recruiter: false, isCurrentUser: false, pageID: "", currentUserID: ""};
 	},
 
-	componentWillMount: function(){
-		var that = this;
+    componentWillMount: function(){
+        var that = this;
 
 		//sets the current pageID of the page
 		this.setState({pageID: this.props.params.id});
@@ -96,12 +94,38 @@ var Profile = React.createClass({
 					<Connection pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
 				</center>
 				<br />
-				
+
 				<hr/>
 				{show}
 			</div>
 		);
 	}
+    render: function(){
+        return (
+            <div className="profile">
+                <div className="container profile-container">
+                    <center>
+                        <div  className="col-md-4 profile-img">
+                            <ProfileImage user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
+                        </div>
+                        <div className="col-md-5 profile-details ">
+                            <h1>{this.state.user_name}</h1>
+                            <h4>500+ Connections</h4>
+                            <h4>Occupation here</h4>
+                            <h4>Education here</h4>
+                            <button className="btn btn-primary">Add connection</button>
+                        </div>
+                    </center>
+                </div>
+                <Summary user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
+                <Projects user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
+                <Education user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
+                <Interests user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
+                <Experience user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
+                <Skills user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
+            </div>
+        );
+    }
 });
 
 module.exports = Profile;

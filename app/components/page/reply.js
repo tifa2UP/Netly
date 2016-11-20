@@ -59,7 +59,7 @@ var Reply = React.createClass({
 
     render: function(){
         return(
-            <div>
+            <div className="replies">
                 {this.state.replies.map((reply,index) => (
                     <div key={index}>
                         <Link to={"/users/"+reply.user_id}> {reply.user_name} </Link> on {(new Date(reply.post_time)).toLocaleTimeString("en-US", dateTimeCustomization)} <br/>
