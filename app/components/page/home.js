@@ -169,7 +169,7 @@ var Home = React.createClass({
 	        				<tbody>
 		        				<tr>
 		        					<td rowSpan='2' style={{padding: '0 5px 0 0'}}>
-		        						<img src={post.user_imgurl} width="50" height="50" style={{objectFit: 'cover'}}/>
+		        						<Link to={"/users/"+post.user_id}><img src={post.user_imgurl} width="50" height="50" style={{objectFit: 'cover'}}/></Link>
 		        					</td>
 		        					<td style={{padding: '0 0 0 5px'}}>
 		        						<Link to={"/users/"+post.user_id}>{post.user_name}</Link>

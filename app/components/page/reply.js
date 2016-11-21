@@ -105,7 +105,7 @@ var Reply = React.createClass({
                             <tbody>
                                 <tr>
                                     <td rowSpan='2' style={{padding: '0 5px 0 0'}}>
-                                        <img src={reply.user_imgurl} width="50" height="50" style={{objectFit: 'cover'}}/>
+                                        <Link to={"/users/"+reply.user_id}><img src={reply.user_imgurl} width="50" height="50" style={{objectFit: 'cover'}}/></Link>
                                     </td>
                                     <td style={{padding: '0 0 0 5px'}}>
                                         <Link to={"/users/"+reply.user_id}> {reply.user_name}</Link>
