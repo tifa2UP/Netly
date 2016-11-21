@@ -104,6 +104,7 @@ var Skills = React.createClass({
 		return (
 			<div>
 				{partToShow}
+				<hr/>
 			</div>
 
 		);

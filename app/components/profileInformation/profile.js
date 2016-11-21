@@ -65,41 +65,53 @@ var Profile = React.createClass({
 		if(this.state.recruiter){
 			show = 	<div>
 						<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 						<JobListings pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 					</div>;
 		}else{
 			show = 	<div>
 						<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
+						
 						<Experience pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
+						
 						<Projects pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
+						
 						<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
+						
 						<Skills pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
+						
 						<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
+						
 					</div>
 		}
 
 		return (
-			<div>
+			<div className="profile">
 				<center>
-					<h1>{this.state.user_name}</h1>
-					<ProfileImage pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-					<Connection pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
+					<div className="container profile-container">
+	                    <center>
+	                        {/*<div  className="col-md-6 profile-img">
+	                            <ProfileImage pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+	                        </div>
+	                        <div className="col-md-6 profile-details ">
+	                            <h1>{this.state.user_name}</h1>
+	                            <h4>500+ Connections</h4>
+	                            <h4>Occupation here</h4>
+	                            <h4>Education here</h4>
+	                            <Connection pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
+	                        </div>*/}
+	                        <h1>{this.state.user_name}</h1>
+	                        <ProfileImage pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+	                        <Connection pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
+	                    </center>
+                	</div>
 				</center>
 				<br />
-
 				<hr/>
 				{show}
 			</div>
 		);
 	},
+	/*
     render: function(){
         return (
             <div className="profile">
@@ -125,7 +137,7 @@ var Profile = React.createClass({
                 <Skills user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
             </div>
         );
-    }
+    }*/
 });
 
 module.exports = Profile;

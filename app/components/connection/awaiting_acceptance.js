@@ -23,16 +23,18 @@ var AwaitingAcceptance = React.createClass({
 				var requesterRef = firebase.database().ref().child('users/' + requesterID);
 				requesterRef.once("value", snap=>{
 					var userData = snap.val();
-					var userInfo = {
-						first: userData.first,
-						last: userData.last,
-						hasProfileImage: userData.hasProfileImage,
-						user_id: snap.ref.key,
-						imageURL: userData.imageURL,
-					};
-					var updatedRequesters = that.state.requesters.slice();
-	                updatedRequesters.push(userInfo);
-	                that.setState({requesters: updatedRequesters});
+					if(userData){
+						var userInfo = {
+							first: userData.first,
+							last: userData.last,
+							hasProfileImage: userData.hasProfileImage,
+							user_id: snap.ref.key,
+							imageURL: userData.imageURL,
+						};
+						var updatedRequesters = that.state.requesters.slice();
+		                updatedRequesters.push(userInfo);
+		                that.setState({requesters: updatedRequesters});
+					}
 				});
 			});
 

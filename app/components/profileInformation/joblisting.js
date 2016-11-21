@@ -162,9 +162,9 @@ var JobListings = React.createClass({
 
 	joblistingHeading: function(){
 		if(this.props.isCurrentUser){
-			return <h2 style={{color: "#0077B5"}}>Job Listings <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add New Listing"></span></button></h2>
+			return <h2 className="profile-heading">Job Listings <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add New Listing"></span></button></h2>
 		}else{
-			return <h2 style={{color: "#0077B5"}}>Job Listings</h2>
+			return <h2 className="profile-heading">Job Listings</h2>
 		}
 	},
 
@@ -226,18 +226,18 @@ var JobListings = React.createClass({
 				<div>
 					{this.state.joblistings.map((joblisting,index) => (
 			        	<div key={index}>
-			       			<h3><strong>{index + 1}. {joblisting.position}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil" title="Edit Listing"></span></button></h3>
-			       			<h5>Industry: {joblisting.industry}</h5>
-			       			<h5>Employment Type: {joblisting.employmentType}</h5>
-			       			<h5>Experience Level: {joblisting.experienceLevel}</h5>
-			       			<h5>Pay Rate: {joblisting.payrate}</h5>
-			       			<h5>Location: {joblisting.location}</h5>
-			       			<h4><strong>Job Description</strong></h4>
-			       			<h5><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.description}</pre></h5>
-			       			<h4><strong>Responsibilities</strong></h4>
-			       			<h5><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.responsibilities}</pre></h5>
-			       			<h4><strong>Qualifications</strong></h4>
-			       			<h5><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.qualitifications}</pre></h5>
+			       			<h4><strong>{index + 1}. {joblisting.position}</strong> <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}><span className="glyphicon glyphicon-pencil" title="Edit Listing"></span></button></h4>
+			       			<h6>Industry: {joblisting.industry}</h6>
+			       			<h6>Employment Type: {joblisting.employmentType}</h6>
+			       			<h6>Experience Level: {joblisting.experienceLevel}</h6>
+			       			<h6>Pay Rate: {joblisting.payrate}</h6>
+			       			<h6>Location: {joblisting.location}</h6>
+			       			<h5><strong>Job Description</strong></h5>
+			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.description}</pre></h6>
+			       			<h5><strong>Responsibilities</strong></h5>
+			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.responsibilities}</pre></h6>
+			       			<h5><strong>Qualifications</strong></h5>
+			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.qualitifications}</pre></h6>
 			       		</div>
 			   		))}
 				</div>
@@ -247,18 +247,19 @@ var JobListings = React.createClass({
 				<div>
 					{this.state.joblistings.map((joblisting,index) => (
 			        	<div key={index}>
-			       			<h3><strong>{index + 1}. {joblisting.position}</strong></h3>
-			       			<h5>Industry: {joblisting.industry}</h5>
-			       			<h5>Employment Type: {joblisting.employmentType}</h5>
-			       			<h5>Experience Level: {joblisting.experienceLevel}</h5>
-			       			<h5>Pay Rate: {joblisting.payrate}</h5>
-			       			<h5>Location: {joblisting.location}</h5>
-			       			<h4><strong>Job Description</strong></h4>
-			       			<h5><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.description}</pre></h5>
-			       			<h4><strong>Responsibilities</strong></h4>
-			       			<h5><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.responsibilities}</pre></h5>
-			       			<h4><strong>Qualifications</strong></h4>
-			       			<h5><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.qualitifications}</pre></h5>
+			       			<h4><strong>{index + 1}. {joblisting.position}</strong></h4>
+			       			<h6>Industry: {joblisting.industry}</h6>
+			       			<h6>Employment Type: {joblisting.employmentType}</h6>
+			       			<h6>Experience Level: {joblisting.experienceLevel}</h6>
+			       			<h6>Pay Rate: {joblisting.payrate}</h6>
+			       			<h6>Location: {joblisting.location}</h6>
+			       			<h5><strong>Job Description</strong></h5>
+			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.description}</pre></h6>
+			       			<h5><strong>Responsibilities</strong></h5>
+			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.responsibilities}</pre></h6>
+			       			<h5><strong>Qualifications</strong></h5>
+			       			<h6><pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{joblisting.qualitifications}</pre></h6>
+			       			<br />
 			       		</div>
 			   		))}
 				</div>

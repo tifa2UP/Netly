@@ -161,7 +161,7 @@ var Education = React.createClass({
 			return <div> <h4 className="profile-heading">Education <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Education"></span></button></h4> </div>
 
 		}else{
-			return <h4 style={{color: "#0077B5"}}>Education</h4>
+			return <h4 className="profile-heading">Education</h4>
 		}
 	},
 
@@ -227,7 +227,6 @@ var Education = React.createClass({
 			       			<h6>{education.startDate} - {education.endDate}</h6>
 			       		</div>
 			   		))}
-                    <hr></hr>
 				</div>
 			)
 		}else{
@@ -260,6 +259,7 @@ var Education = React.createClass({
 			<div>
 				{this.educationHeading()}
 				{show}
+				<hr />
 			</div>
 		)
 	},

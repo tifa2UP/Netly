@@ -160,7 +160,7 @@ var Experience = React.createClass({
 		if(this.props.isCurrentUser){
 			return <h4 className="profile-heading">Experience <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Experience"></span></button></h4>
 		}else{
-			return <h4>Experience</h4>
+			return <h4 className="profile-heading">Experience</h4>
 		}
 	},
 

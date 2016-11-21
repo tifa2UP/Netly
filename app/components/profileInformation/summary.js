@@ -71,7 +71,7 @@ var Summary = React.createClass({
 
 		return(
 			<div>
-				<h4 className="profile-heading">Summary {editButton}</h4>
+				<h4 className="profile-heading">About {editButton}</h4>
 				<pre className="summary-pre">{this.state.summary}</pre>
 				<hr></hr>
 			</div>

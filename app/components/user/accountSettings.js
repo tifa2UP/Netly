@@ -80,7 +80,7 @@ var AccountSettings = React.createClass({
 			show = 
 				<div>
 					<UpdatePassword /><br />
-					<DeleteAccount /><br />
+					{/*<DeleteAccount /><br />*/}
 				</div>
 		}else{
 			show = 
