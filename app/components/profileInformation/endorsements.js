@@ -39,7 +39,7 @@ var endorsement = React.createClass({
         });
 	},
 	
-	componentDidMount: function(){
+	componentDidMount: function(){ // can't use will mount, sometimes f5 won't load data. maybe because its the last thing to be rendered and it can't sync fast enough?
 		this.endorsementRef = firebase.database().ref().child('user-endorsement/'+this.props.pageID);
 		this.endorsementRef.on("child_added", snap => {
         	var endorsement = snap.val();
@@ -205,9 +205,9 @@ var endorsement = React.createClass({
 
 	defaultendorsement: function(){
 	
-		console.log("this.state.logged_in_user_id: " + this.state.logged_in_user_id);
-		console.log("this.state.isConnected: " + this.state.isConnected);
-		console.log("this.state.endorsed: " + this.state.endorsed);
+		//console.log("this.state.logged_in_user_id: " + this.state.logged_in_user_id);
+		//console.log("this.state.isConnected: " + this.state.isConnected);
+		//console.log("this.state.endorsed: " + this.state.endorsed);
 		if(this.state.isConnected){
 			return(
 				<div>
