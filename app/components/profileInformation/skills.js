@@ -72,7 +72,7 @@ var Skills = React.createClass({
 		return(
 			<div>
 				<h4 className="profile-heading">Skills {editButton}</h4>
-				{this.state.skills}
+				<pre>{this.state.skills}</pre>
 			</div>
 		);
 	},

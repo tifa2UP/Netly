@@ -69,8 +69,8 @@ var Interests = React.createClass({
 
 		return(
 			<div>
-				<h4>Interests {editButton}</h4>
-				{this.state.interests}
+				<h4 className="profile-heading">Interests {editButton}</h4>
+			<pre>{this.state.interests}</pre>
 			</div>
 		);
 	},

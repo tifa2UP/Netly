@@ -72,7 +72,7 @@ var Summary = React.createClass({
 		return(
 			<div>
 				<h4 className="profile-heading">Summary {editButton}</h4>
-				{this.state.summary}
+				<pre className="summary-pre">{this.state.summary}</pre>
 				<hr></hr>
 			</div>
 		);

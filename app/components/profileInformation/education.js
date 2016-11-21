@@ -227,6 +227,7 @@ var Education = React.createClass({
 			       			<h6>{education.startDate} - {education.endDate}</h6>
 			       		</div>
 			   		))}
+                    <hr></hr>
 				</div>
 			)
 		}else{

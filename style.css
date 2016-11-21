@@ -41,6 +41,10 @@ body {
     padding: 20px;
 }
 
+.profile button {
+    border: white;
+}
+
 .profile-img{
     text-align: right;
     /*float: right;*/
@@ -55,4 +59,21 @@ body {
 }
 .navbar-search{
     width: 200% !important;
+}
+.profile-heading{
+    color: #8b8d8f;
+    font-size: 200%;
+}
+
+pre{
+    padding: 0px;
+    margin: 0px !important;
+    font-family: Helvetica;
+    border: none;
+    white-space: normal;
+    background: none;
+}
+.summary-pre{
+    font-size: 14px;
+
 }
