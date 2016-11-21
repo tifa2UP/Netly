@@ -38,8 +38,15 @@ var Layout = React.createClass({
                 this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
                 this.connectionRef.on("child_added", snap=>{
                     if(snap.val()){
-                        this.state.requests.push(snap.ref.key);
-                        this.setState({requests: this.state.requests});
+                        var requesterID = snap.ref.key;
+                        var requesterRef = firebase.database().ref().child('users/' + requesterID);
+                        requesterRef.once("value", snap=>{
+                            var userData = snap.val();
+                            if(userData){
+                                this.state.requests.push(requesterID);
+                                this.setState({requests: this.state.requests});
+                            }
+                        });
                     }
                 });
 
@@ -68,10 +75,10 @@ var Layout = React.createClass({
 
     componentWillReceiveProps: function(nextProps){
         var that = this;
+        this.unsubscribe();
         //this.state.requests.splice(0, this.state.requests.length);
 
         this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-            console.log("auth changed");
             this.setState({isLoggedIn: (null != user)});
             this.setState({recruiter: this.state.isLoggedIn == false ? false : null});
             this.setState({name: this.state.isLoggedIn ? user.displayName : null});
@@ -88,10 +95,18 @@ var Layout = React.createClass({
                 this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
                 this.connectionRef.on("child_added", snap=>{
                     if(snap.val()){
-                        if(this.state.requests.indexOf(snap.ref.key) < 0){
-                            this.state.requests.push(snap.ref.key);
-                            this.setState({requests: this.state.requests});
-                        }
+                        var requesterID = snap.ref.key;
+                        var requesterRef = firebase.database().ref().child('users/' + requesterID);
+                        requesterRef.once("value", snap=>{
+                            var userData = snap.val();
+                            if(userData){
+                                if(this.state.requests.indexOf(snap.ref.key) < 0){
+                                    this.state.requests.push(snap.ref.key);
+                                    this.setState({requests: this.state.requests});
+                                }
+                            }
+                        });
+                        
                     }
                 });
 

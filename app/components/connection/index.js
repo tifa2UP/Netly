@@ -23,15 +23,17 @@ var AllConnections = React.createClass({
 				this.otherConnectionRef = firebase.database().ref().child('users/' + connectionID);
 				this.otherConnectionRef.once("value", snap=>{
 					var userData = snap.val();
-					var userInfo = {
-						first: userData.first,
-						last: userData.last,
-						user_id: snap.ref.key,
-						imageURL: userData.imageURL,
-					};
-					var updatedConnections = that.state.connections.slice();
-	                updatedConnections.push(userInfo);
-	                that.setState({connections: updatedConnections});
+					if(userData){
+						var userInfo = {
+							first: userData.first,
+							last: userData.last,
+							user_id: snap.ref.key,
+							imageURL: userData.imageURL,
+						};
+						var updatedConnections = that.state.connections.slice();
+		                updatedConnections.push(userInfo);
+		                that.setState({connections: updatedConnections});
+					}
 				});
 			});
 
