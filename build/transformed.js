@@ -28108,22 +28108,27 @@
 			//for each child added to post, push to postArray
 			this.postsRef.on("child_added", snap => {
 				var post = snap.val();
-				var postID = snap.ref.key;
+				post.post_id = snap.ref.key;
+				post.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+
+				var updatedPostArray = this.state.postArray;
+				updatedPostArray.push(post);
+				this.setState({ postArray: updatedPostArray });
 
 				var userRef = firebase.database().ref('users/' + post.user_id);
 				userRef.once('value', snap => {
-					var newPostWithId = {
-						user_id: post.user_id,
-						user_name: post.user_name,
-						body: post.body,
-						created_at: post.created_at,
-						likes: post.likes,
-						post_id: postID,
-						user_imgurl: snap.val().imageURL
-					};
+
+					post.user_imgurl = snap.val().imageURL;
+
+					var index = -1;
+					for (var i = 0; i < this.state.postArray.length; i++) {
+						if (this.state.postArray[i].post_id == post.post_id) {
+							index = i;
+						}
+					}
 
 					var updatedPostArray = this.state.postArray;
-					updatedPostArray.push(newPostWithId);
+					updatedPostArray.splice(index, 1, post);
 					this.setState({ postArray: updatedPostArray });
 				});
 			});
@@ -28131,29 +28136,22 @@
 			//for each child changed to post, replace that post with the post already in postArray
 			this.postsRef.on("child_changed", snap => {
 				var post = snap.val();
-				var postID = snap.ref.key;
+				post.post_id = snap.ref.key;
 
 				var userRef = firebase.database().ref('users/' + post.user_id);
 				userRef.once('value', snap => {
-					var updatedPost = {
-						user_id: post.user_id,
-						user_name: post.user_name,
-						body: post.body,
-						created_at: post.created_at,
-						likes: post.likes,
-						post_id: postID,
-						user_imgurl: snap.val().imageURL
-					};
+
+					post.user_imgurl = snap.val().imageURL;
 
 					var index;
 					for (var i = 0; i < this.state.postArray.length; i++) {
-						if (this.state.postArray[i].post_id == updatedPost.post_id) {
+						if (this.state.postArray[i].post_id == post.post_id) {
 							index = i;
 						}
 					}
 
 					var updatedPostArray = this.state.postArray;
-					updatedPostArray.splice(index, 1, updatedPost);
+					updatedPostArray.splice(index, 1, post);
 					this.setState({ postArray: updatedPostArray });
 				});
 			});
@@ -28252,22 +28250,16 @@
 				'div',
 				null,
 				React.createElement(
-					'h1',
-					null,
-					'Connection Feed'
-				),
-				React.createElement('br', null),
-				React.createElement('input', { type: 'text', ref: 'body', placeholder: 'What are you thinking about?', onKeyPress: this.handleKeyPress, className: 'form-control update-post' }),
-				React.createElement('br', null),
-				React.createElement(
 					'center',
 					null,
 					React.createElement(
-						'button',
-						{ className: 'btn btn-primary', onClick: this.handlePost },
-						'Post'
+						'h1',
+						null,
+						'Connection Feed'
 					)
 				),
+				React.createElement('br', null),
+				React.createElement('input', { type: 'text', ref: 'body', placeholder: 'What are you thinking about?', onKeyPress: this.handleKeyPress, className: 'form-control update-post' }),
 				React.createElement('br', null),
 				reversedPost.map((post, index) => React.createElement(
 					'div',
@@ -28344,7 +28336,7 @@
 
 	//customize date for rendering
 	var dateTimeCustomization = {
-	    weekday: "long", month: "short",
+	    year: "numeric", month: "short",
 	    day: "numeric", hour: "2-digit", minute: "2-digit"
 	};
 
@@ -28362,11 +28354,31 @@
 	            } catch (e) {};
 	        }
 	    },
+
 	    componentWillMount: function () {
-	        this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id);
+	        this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id).orderByChild("post_time");
 	        this.postReplyRef.on('child_added', snap => {
-	            this.state.replies.push(snap.val());
+	            var replyInfo = snap.val();
+	            replyInfo.reply_id = snap.ref.key;
+	            replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+
+	            this.state.replies.push(replyInfo);
 	            this.setState({ replies: this.state.replies });
+
+	            var userRef = firebase.database().ref('users/' + replyInfo.user_id);
+	            userRef.once('value', snap => {
+	                replyInfo.user_imgurl = snap.val().imageURL;
+
+	                var index = -1;
+	                for (var i = 0; i < this.state.replies.length; i++) {
+	                    if (this.state.replies[i].reply_id == replyInfo.reply_id) {
+	                        index = i;
+	                    }
+	                }
+
+	                this.state.replies.splice(index, 1, replyInfo);
+	                this.setState({ replies: this.state.replies });
+	            });
 	        });
 	    },
 
@@ -28376,8 +28388,27 @@
 
 	        this.postReplyRef = firebase.database().ref('post-reply').child(nextProps.post_id);
 	        this.postReplyRef.on('child_added', snap => {
-	            this.state.replies.push(snap.val());
+	            var replyInfo = snap.val();
+	            replyInfo.reply_id = snap.ref.key;
+	            replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+
+	            this.state.replies.push(replyInfo);
 	            this.setState({ replies: this.state.replies });
+
+	            var userRef = firebase.database().ref('users/' + replyInfo.user_id);
+	            userRef.once('value', snap => {
+	                replyInfo.user_imgurl = snap.val().imageURL;
+
+	                var index = -1;
+	                for (var i = 0; i < this.state.replies.length; i++) {
+	                    if (this.state.replies[i].reply_id == replyInfo.reply_id) {
+	                        index = i;
+	                    }
+	                }
+
+	                this.state.replies.splice(index, 1, replyInfo);
+	                this.setState({ replies: this.state.replies });
+	            });
 	        });
 	    },
 
@@ -28404,16 +28435,41 @@
 	                'div',
 	                { key: index },
 	                React.createElement(
-	                    Link,
-	                    { to: "/users/" + reply.user_id },
-	                    ' ',
-	                    reply.user_name,
-	                    ' '
+	                    'table',
+	                    null,
+	                    React.createElement(
+	                        'tbody',
+	                        null,
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'td',
+	                                { rowSpan: '2', style: { padding: '0 5px 0 0' } },
+	                                React.createElement('img', { src: reply.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
+	                            ),
+	                            React.createElement(
+	                                'td',
+	                                { style: { padding: '0 0 0 5px' } },
+	                                React.createElement(
+	                                    Link,
+	                                    { to: "/users/" + reply.user_id },
+	                                    ' ',
+	                                    reply.user_name
+	                                )
+	                            )
+	                        ),
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'td',
+	                                { style: { padding: '0 0 0 5px' } },
+	                                new Date(reply.post_time).toLocaleTimeString("en-US", dateTimeCustomization)
+	                            )
+	                        )
+	                    )
 	                ),
-	                ' on ',
-	                new Date(reply.post_time).toLocaleTimeString("en-US", dateTimeCustomization),
-	                ' ',
-	                React.createElement('br', null),
 	                React.createElement(
 	                    'blockquote',
 	                    null,
@@ -28423,12 +28479,7 @@
 	                    React.createElement('br', null)
 	                )
 	            )),
-	            React.createElement('input', { type: 'text', onKeyPress: this.handleKeyPress, ref: 'theReply', className: 'form-control', placeholder: 'Reply', id: 'reply' }),
-	            React.createElement(
-	                'button',
-	                { type: 'button', className: 'btn btn-primary', onClick: this.handlePostReply },
-	                'Submit'
-	            )
+	            React.createElement('input', { type: 'text', onKeyPress: this.handleKeyPress, ref: 'theReply', className: 'form-control', placeholder: 'Reply to post...', id: 'reply' })
 	        );
 	    }
 	});

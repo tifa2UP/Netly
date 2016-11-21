@@ -25,14 +25,27 @@ var Reply = React.createClass({
     },
 
     componentWillMount: function(){
-        this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id);
+        this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id).orderByChild("post_time");
         this.postReplyRef.on('child_added', snap=>{
             var replyInfo = snap.val();
+            replyInfo.reply_id = snap.ref.key;
+            replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+            
+            this.state.replies.push(replyInfo);
+            this.setState({replies: this.state.replies});
 
             var userRef = firebase.database().ref('users/'+ replyInfo.user_id);
             userRef.once('value', snap=>{
                 replyInfo.user_imgurl = snap.val().imageURL;
-                this.state.replies.push(replyInfo);
+
+                var index = -1;
+                for(var i = 0; i < this.state.replies.length; i++){
+                    if(this.state.replies[i].reply_id == replyInfo.reply_id){
+                        index = i;
+                    }
+                }
+
+                this.state.replies.splice(index, 1, replyInfo);
                 this.setState({replies: this.state.replies});
             });
         });
@@ -45,11 +58,24 @@ var Reply = React.createClass({
         this.postReplyRef = firebase.database().ref('post-reply').child(nextProps.post_id);
         this.postReplyRef.on('child_added', snap=>{
             var replyInfo = snap.val();
+            replyInfo.reply_id = snap.ref.key;
+            replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+            
+            this.state.replies.push(replyInfo);
+            this.setState({replies: this.state.replies});
 
             var userRef = firebase.database().ref('users/'+ replyInfo.user_id);
             userRef.once('value', snap=>{
                 replyInfo.user_imgurl = snap.val().imageURL;
-                this.state.replies.push(replyInfo);
+
+                var index = -1;
+                for(var i = 0; i < this.state.replies.length; i++){
+                    if(this.state.replies[i].reply_id == replyInfo.reply_id){
+                        index = i;
+                    }
+                }
+
+                this.state.replies.splice(index, 1, replyInfo);
                 this.setState({replies: this.state.replies});
             });
         });

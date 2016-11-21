@@ -21,15 +21,27 @@ var Home = React.createClass({
 		this.postsRef.on("child_added", snap => {
 			var post = snap.val();
 			post.post_id = snap.ref.key;
+			post.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+			
+			var updatedPostArray = this.state.postArray;
+			updatedPostArray.push(post);
+			this.setState({postArray : updatedPostArray});
 
 			var userRef = firebase.database().ref('users/'+ post.user_id);
 			userRef.once('value', snap=>{
 
 				post.user_imgurl = snap.val().imageURL;
 				
+				var index = -1;
+				for(var i = 0; i < this.state.postArray.length; i++){
+					if(this.state.postArray[i].post_id == post.post_id){
+						index = i;
+					}
+				}
+
 				var updatedPostArray = this.state.postArray;
-				updatedPostArray.push(post);
-				this.setState({postArray : updatedPostArray});
+				updatedPostArray.splice(index, 1, post);
+				this.setState({postArray: updatedPostArray});
 			});
 		});
 
