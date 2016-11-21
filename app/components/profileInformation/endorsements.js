@@ -53,7 +53,7 @@ var endorsement = React.createClass({
 			for(var i = 0; i < this.state.endorsements.length; i++){
 				if(this.state.endorsements[i].endorsedById == this.state.logged_in_user_id){
 					index = i;
-					console.log("match at index: "+i);
+					//console.log("match at index: "+i);
 					this.setState({endorsed: true});
 				}
 			}
