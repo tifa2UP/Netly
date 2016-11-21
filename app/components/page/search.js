@@ -36,10 +36,9 @@ var Search = React.createClass({
         return (
             <form className="navbar-form pull-left" onChange={this.handleSearch}>
                 <div className="form-group">
-                    <input type="text" className="form-control" ref="search" placeholder="Search for people"/>
+                    <input type="text" className="form-control navbar-search" ref="search" placeholder="Search for people"/>
                 </div>
-                <button className="btn btn-default"><span className='glyphicon glyphicon-search' title="Search"></span></button>
-                {advancedSearch}
+                 {advancedSearch}
             </form>
         )
     }

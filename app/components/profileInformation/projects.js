@@ -166,9 +166,9 @@ var Project = React.createClass({
 
 	projectHeading: function(){
 		if(this.props.isCurrentUser){
-			return <h2 style={{color: "#0077B5"}}>Projects <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Project"></span></button></h2>
+			return <h4 className="profile-heading"> Projects <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Project"></span></button></h4>
 		}else{
-			return <h2 style={{color: "#0077B5"}}>Projects</h2>
+			return <h4>Projects</h4>
 		}
 	},
 
@@ -267,6 +267,7 @@ var Project = React.createClass({
 			<div>
 				{this.projectHeading()}
 				{show}
+				<hr></hr>
 			</div>
 		)
 	},

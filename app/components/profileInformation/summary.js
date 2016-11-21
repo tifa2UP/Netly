@@ -71,7 +71,7 @@ var Summary = React.createClass({
 
 		return(
 			<div>
-				<h4>Summary {editButton}</h4>
+				<h4 className="profile-heading">Summary {editButton}</h4>
 				{this.state.summary}
 				<hr></hr>
 			</div>
@@ -81,7 +81,7 @@ var Summary = React.createClass({
 	editingSummary: function(){
 		return(
 			<div>
-				<h3>About</h3>
+				<h4>About</h4>
 				<textarea className="form-control" rows="6" style={{width: '100%'}} ref="newSummary" defaultValue={this.state.summary} />
 				<center>
 					<div className="btn btn-toolbar">

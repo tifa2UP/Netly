@@ -28,13 +28,7 @@ body {
     font-size: 90%;
     margin-left: 30px;
 }
-.glyphicon-home {
-    color: white;
-}
-.glyphicon-cog {
-    color: white;
-}
-.glyphicon-off {
+.navbar-icon {
     color: white;
 }
 
@@ -58,4 +52,7 @@ body {
 
 .profile-container{
     margin-top: 20px;
+}
+.navbar-search{
+    width: 200% !important;
 }

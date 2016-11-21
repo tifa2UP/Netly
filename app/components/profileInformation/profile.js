@@ -99,7 +99,7 @@ var Profile = React.createClass({
 				{show}
 			</div>
 		);
-	}
+	},
     render: function(){
         return (
             <div className="profile">
