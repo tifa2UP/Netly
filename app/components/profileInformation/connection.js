@@ -82,6 +82,9 @@ var Connection = React.createClass({
 
 		var connectionOtherRef = firebase.database().ref().child('connections/' + this.state.pageID + '/' + this.state.currentUserID);
 		connectionOtherRef.remove();
+		
+		var endorsementRef = firebase.database().ref().child('user-endorsement/' + this.state.pageID + '/' + this.state.currentUserID);
+		endorsementRef.remove();
 	},
 
 

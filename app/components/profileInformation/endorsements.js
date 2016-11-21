@@ -19,6 +19,7 @@ var endorsement = React.createClass({
 	},
 	
 	componentWillMount: function(){
+	
 		this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
 			this.setState({logged_in_user_id: user.uid});
 			
@@ -127,11 +128,11 @@ var endorsement = React.createClass({
 
 		if(this.state.editing){
 			var endorsementUpdate = {};
-			endorsementUpdate['/user-endorsement/' + this.props.pageID + '/' + this.state.endorsements[this.state.indexToEdit].key] = endorsementData;
+			endorsementUpdate['user-endorsement/' + this.props.pageID + '/' + this.state.logged_in_user_id] = endorsementData;
 			firebase.database().ref().update(endorsementUpdate);
 		}else{
-			var newendorsementKey = firebase.database().ref().child('endorsement').push().key;
-			firebase.database().ref('/user-endorsement/' + this.props.pageID + '/' + newendorsementKey).set(endorsementData);
+			var newendoresement = firebase.database().ref().child('user-endorsement/' + this.props.pageID + '/' + this.state.logged_in_user_id).set(endorsementData);
+
 		}
 		
 		this.setState({endorsed: true});
@@ -141,7 +142,7 @@ var endorsement = React.createClass({
 	},
 
 	handleRemoveExisting: function(){
-		var endorsementRef = firebase.database().ref('user-endorsement/' + this.props.pageID + '/' + this.state.endorsements[this.state.indexToEdit].key);
+		var endorsementRef = firebase.database().ref('user-endorsement/' + this.props.pageID + '/' + this.state.logged_in_user_id);
 		endorsementRef.remove();
 
 		this.setState({endorsed: false});
@@ -215,10 +216,9 @@ var endorsement = React.createClass({
 							<Link to={"/users/"+ endorsement.endorsedById}>{endorsement.endorsedBy}</Link>
 								<blockquote>
 									"{endorsement.msg}"
-								</blockquote>
 								{ (this.state.endorsed && endorsement.endorsedById==this.state.logged_in_user_id) ? <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}>
 								<span className="glyphicon glyphicon-pencil" title="Edit endorsement"></span>
-								</button> : null }
+								</button> : null }</blockquote>
 			       		</div>
 			   		))}
 				</div>
