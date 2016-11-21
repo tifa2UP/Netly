@@ -65,7 +65,7 @@ var Connection = React.createClass({
 		this.connectionRef.off();
 		this.connectionOtherRef.off();
 		this.endorsementRef.off();
-		this.endorsementRef.off();
+		this.endorsementOtherRef.off();
 		this.connectionRefUpdates.off();
 	},
 

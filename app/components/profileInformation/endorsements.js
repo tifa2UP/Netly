@@ -15,7 +15,8 @@ var endorsement = React.createClass({
 			endorsements: [], 
 			currentUserID: "",
 			id: this.props.pageID,
-			pageID: ""};
+			pageID: "",
+            imgURL: ""};
 	},
 	
 	componentWillMount: function(){
@@ -98,7 +99,7 @@ var endorsement = React.createClass({
 			}
 			if(!match){
 					this.setState({endorsed: false});
-					console.log("no match");
+					//console.log("no match");
 			}
         });
 	},
