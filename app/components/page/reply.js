@@ -6,7 +6,7 @@ var hashHistory = require('react-router').hashHistory;
 
 //customize date for rendering
 var dateTimeCustomization = {
-    weekday: "long",  month: "short",
+    year: "numeric", month: "short",
     day: "numeric", hour: "2-digit", minute: "2-digit"
 }
 
@@ -23,11 +23,18 @@ var Reply = React.createClass({
             catch(e){};
         }
     },
+
     componentWillMount: function(){
         this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id);
         this.postReplyRef.on('child_added', snap=>{
-            this.state.replies.push(snap.val());
-            this.setState({replies: this.state.replies});
+            var replyInfo = snap.val();
+
+            var userRef = firebase.database().ref('users/'+ replyInfo.user_id);
+            userRef.once('value', snap=>{
+                replyInfo.user_imgurl = snap.val().imageURL;
+                this.state.replies.push(replyInfo);
+                this.setState({replies: this.state.replies});
+            });
         });
     },
 
@@ -37,8 +44,14 @@ var Reply = React.createClass({
 
         this.postReplyRef = firebase.database().ref('post-reply').child(nextProps.post_id);
         this.postReplyRef.on('child_added', snap=>{
-            this.state.replies.push(snap.val());
-            this.setState({replies: this.state.replies});
+            var replyInfo = snap.val();
+
+            var userRef = firebase.database().ref('users/'+ replyInfo.user_id);
+            userRef.once('value', snap=>{
+                replyInfo.user_imgurl = snap.val().imageURL;
+                this.state.replies.push(replyInfo);
+                this.setState({replies: this.state.replies});
+            });
         });
     },
 
@@ -62,14 +75,30 @@ var Reply = React.createClass({
             <div className="replies">
                 {this.state.replies.map((reply,index) => (
                     <div key={index}>
-                        <Link to={"/users/"+reply.user_id}> {reply.user_name} </Link> on {(new Date(reply.post_time)).toLocaleTimeString("en-US", dateTimeCustomization)} <br/>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td rowSpan='2' style={{padding: '0 5px 0 0'}}>
+                                        <img src={reply.user_imgurl} width="50" height="50" style={{objectFit: 'cover'}}/>
+                                    </td>
+                                    <td style={{padding: '0 0 0 5px'}}>
+                                        <Link to={"/users/"+reply.user_id}> {reply.user_name}</Link>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style={{padding: '0 0 0 5px'}}>
+                                        {(new Date(reply.post_time)).toLocaleTimeString("en-US", dateTimeCustomization)}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                         <blockquote>
                             "{reply.body}"<br />
                         </blockquote>
                     </div>
                 ))}
-                <input type="text" onKeyPress={this.handleKeyPress} ref="theReply" className="form-control" placeholder="Reply" id="reply"/>
-                <button type="button" className="btn btn-primary" onClick={this.handlePostReply}>Submit</button>
+                <input type="text" onKeyPress={this.handleKeyPress} ref="theReply" className="form-control" placeholder="Reply to post..." id="reply"/>
             </div>
         )
     }

@@ -20,22 +20,15 @@ var Home = React.createClass({
 		//for each child added to post, push to postArray
 		this.postsRef.on("child_added", snap => {
 			var post = snap.val();
-			var postID = snap.ref.key;
+			post.post_id = snap.ref.key;
 
 			var userRef = firebase.database().ref('users/'+ post.user_id);
 			userRef.once('value', snap=>{
-				var newPostWithId = {
-					user_id: post.user_id,
-					user_name: post.user_name,
-					body: post.body,
-					created_at: post.created_at,
-					likes: post.likes,
-					post_id: postID,
-					user_imgurl: snap.val().imageURL
-				};
+
+				post.user_imgurl = snap.val().imageURL;
 				
 				var updatedPostArray = this.state.postArray;
-				updatedPostArray.push(newPostWithId);
+				updatedPostArray.push(post);
 				this.setState({postArray : updatedPostArray});
 			});
 		});
@@ -43,29 +36,22 @@ var Home = React.createClass({
 		//for each child changed to post, replace that post with the post already in postArray
 		this.postsRef.on("child_changed", snap => {
 			var post = snap.val();
-			var postID = snap.ref.key;
+			post.post_id = snap.ref.key;
 
 			var userRef = firebase.database().ref('users/'+ post.user_id);
 			userRef.once('value', snap=>{
-				var updatedPost = {
-					user_id: post.user_id,
-					user_name: post.user_name,
-					body: post.body,
-					created_at: post.created_at,
-					likes: post.likes,
-					post_id: postID,
-					user_imgurl: snap.val().imageURL
-				};
+
+				post.user_imgurl = snap.val().imageURL;
 
 				var index;
 				for(var i = 0; i < this.state.postArray.length; i++){
-					if(this.state.postArray[i].post_id == updatedPost.post_id){
+					if(this.state.postArray[i].post_id == post.post_id){
 						index = i;
 					}
 				}
 
 				var updatedPostArray = this.state.postArray;
-				updatedPostArray.splice(index, 1, updatedPost);
+				updatedPostArray.splice(index, 1, post);
 				this.setState({postArray: updatedPostArray});
 			});
 		});
@@ -163,28 +149,27 @@ var Home = React.createClass({
 
 		return (
 			<div>
-				<h1>Connection Feed</h1><br />
+				<center><h1>Connection Feed</h1></center><br />
 				<input type="text" ref="body" placeholder="What are you thinking about?" onKeyPress={this.handleKeyPress} className="form-control update-post"/><br />
-				<center><button className="btn btn-primary" onClick={this.handlePost}>Post</button></center><br />
 				{reversedPost.map((post,index) => (
         			<div key={index} className="post">
         				<table>
-        				<tbody>
-        				<tr>
-        					<td rowSpan='2' style={{padding: '0 5px 0 0'}}>
-        						<img src={post.user_imgurl} width="50" height="50" style={{objectFit: 'cover'}}/>
-        					</td>
-        					<td style={{padding: '0 0 0 5px'}}>
-        						<Link to={"/users/"+post.user_id}>{post.user_name}</Link>
-        					</td>
-        				</tr>
+	        				<tbody>
+		        				<tr>
+		        					<td rowSpan='2' style={{padding: '0 5px 0 0'}}>
+		        						<img src={post.user_imgurl} width="50" height="50" style={{objectFit: 'cover'}}/>
+		        					</td>
+		        					<td style={{padding: '0 0 0 5px'}}>
+		        						<Link to={"/users/"+post.user_id}>{post.user_name}</Link>
+		        					</td>
+		        				</tr>
 
-        				<tr>
-        					<td style={{padding: '0 0 0 5px'}}>
-        						{(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}
-        					</td>
-        				</tr>
-        				</tbody>
+		        				<tr>
+		        					<td style={{padding: '0 0 0 5px'}}>
+		        						{(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}
+		        					</td>
+		        				</tr>
+	        				</tbody>
         				</table>
         				<blockquote>
         					"{post.body}"<br />

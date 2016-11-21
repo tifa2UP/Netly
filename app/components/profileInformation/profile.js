@@ -70,17 +70,11 @@ var Profile = React.createClass({
 		}else{
 			show = 	<div>
 						<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						
 						<Experience pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						
 						<Projects pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						
 						<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						
 						<Skills pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						
 						<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						
 					</div>
 		}
 
@@ -89,16 +83,6 @@ var Profile = React.createClass({
 				<center>
 					<div className="container profile-container">
 	                    <center>
-	                        {/*<div  className="col-md-6 profile-img">
-	                            <ProfileImage pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-	                        </div>
-	                        <div className="col-md-6 profile-details ">
-	                            <h1>{this.state.user_name}</h1>
-	                            <h4>500+ Connections</h4>
-	                            <h4>Occupation here</h4>
-	                            <h4>Education here</h4>
-	                            <Connection pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
-	                        </div>*/}
 	                        <h1>{this.state.user_name}</h1>
 	                        <ProfileImage pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 	                        <Connection pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
@@ -111,33 +95,6 @@ var Profile = React.createClass({
 			</div>
 		);
 	},
-	/*
-    render: function(){
-        return (
-            <div className="profile">
-                <div className="container profile-container">
-                    <center>
-                        <div  className="col-md-4 profile-img">
-                            <ProfileImage user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
-                        </div>
-                        <div className="col-md-5 profile-details ">
-                            <h1>{this.state.user_name}</h1>
-                            <h4>500+ Connections</h4>
-                            <h4>Occupation here</h4>
-                            <h4>Education here</h4>
-                            <button className="btn btn-primary">Add connection</button>
-                        </div>
-                    </center>
-                </div>
-                <Summary user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
-                <Projects user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
-                <Education user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
-                <Interests user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
-                <Experience user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
-                <Skills user_id={this.state.currentID} isCurrentUser={this.state.isCurrentUser}/>
-            </div>
-        );
-    }*/
 });
 
 module.exports = Profile;
