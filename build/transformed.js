@@ -28276,7 +28276,11 @@
 								React.createElement(
 									'td',
 									{ rowSpan: '2', style: { padding: '0 5px 0 0' } },
-									React.createElement('img', { src: post.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
+									React.createElement(
+										Link,
+										{ to: "/users/" + post.user_id },
+										React.createElement('img', { src: post.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
+									)
 								),
 								React.createElement(
 									'td',
@@ -28446,7 +28450,11 @@
 	                            React.createElement(
 	                                'td',
 	                                { rowSpan: '2', style: { padding: '0 5px 0 0' } },
-	                                React.createElement('img', { src: reply.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
+	                                React.createElement(
+	                                    Link,
+	                                    { to: "/users/" + reply.user_id },
+	                                    React.createElement('img', { src: reply.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
+	                                )
 	                            ),
 	                            React.createElement(
 	                                'td',
