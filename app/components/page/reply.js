@@ -12,7 +12,7 @@ var dateTimeCustomization = {
 
 var Reply = React.createClass({
     getInitialState: function(){
-      return {replies: []}
+        return {replies: []}
     },
     //just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"
     handleKeyPress: function(e){
@@ -30,7 +30,7 @@ var Reply = React.createClass({
             var replyInfo = snap.val();
             replyInfo.reply_id = snap.ref.key;
             replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
-            
+
             this.state.replies.push(replyInfo);
             this.setState({replies: this.state.replies});
 
@@ -60,7 +60,7 @@ var Reply = React.createClass({
             var replyInfo = snap.val();
             replyInfo.reply_id = snap.ref.key;
             replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
-            
+
             this.state.replies.push(replyInfo);
             this.setState({replies: this.state.replies});
 
@@ -101,8 +101,9 @@ var Reply = React.createClass({
             <div className="replies">
                 {this.state.replies.map((reply,index) => (
                     <div key={index}>
-                        <table>
-                            <tbody>
+                        <div className="reply">
+                            <table>
+                                <tbody>
                                 <tr>
                                     <td rowSpan='2' style={{padding: '0 5px 0 0'}}>
                                         <Link to={"/users/"+reply.user_id}><img src={reply.user_imgurl} width="50" height="50" style={{objectFit: 'cover'}}/></Link>
@@ -113,15 +114,13 @@ var Reply = React.createClass({
                                 </tr>
 
                                 <tr>
-                                    <td style={{padding: '0 0 0 5px'}}>
-                                        {(new Date(reply.post_time)).toLocaleTimeString("en-US", dateTimeCustomization)}
+                                    <td  width="95%" style={{padding: '0 0 0 5px'}}>
+                                        {reply.body} <span className="reply-time"> {(new Date(reply.post_time)).toLocaleTimeString("en-US", dateTimeCustomization)} </span>
                                     </td>
                                 </tr>
-                            </tbody>
-                        </table>
-                        <blockquote>
-                            "{reply.body}"<br />
-                        </blockquote>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 ))}
                 <input type="text" onKeyPress={this.handleKeyPress} ref="theReply" className="form-control" placeholder="Reply to post..." id="reply"/>

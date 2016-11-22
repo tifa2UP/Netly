@@ -169,9 +169,9 @@ var Home = React.createClass({
 	        				<tbody>
 		        				<tr>
 		        					<td rowSpan='2' style={{padding: '0 5px 0 0'}}>
-		        						<Link to={"/users/"+post.user_id}><img src={post.user_imgurl} width="50" height="50" style={{objectFit: 'cover'}}/></Link>
+		        						<Link to={"/users/"+post.user_id}><img src={post.user_imgurl} width="80" height="80" style={{objectFit: 'cover'}}/></Link>
 		        					</td>
-		        					<td style={{padding: '0 0 0 5px'}}>
+		        					<td className="post-username" style={{padding: '0 0 0 5px'}}>
 		        						<Link to={"/users/"+post.user_id}>{post.user_name}</Link>
 		        					</td>
 		        				</tr>
@@ -184,7 +184,7 @@ var Home = React.createClass({
 	        				</tbody>
         				</table>
         				<blockquote>
-        					"{post.body}"<br />
+        					{post.body}<br/>
         					<button className="btn btn-default" onClick={this.handleLike.bind(null, post)}><span className="glyphicon glyphicon-thumbs-up"></span> ({post.likes})</button>
         				</blockquote>
                         <hr/>
