@@ -7,74 +7,74 @@ var Reply = require('./reply.js');
 
 var Home = React.createClass({
 
-	//initializes the postArray
-	getInitialState: function(){
-		return {postArray: []};
-	},
+    //initializes the postArray
+    getInitialState: function(){
+        return {postArray: []};
+    },
 
-	//loading all posts into the state's postArray
-	componentWillMount: function(){
-		var that = this;
-		//gets the post reference
-		this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
-		//for each child added to post, push to postArray
-		this.postsRef.on("child_added", snap => {
-			var post = snap.val();
-			post.post_id = snap.ref.key;
-			post.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
-			
-			var updatedPostArray = this.state.postArray;
-			updatedPostArray.push(post);
-			this.setState({postArray : updatedPostArray});
+    //loading all posts into the state's postArray
+    componentWillMount: function(){
+        var that = this;
+        //gets the post reference
+        this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
+        //for each child added to post, push to postArray
+        this.postsRef.on("child_added", snap => {
+            var post = snap.val();
+            post.post_id = snap.ref.key;
+            post.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
 
-			var userRef = firebase.database().ref('users/'+ post.user_id);
-			userRef.once('value', snap=>{
+            var updatedPostArray = this.state.postArray;
+            updatedPostArray.push(post);
+            this.setState({postArray : updatedPostArray});
 
-				post.user_imgurl = snap.val().imageURL;
-				
-				var index = -1;
-				for(var i = 0; i < this.state.postArray.length; i++){
-					if(this.state.postArray[i].post_id == post.post_id){
-						index = i;
-					}
-				}
+            var userRef = firebase.database().ref('users/'+ post.user_id);
+            userRef.once('value', snap=>{
 
-				var updatedPostArray = this.state.postArray;
-				updatedPostArray.splice(index, 1, post);
-				this.setState({postArray: updatedPostArray});
-			});
-		});
+                post.user_imgurl = snap.val().imageURL;
 
-		//for each child changed to post, replace that post with the post already in postArray
-		this.postsRef.on("child_changed", snap => {
-			var post = snap.val();
-			post.post_id = snap.ref.key;
+                var index = -1;
+                for(var i = 0; i < this.state.postArray.length; i++){
+                    if(this.state.postArray[i].post_id == post.post_id){
+                        index = i;
+                    }
+                }
 
-			var userRef = firebase.database().ref('users/'+ post.user_id);
-			userRef.once('value', snap=>{
+                var updatedPostArray = this.state.postArray;
+                updatedPostArray.splice(index, 1, post);
+                this.setState({postArray: updatedPostArray});
+            });
+        });
 
-				post.user_imgurl = snap.val().imageURL;
+        //for each child changed to post, replace that post with the post already in postArray
+        this.postsRef.on("child_changed", snap => {
+            var post = snap.val();
+            post.post_id = snap.ref.key;
 
-				var index;
-				for(var i = 0; i < this.state.postArray.length; i++){
-					if(this.state.postArray[i].post_id == post.post_id){
-						index = i;
-					}
-				}
+            var userRef = firebase.database().ref('users/'+ post.user_id);
+            userRef.once('value', snap=>{
 
-				var updatedPostArray = this.state.postArray;
-				updatedPostArray.splice(index, 1, post);
-				this.setState({postArray: updatedPostArray});
-			});
-		});
-	},
+                post.user_imgurl = snap.val().imageURL;
 
-	componentWillUnmount: function(){
-		this.postsRef.off();
-	},
+                var index;
+                for(var i = 0; i < this.state.postArray.length; i++){
+                    if(this.state.postArray[i].post_id == post.post_id){
+                        index = i;
+                    }
+                }
 
-	//adds the new post to the database upon clicking Post
-	handlePost: function(){
+                var updatedPostArray = this.state.postArray;
+                updatedPostArray.splice(index, 1, post);
+                this.setState({postArray: updatedPostArray});
+            });
+        });
+    },
+
+    componentWillUnmount: function(){
+        this.postsRef.off();
+    },
+
+    //adds the new post to the database upon clicking Post
+    handlePost: function(){
 
         //only saves data if the post field isn't empty
         if(this.refs.body.value){
@@ -138,62 +138,64 @@ var Home = React.createClass({
         }
     },
 
-	//just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"
-	handleKeyPress: function(e){
-		if(e.key == 'Enter'){
-			try{
-				this.handlePost();
-			}
-			catch(e){};
-		}
-	},
+    //just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"
+    handleKeyPress: function(e){
+        if(e.key == 'Enter'){
+            try{
+                this.handlePost();
+            }
+            catch(e){};
+        }
+    },
 
-	render: function(){
-		//reverse the order so that the newest posts are at the top of the array
-		var reversedPost = Array.prototype.slice.call(this.state.postArray);
-		reversedPost.reverse();
+    render: function(){
+        //reverse the order so that the newest posts are at the top of the array
+        var reversedPost = Array.prototype.slice.call(this.state.postArray);
+        reversedPost.reverse();
 
-		//customize date for rendering
-		var dateTimeCustomization = {
-   		 	year: "numeric", month: "short",
-    		day: "numeric", hour: "2-digit", minute: "2-digit"
-		}
+        //customize date for rendering
+        var dateTimeCustomization = {
+            year: "numeric", month: "short",
+            day: "numeric", hour: "2-digit", minute: "2-digit"
+        }
 
-		return (
-			<div>
-				<center><h1>Connection Feed</h1></center><br />
-				<input type="text" ref="body" placeholder="What are you thinking about?" onKeyPress={this.handleKeyPress} className="form-control update-post"/><br />
-				{reversedPost.map((post,index) => (
-        			<div key={index} className="post">
-        				<table>
-	        				<tbody>
-		        				<tr>
-		        					<td rowSpan='2' style={{padding: '0 5px 0 0'}}>
-		        						<Link to={"/users/"+post.user_id}><img src={post.user_imgurl} width="80" height="80" style={{objectFit: 'cover'}}/></Link>
-		        					</td>
-		        					<td className="post-username" style={{padding: '0 0 0 5px'}}>
-		        						<Link to={"/users/"+post.user_id}>{post.user_name}</Link>
-		        					</td>
-		        				</tr>
+        return (
+            <div>
+                <center><h1>Connection Feed</h1></center><br />
+                <div className="update-post-container">
+                    <input type="text" ref="body" placeholder="What are you thinking about?" onKeyPress={this.handleKeyPress} className="form-control update-post"/><br />
+                </div>
+                {reversedPost.map((post,index) => (
+                    <div key={index} className="post">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td rowSpan='2' style={{padding: '0 5px 0 0'}}>
+                                    <Link to={"/users/"+post.user_id}><img src={post.user_imgurl} width="80" height="80" style={{objectFit: 'cover'}}/></Link>
+                                </td>
+                                <td className="post-username" style={{padding: '0 0 0 5px'}}>
+                                    <Link to={"/users/"+post.user_id}>{post.user_name}</Link>
+                                </td>
+                            </tr>
 
-		        				<tr>
-		        					<td style={{padding: '0 0 0 5px'}}>
-		        						{(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}
-		        					</td>
-		        				</tr>
-	        				</tbody>
-        				</table>
-        				<blockquote>
-        					{post.body}<br/>
-        					<button className="btn btn-default" onClick={this.handleLike.bind(null, post)}><span className="glyphicon glyphicon-thumbs-up"></span> ({post.likes})</button>
-        				</blockquote>
+                            <tr>
+                                <td style={{padding: '0 0 0 5px'}}>
+                                    {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <blockquote>
+                            {post.body}<br/>
+                            <button className="btn btn-default" onClick={this.handleLike.bind(null, post)}><span className="glyphicon glyphicon-thumbs-up"></span> ({post.likes})</button>
+                        </blockquote>
                         <hr/>
-        				<Reply post_id={post.post_id}/>
-        			</div>
-   				))}
-			</div>
-		);
-	}
+                        <Reply post_id={post.post_id}/>
+                    </div>
+                ))}
+            </div>
+        );
+    }
 });
 
 module.exports = Home;

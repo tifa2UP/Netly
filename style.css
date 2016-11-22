@@ -12,7 +12,11 @@
 }
 
 .update-post{
-    margin-top: 20px;
+    width: 95%;
+    margin: auto;
+}
+.update-post-container{
+    text-align: center;
 }
 
 body {
@@ -22,6 +26,7 @@ body {
     background-color: white;
     margin: 20px;
     padding: 15px;
+    border-radius: 5px;
 }
 
 .replies{
@@ -87,4 +92,9 @@ pre{
 .reply-time {
     float: right;
     color: #9f9f9f;
+}
+
+blockquote{
+    padding-left: 90px;
+    border-left: 0px;
 }
