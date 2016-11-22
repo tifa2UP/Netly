@@ -98,3 +98,28 @@ blockquote{
     padding-left: 90px;
     border-left: 0px;
 }
+
+.grid-item{
+    background-color: white;
+    border-radius: 5px;
+    text-align: center;
+    margin: 5px;
+    width: 23%;
+}
+
+.grid-img{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.grid-img > h4{
+    margin-bottom: 0px;
+}
+.grid-title{
+    margin-bottom: 30px;
+}
+
+.request-button{
+    margin-top: 7px;
+    width: 80%;
+    font-size: 80%;
+}

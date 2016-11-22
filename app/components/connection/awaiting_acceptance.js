@@ -106,8 +106,8 @@ var AwaitingAcceptance = React.createClass({
 	showAwaitingAcceptance: function(user){
 		return(
 			<div>
-				<button className='btn btn-default' onClick={this.handleAcceptConnection.bind(null, user)}>Accept Connection</button>
-				<button className='btn btn-default' onClick={this.handleRemoveConnection.bind(null, user)}>Delete Request</button>
+				<button className='btn btn-primary request-button' onClick={this.handleAcceptConnection.bind(null, user)}>Accept Connection</button>
+				<button className='btn btn-default request-button' onClick={this.handleRemoveConnection.bind(null, user)}>Delete Request</button>
 			</div>
 		);
 	},
@@ -119,8 +119,8 @@ var AwaitingAcceptance = React.createClass({
 		}else{
 			showRequests = 
 				this.state.requesters.map((user,index) => (
-        			<div key={index}>
-       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover', border: "1px solid #B5A4A4"}}/> 
+        			<div className="grid-item col-md-3" key={index}>
+       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="grid-img img-circle" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> <br/>
        					{user.first + " " + user.last}</h4></Link>
         				{this.showAwaitingAcceptance(user)}
         				<br />
@@ -130,7 +130,7 @@ var AwaitingAcceptance = React.createClass({
 
 		return(
 			<div>
-				<center><h1>Requests</h1></center>
+				<center><h1 className="grid-title">Requests</h1></center>
 				{showRequests}
 			</div>
 		);
