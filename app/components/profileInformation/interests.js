@@ -69,8 +69,8 @@ var Interests = React.createClass({
 
 		return(
 			<div>
-				<h2 style={{color: "#0077B5"}}>Interests {editButton}</h2>
-				<pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{this.state.interests}</pre>
+				<h4 className="profile-heading">Interests {editButton}</h4>
+			<pre>{this.state.interests}</pre>
 			</div>
 		);
 	},
@@ -78,7 +78,7 @@ var Interests = React.createClass({
 	editingInterests: function(){
 		return(
 			<div>
-				<h3>Interests</h3>
+				<h4 className="profile-heading">Interests</h4>
 				<textarea className="form-control" rows="6" style={{width: '100%'}} ref="newInterests" defaultValue={this.state.interests}  placeholder="Ex. Hiking, singing, cooking"/>
 				<br/>
 				<center>
@@ -102,6 +102,7 @@ var Interests = React.createClass({
 		return (
 			<div>
 				{partToShow}
+				<hr/>
 			</div>
 
 		);

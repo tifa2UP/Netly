@@ -71,8 +71,9 @@ var Summary = React.createClass({
 
 		return(
 			<div>
-				<h2 style={{color: "#0077B5"}}>About {editButton}</h2>
-				<pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", background: "none", whiteSpace: "pre-wrap"}}>{this.state.summary}</pre>
+				<h4 className="profile-heading">About {editButton}</h4>
+				<pre className="summary-pre">{this.state.summary}</pre>
+				<hr></hr>
 			</div>
 		);
 	},
@@ -80,7 +81,7 @@ var Summary = React.createClass({
 	editingSummary: function(){
 		return(
 			<div>
-				<h3>About</h3>
+				<h4>About</h4>
 				<textarea className="form-control" rows="6" style={{width: '100%'}} ref="newSummary" defaultValue={this.state.summary} />
 				<center>
 					<div className="btn btn-toolbar">

@@ -1,0 +1,79 @@
+.navbar {
+    background: linear-gradient(to right, #447FD0, #2AC6CC);
+    border-radius: 0px;
+    margin-bottom: 0px;
+}
+
+#logo {
+    color: white;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    margin-right: 100px;
+    margin-left: 20px;
+}
+
+.update-post{
+    margin-top: 20px;
+}
+
+body {
+    background-color: #e7e9ec;
+}
+.post{
+    background-color: white;
+    margin: 20px;
+    padding: 10px;
+}
+
+.replies{
+    font-size: 90%;
+    margin-left: 30px;
+}
+.navbar-icon {
+    color: white;
+}
+
+.sections {
+    color: white;
+}
+
+.profile {
+    background-color: white;
+    padding: 20px;
+}
+
+.profile button {
+    border: white;
+}
+
+.profile-img{
+    text-align: right;
+    /*float: right;*/
+}
+.profile-details{
+    text-align: left;
+
+}
+
+.profile-container{
+    margin-top: 20px;
+}
+.navbar-search{
+    width: 100% !important;
+}
+.profile-heading{
+    color: #8b8d8f;
+    font-size: 200%;
+}
+
+pre{
+    padding: 0px;
+    margin: 0px !important;
+    font-family: Helvetica;
+    border: none;
+    white-space: normal;
+    background: none;
+}
+.summary-pre{
+    font-size: 14px;
+
+}

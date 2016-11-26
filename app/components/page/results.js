@@ -49,12 +49,12 @@ var Results = React.createClass({
 		return(
 			<div>
 				<center>
-					<h1>Showing results for "{this.state.prop_name}"</h1>
+					<h1 className="grid-title">Showing results for "{this.state.prop_name}"</h1>
 					<div>Your search returned {this.state.users.length} results...</div>
 				</center>
 				{this.state.users.map((user,index) => (
-        			<div key={index}>
-       					<Link to={"users/" + user.id}><h4><img src={user.imageURL} className="img-circle" alt="" width="100" height="100" style={{objectFit: 'cover', border: "1px solid #B5A4A4"}}/> 
+        			<div className="grid-item col-md-3" clkey={index}>
+       					<Link to={"users/" + user.id}><h4><img src={user.imageURL} className="img-circle grid-img" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> <br/>
        					{user.first + " " + user.last}</h4></Link>
         				<br /><br />
         			</div>

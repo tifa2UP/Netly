@@ -158,9 +158,9 @@ var Experience = React.createClass({
 
 	experienceHeading: function(){
 		if(this.props.isCurrentUser){
-			return <h2 style={{color: "#0077B5"}}>Experience <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Experience"></span></button></h2>
+			return <h4 className="profile-heading">Experience <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Experience"></span></button></h4>
 		}else{
-			return <h2 style={{color: "#0077B5"}}>Experience</h2>
+			return <h4 className="profile-heading">Experience</h4>
 		}
 	},
 
@@ -259,6 +259,7 @@ var Experience = React.createClass({
 			<div>
 				{this.experienceHeading()}
 				{show}
+				<hr></hr>
 			</div>
 		)
 	},

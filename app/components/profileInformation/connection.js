@@ -105,24 +105,24 @@ var Connection = React.createClass({
 	},
 
 	showAccepted: function(){
-		return (<button className='btn btn-default' onClick={this.handleRemoveConnection}>Remove Connection</button>);
+		return (<button className='btn btn-danger' onClick={this.handleRemoveConnection}>Remove Connection</button>);
 	},
 
 	showRequested: function(){
-		return(<button className='btn btn-default' onClick={this.handleRemoveConnection}>Undo Request</button>);
+		return(<button className='btn btn-danger' onClick={this.handleRemoveConnection}>Undo Request</button>);
 	},
 
 	showAwaitingAcceptance: function(){
 		return(
 			<div>
-				<button className='btn btn-default' onClick={this.handleAcceptConnection}>Accept Connection</button>
-				<button className='btn btn-default' onClick={this.handleRemoveConnection}>Delete Request</button>
+				<button className='btn btn-primary' onClick={this.handleAcceptConnection}>Accept Connection</button>
+				<button className='btn btn-danger' onClick={this.handleRemoveConnection}>Delete Request</button>
 			</div>
 		);
 	},
 
 	showAdd: function(){
-		return(<button className='btn btn-default' onClick={this.handleAddConnection}>Add Connection</button>);
+		return(<button className='btn btn-primary' onClick={this.handleAddConnection}>Add Connection</button>);
 	},
 
 	render: function(){

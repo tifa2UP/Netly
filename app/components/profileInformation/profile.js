@@ -2,8 +2,6 @@ var React = require('react');
 var firebase = require('firebase');
 var Link = require('react-router').Link;
 var hashHistory = require('react-router').hashHistory;
-
-//profile components
 var Summary = require('./summary.js');
 var Education = require('./education.js');
 var Projects = require('./projects.js');
@@ -20,8 +18,8 @@ var Profile = React.createClass({
 		return {user_name: "", recruiter: false, isCurrentUser: false, pageID: "", currentUserID: ""};
 	},
 
-	componentWillMount: function(){
-		var that = this;
+    componentWillMount: function(){
+        var that = this;
 
 		//sets the current pageID of the page
 		this.setState({pageID: this.props.params.id});
@@ -68,45 +66,39 @@ var Profile = React.createClass({
 		if(this.state.recruiter){
 			show = 	<div>
 						<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 						<JobListings pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
+
 						<Endorsements pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 					</div>;
 		}else{
 			show = 	<div>
 						<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 						<Experience pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 						<Projects pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 						<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 						<Skills pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 						<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 						<Endorsements pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<hr/>
 					</div>
 		}
 
 		return (
-			<div>
+			<div className="profile">
 				<center>
-					<h1>{this.state.user_name}</h1>
-					<ProfileImage pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-					<Connection pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
+					<div className="container profile-container">
+	                    <center>
+	                        <h1>{this.state.user_name}</h1>
+	                        <ProfileImage pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+	                        <Connection pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
+	                    </center>
+                	</div>
 				</center>
 				<br />
-				
 				<hr/>
 				{show}
 			</div>
 		);
-	}
+	},
 });
 
 module.exports = Profile;

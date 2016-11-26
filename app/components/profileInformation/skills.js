@@ -71,8 +71,8 @@ var Skills = React.createClass({
 
 		return(
 			<div>
-				<h2 style={{color: "#0077B5"}}>Skills {editButton}</h2>
-				<pre style={{margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap"}}>{this.state.skills}</pre>
+				<h4 className="profile-heading">Skills {editButton}</h4>
+				<pre>{this.state.skills}</pre>
 			</div>
 		);
 	},
@@ -80,7 +80,7 @@ var Skills = React.createClass({
     editingSkills: function(){
 		return(
 			<div>
-				<h3>Skills</h3>
+				<h4>Skills</h4>
 				<textarea className="form-control" rows="6" style={{width: '100%'}} ref="newSkills" defaultValue={this.state.skills}  placeholder="Ex. Microsoft Office, Java, Git"/>
 				<br/>
 				<center>
@@ -104,6 +104,7 @@ var Skills = React.createClass({
 		return (
 			<div>
 				{partToShow}
+				<hr/>
 			</div>
 
 		);

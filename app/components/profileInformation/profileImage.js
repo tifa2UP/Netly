@@ -6,7 +6,21 @@ var hashHistory = require('react-router').hashHistory;
 
 var UploadImage = React.createClass({
     getInitialState: function(){
-        return{imgURL: "", userData: {}};
+        return{
+            imgURL: "", 
+
+            userData: {}, 
+
+            style: {objectFit: 'cover', border: '1px solid #B5A4A4'},
+
+            divStyle: {
+                textAlign: 'center',
+                color: 'white',
+                position: 'relative',
+                borderRadius: '5px',
+                left: '0px',
+                zIndex: '1'
+        }};
     },
 
     componentWillMount: function(){
@@ -59,21 +73,44 @@ var UploadImage = React.createClass({
         });
     },
 
+    uploadHover: function(){
+        this.setState({style: {objectFit: 'cover', border: '1px solid black', opacity: '0.5'}});
+        this.setState({divStyle: {
+            textAlign: 'center',
+            color: 'white',
+            position: 'relative',
+            borderRadius: '5px',
+            left: '-100px',
+            zIndex: '1'
+        }});
+    },
+
+    uploadHoverOff: function(){
+        this.setState({style: {objectFit: 'cover', border: '1px solid #B5A4A4'}});
+        this.setState({divStyle: {
+            textAlign: 'center',
+            color: 'white',
+            position: 'relative',
+            borderRadius: '5px',
+            opacity: '0',
+            zIndex: '1'
+        }});
+    },
+
     render: function(){
         var showUpload;
         //shows an upload image option if currentuser
         if(this.props.isCurrentUser){
             showUpload = <label className="btn btn-file btn-link">
-                            <span className='glyphicon glyphicon-paperclip'></span>
+                            <img src={this.state.userData.imageURL} onMouseOver={this.uploadHover} onMouseOut={this.uploadHoverOff} className="" alt="" width="200" height="200" style={this.state.style}/><span className="glyphicon glyphicon-camera" style={this.state.divStyle}></span><br />
                             <input type="file" accept="image/*" onChange={this.handleUploadImage} style={{display: 'none'}} />
                         </label>
         }else{
-            showUpload = <div></div>
+            showUpload = <div><img src={this.state.userData.imageURL} className="" alt="" width="200" height="200" style={this.state.style}/><br /></div>
         }
 
         return (
             <div>
-                <img src={this.state.userData.imageURL} className="img-circle" alt="" width="200" height="200" style={{objectFit: 'cover', border: "1px solid #B5A4A4"}}/><br />
                 {showUpload}
                 <br />
             </div>

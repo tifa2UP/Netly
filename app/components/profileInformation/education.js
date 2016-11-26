@@ -158,9 +158,10 @@ var Education = React.createClass({
 
 	educationHeading: function(){
 		if(this.props.isCurrentUser){
-			return <h2 style={{color: "#0077B5"}}>Education <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Education"></span></button></h2>
+			return <div> <h4 className="profile-heading">Education <button className="btn btn-default" onClick={this.handleClickAdd}><span className="glyphicon glyphicon-plus" title="Add Education"></span></button></h4> </div>
+
 		}else{
-			return <h2 style={{color: "#0077B5"}}>Education</h2>
+			return <h4 className="profile-heading">Education</h4>
 		}
 	},
 
@@ -258,6 +259,7 @@ var Education = React.createClass({
 			<div>
 				{this.educationHeading()}
 				{show}
+				<hr />
 			</div>
 		)
 	},

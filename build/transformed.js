@@ -28108,41 +28108,52 @@
 			//for each child added to post, push to postArray
 			this.postsRef.on("child_added", snap => {
 				var post = snap.val();
-				var newPostWithId = {
-					user_id: post.user_id,
-					user_name: post.user_name,
-					body: post.body,
-					created_at: post.created_at,
-					likes: post.likes,
-					post_id: snap.ref.key
-				};
+				post.post_id = snap.ref.key;
+				post.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
 
 				var updatedPostArray = this.state.postArray;
-				updatedPostArray.push(newPostWithId);
+				updatedPostArray.push(post);
 				this.setState({ postArray: updatedPostArray });
+
+				var userRef = firebase.database().ref('users/' + post.user_id);
+				userRef.once('value', snap => {
+
+					post.user_imgurl = snap.val().imageURL;
+
+					var index = -1;
+					for (var i = 0; i < this.state.postArray.length; i++) {
+						if (this.state.postArray[i].post_id == post.post_id) {
+							index = i;
+						}
+					}
+
+					var updatedPostArray = this.state.postArray;
+					updatedPostArray.splice(index, 1, post);
+					this.setState({ postArray: updatedPostArray });
+				});
 			});
 
 			//for each child changed to post, replace that post with the post already in postArray
 			this.postsRef.on("child_changed", snap => {
 				var post = snap.val();
-				var updatedPost = {
-					user_id: post.user_id,
-					user_name: post.user_name,
-					body: post.body,
-					created_at: post.created_at,
-					likes: post.likes,
-					post_id: snap.ref.key
-				};
-				var index;
-				for (var i = 0; i < this.state.postArray.length; i++) {
-					if (this.state.postArray[i].post_id == updatedPost.post_id) {
-						index = i;
-					}
-				}
+				post.post_id = snap.ref.key;
 
-				var updatedPostArray = this.state.postArray;
-				updatedPostArray.splice(index, 1, updatedPost);
-				this.setState({ postArray: updatedPostArray });
+				var userRef = firebase.database().ref('users/' + post.user_id);
+				userRef.once('value', snap => {
+
+					post.user_imgurl = snap.val().imageURL;
+
+					var index;
+					for (var i = 0; i < this.state.postArray.length; i++) {
+						if (this.state.postArray[i].post_id == post.post_id) {
+							index = i;
+						}
+					}
+
+					var updatedPostArray = this.state.postArray;
+					updatedPostArray.splice(index, 1, post);
+					this.setState({ postArray: updatedPostArray });
+				});
 			});
 		},
 
@@ -28161,6 +28172,7 @@
 					user_name: firebase.auth().currentUser.displayName,
 					body: this.refs.body.value,
 					created_at: firebase.database.ServerValue.TIMESTAMP,
+					replies: [],
 					likes: 0
 				};
 
@@ -28230,7 +28242,7 @@
 
 			//customize date for rendering
 			var dateTimeCustomization = {
-				weekday: "long", year: "numeric", month: "short",
+				year: "numeric", month: "short",
 				day: "numeric", hour: "2-digit", minute: "2-digit"
 			};
 
@@ -28238,35 +28250,59 @@
 				'div',
 				null,
 				React.createElement(
-					'h1',
-					null,
-					'Connection Feed'
-				),
-				React.createElement('br', null),
-				React.createElement('input', { type: 'text', ref: 'body', placeholder: 'What are you thinking about?', onKeyPress: this.handleKeyPress, className: 'form-control' }),
-				React.createElement('br', null),
-				React.createElement(
 					'center',
 					null,
 					React.createElement(
-						'button',
-						{ className: 'btn btn-primary', onClick: this.handlePost },
-						'Post'
+						'h1',
+						null,
+						'Connection Feed'
 					)
 				),
 				React.createElement('br', null),
+				React.createElement('input', { type: 'text', ref: 'body', placeholder: 'What are you thinking about?', onKeyPress: this.handleKeyPress, className: 'form-control update-post' }),
+				React.createElement('br', null),
 				reversedPost.map((post, index) => React.createElement(
 					'div',
-					{ key: index },
-					'On ',
-					new Date(post.created_at).toLocaleTimeString("en-US", dateTimeCustomization),
-					', ',
+					{ key: index, className: 'post' },
 					React.createElement(
-						Link,
-						{ to: "/users/" + post.user_id },
-						post.user_name
+						'table',
+						null,
+						React.createElement(
+							'tbody',
+							null,
+							React.createElement(
+								'tr',
+								null,
+								React.createElement(
+									'td',
+									{ rowSpan: '2', style: { padding: '0 5px 0 0' } },
+									React.createElement(
+										Link,
+										{ to: "/users/" + post.user_id },
+										React.createElement('img', { src: post.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
+									)
+								),
+								React.createElement(
+									'td',
+									{ style: { padding: '0 0 0 5px' } },
+									React.createElement(
+										Link,
+										{ to: "/users/" + post.user_id },
+										post.user_name
+									)
+								)
+							),
+							React.createElement(
+								'tr',
+								null,
+								React.createElement(
+									'td',
+									{ style: { padding: '0 0 0 5px' } },
+									new Date(post.created_at).toLocaleTimeString("en-US", dateTimeCustomization)
+								)
+							)
+						)
 					),
-					' said',
 					React.createElement(
 						'blockquote',
 						null,
@@ -28283,6 +28319,7 @@
 							')'
 						)
 					),
+					React.createElement('hr', null),
 					React.createElement(Reply, { post_id: post.post_id })
 				))
 			);
@@ -28303,7 +28340,7 @@
 
 	//customize date for rendering
 	var dateTimeCustomization = {
-	    weekday: "long", month: "short",
+	    year: "numeric", month: "short",
 	    day: "numeric", hour: "2-digit", minute: "2-digit"
 	};
 
@@ -28321,11 +28358,31 @@
 	            } catch (e) {};
 	        }
 	    },
+
 	    componentWillMount: function () {
-	        this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id);
+	        this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id).orderByChild("post_time");
 	        this.postReplyRef.on('child_added', snap => {
-	            this.state.replies.push(snap.val());
+	            var replyInfo = snap.val();
+	            replyInfo.reply_id = snap.ref.key;
+	            replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+
+	            this.state.replies.push(replyInfo);
 	            this.setState({ replies: this.state.replies });
+
+	            var userRef = firebase.database().ref('users/' + replyInfo.user_id);
+	            userRef.once('value', snap => {
+	                replyInfo.user_imgurl = snap.val().imageURL;
+
+	                var index = -1;
+	                for (var i = 0; i < this.state.replies.length; i++) {
+	                    if (this.state.replies[i].reply_id == replyInfo.reply_id) {
+	                        index = i;
+	                    }
+	                }
+
+	                this.state.replies.splice(index, 1, replyInfo);
+	                this.setState({ replies: this.state.replies });
+	            });
 	        });
 	    },
 
@@ -28335,8 +28392,27 @@
 
 	        this.postReplyRef = firebase.database().ref('post-reply').child(nextProps.post_id);
 	        this.postReplyRef.on('child_added', snap => {
-	            this.state.replies.push(snap.val());
+	            var replyInfo = snap.val();
+	            replyInfo.reply_id = snap.ref.key;
+	            replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+
+	            this.state.replies.push(replyInfo);
 	            this.setState({ replies: this.state.replies });
+
+	            var userRef = firebase.database().ref('users/' + replyInfo.user_id);
+	            userRef.once('value', snap => {
+	                replyInfo.user_imgurl = snap.val().imageURL;
+
+	                var index = -1;
+	                for (var i = 0; i < this.state.replies.length; i++) {
+	                    if (this.state.replies[i].reply_id == replyInfo.reply_id) {
+	                        index = i;
+	                    }
+	                }
+
+	                this.state.replies.splice(index, 1, replyInfo);
+	                this.setState({ replies: this.state.replies });
+	            });
 	        });
 	    },
 
@@ -28358,21 +28434,50 @@
 	    render: function () {
 	        return React.createElement(
 	            'div',
-	            null,
+	            { className: 'replies' },
 	            this.state.replies.map((reply, index) => React.createElement(
 	                'div',
 	                { key: index },
 	                React.createElement(
-	                    Link,
-	                    { to: "/users/" + reply.user_id },
-	                    ' ',
-	                    reply.user_name,
-	                    ' '
+	                    'table',
+	                    null,
+	                    React.createElement(
+	                        'tbody',
+	                        null,
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'td',
+	                                { rowSpan: '2', style: { padding: '0 5px 0 0' } },
+	                                React.createElement(
+	                                    Link,
+	                                    { to: "/users/" + reply.user_id },
+	                                    React.createElement('img', { src: reply.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
+	                                )
+	                            ),
+	                            React.createElement(
+	                                'td',
+	                                { style: { padding: '0 0 0 5px' } },
+	                                React.createElement(
+	                                    Link,
+	                                    { to: "/users/" + reply.user_id },
+	                                    ' ',
+	                                    reply.user_name
+	                                )
+	                            )
+	                        ),
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'td',
+	                                { style: { padding: '0 0 0 5px' } },
+	                                new Date(reply.post_time).toLocaleTimeString("en-US", dateTimeCustomization)
+	                            )
+	                        )
+	                    )
 	                ),
-	                ' on ',
-	                new Date(reply.post_time).toLocaleTimeString("en-US", dateTimeCustomization),
-	                ' ',
-	                React.createElement('br', null),
 	                React.createElement(
 	                    'blockquote',
 	                    null,
@@ -28382,12 +28487,7 @@
 	                    React.createElement('br', null)
 	                )
 	            )),
-	            React.createElement('input', { type: 'text', onKeyPress: this.handleKeyPress, ref: 'theReply', className: 'form-control', placeholder: 'Reply', id: 'reply' }),
-	            React.createElement(
-	                'button',
-	                { type: 'button', className: 'btn btn-primary', onClick: this.handlePostReply },
-	                'Submit'
-	            )
+	            React.createElement('input', { type: 'text', onKeyPress: this.handleKeyPress, ref: 'theReply', className: 'form-control', placeholder: 'Reply to post...', id: 'reply' })
 	        );
 	    }
 	});
@@ -28454,92 +28554,111 @@
 	        this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
 	            this.setState({ isLoggedIn: null != user });
 	            this.setState({ recruiter: this.state.isLoggedIn == false ? false : null });
-	            this.setState({ name: user.displayName });
-	            this.setState({ user_id: user.uid });
+	            this.setState({ name: this.state.isLoggedIn ? user.displayName : null });
+	            this.setState({ user_id: this.state.isLoggedIn ? user.uid : null });
 
-	            this.userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
-	            this.userRef.on("value", snap => {
-	                var user = snap.val();
-	                this.setState({ imgURL: user.imageURL });
-	                this.setState({ recruiter: user == null || !user.recruiter ? false : true });
-	            });
+	            if (this.state.isLoggedIn) {
+	                this.userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
+	                this.userRef.on("value", snap => {
+	                    var user = snap.val();
+	                    this.setState({ imgURL: user.imageURL });
+	                    this.setState({ recruiter: user == null || !user.recruiter ? false : true });
+	                });
 
-	            this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
-	            this.connectionRef.on("child_added", snap => {
-	                if (snap.val()) {
-	                    this.state.requests.push(snap.ref.key);
-	                    this.setState({ requests: this.state.requests });
-	                }
-	            });
+	                this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
+	                this.connectionRef.on("child_added", snap => {
+	                    if (snap.val()) {
+	                        var requesterID = snap.ref.key;
+	                        var requesterRef = firebase.database().ref().child('users/' + requesterID);
+	                        requesterRef.once("value", snap => {
+	                            var userData = snap.val();
+	                            if (userData) {
+	                                this.state.requests.push(requesterID);
+	                                this.setState({ requests: this.state.requests });
+	                            }
+	                        });
+	                    }
+	                });
 
-	            this.connectionRefUpdate = firebase.database().ref().child('connections/' + user.uid);
-	            this.connectionRefUpdate.on("child_changed", snap => {
-	                if (snap.val().status == 'accepted') {
+	                this.connectionRefUpdate = firebase.database().ref().child('connections/' + user.uid);
+	                this.connectionRefUpdate.on("child_changed", snap => {
+	                    if (snap.val().status == 'accepted') {
+	                        var index = this.state.requests.indexOf(snap.ref.key);
+	                        if (index >= 0) {
+	                            this.state.requests.splice(index, 1);
+	                            this.setState({ requests: this.state.requests });
+	                        }
+	                    }
+	                });
+
+	                this.connectionRefRemoved = firebase.database().ref().child('connections/' + user.uid);
+	                this.connectionRefRemoved.on("child_removed", snap => {
 	                    var index = this.state.requests.indexOf(snap.ref.key);
 	                    if (index >= 0) {
 	                        this.state.requests.splice(index, 1);
 	                        this.setState({ requests: this.state.requests });
 	                    }
-	                }
-	            });
-
-	            this.connectionRefRemoved = firebase.database().ref().child('connections/' + user.uid);
-	            this.connectionRefRemoved.on("child_removed", snap => {
-	                var index = this.state.requests.indexOf(snap.ref.key);
-	                if (index >= 0) {
-	                    this.state.requests.splice(index, 1);
-	                    this.setState({ requests: this.state.requests });
-	                }
-	            });
+	                });
+	            }
 	        });
 	    },
 
 	    componentWillReceiveProps: function (nextProps) {
 	        var that = this;
+	        this.unsubscribe();
 	        //this.state.requests.splice(0, this.state.requests.length);
 
 	        this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
 	            this.setState({ isLoggedIn: null != user });
 	            this.setState({ recruiter: this.state.isLoggedIn == false ? false : null });
-	            this.setState({ name: user.displayName });
-	            this.setState({ user_id: user.uid });
+	            this.setState({ name: this.state.isLoggedIn ? user.displayName : null });
+	            this.setState({ user_id: this.state.isLoggedIn ? user.uid : null });
 
-	            this.userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
-	            this.userRef.on("value", snap => {
-	                var user = snap.val();
-	                this.setState({ imgURL: user.imageURL });
-	                this.setState({ recruiter: user == null || !user.recruiter ? false : true });
-	            });
+	            if (this.state.isLoggedIn) {
+	                this.userRef = firebase.database().ref().child('users/' + firebase.auth().currentUser.uid);
+	                this.userRef.on("value", snap => {
+	                    var user = snap.val();
+	                    this.setState({ imgURL: user.imageURL });
+	                    this.setState({ recruiter: user == null || !user.recruiter ? false : true });
+	                });
 
-	            this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
-	            this.connectionRef.on("child_added", snap => {
-	                if (snap.val()) {
-	                    if (this.state.requests.indexOf(snap.ref.key) < 0) {
-	                        this.state.requests.push(snap.ref.key);
-	                        this.setState({ requests: this.state.requests });
+	                this.connectionRef = firebase.database().ref().child('connections/' + user.uid).orderByChild('status').equalTo('awaiting-acceptance');
+	                this.connectionRef.on("child_added", snap => {
+	                    if (snap.val()) {
+	                        var requesterID = snap.ref.key;
+	                        var requesterRef = firebase.database().ref().child('users/' + requesterID);
+	                        requesterRef.once("value", snap => {
+	                            var userData = snap.val();
+	                            if (userData) {
+	                                if (this.state.requests.indexOf(snap.ref.key) < 0) {
+	                                    this.state.requests.push(snap.ref.key);
+	                                    this.setState({ requests: this.state.requests });
+	                                }
+	                            }
+	                        });
 	                    }
-	                }
-	            });
+	                });
 
-	            this.connectionRefUpdate = firebase.database().ref().child('connections/' + user.uid);
-	            this.connectionRefUpdate.on("child_changed", snap => {
-	                if (snap.val().status == 'accepted') {
+	                this.connectionRefUpdate = firebase.database().ref().child('connections/' + user.uid);
+	                this.connectionRefUpdate.on("child_changed", snap => {
+	                    if (snap.val().status == 'accepted') {
+	                        var index = this.state.requests.indexOf(snap.ref.key);
+	                        if (index >= 0) {
+	                            this.state.requests.splice(index, 1);
+	                            this.setState({ requests: this.state.requests });
+	                        }
+	                    }
+	                });
+
+	                this.connectionRefRemoved = firebase.database().ref().child('connections/' + user.uid);
+	                this.connectionRefRemoved.on("child_removed", snap => {
 	                    var index = this.state.requests.indexOf(snap.ref.key);
 	                    if (index >= 0) {
 	                        this.state.requests.splice(index, 1);
 	                        this.setState({ requests: this.state.requests });
 	                    }
-	                }
-	            });
-
-	            this.connectionRefRemoved = firebase.database().ref().child('connections/' + user.uid);
-	            this.connectionRefRemoved.on("child_removed", snap => {
-	                var index = this.state.requests.indexOf(snap.ref.key);
-	                if (index >= 0) {
-	                    this.state.requests.splice(index, 1);
-	                    this.setState({ requests: this.state.requests });
-	                }
-	            });
+	                });
+	            }
 	        });
 	    },
 
@@ -28560,19 +28679,7 @@
 
 	        var navClassName;
 
-	        var style;
 	        var div;
-	        if (this.state.requests.length > 0) {
-	            style = {
-	                //color: 'red',
-	                //border: '1px solid black',
-	                //position: 'absolute',
-	                //top: '15',
-	                //right: '10'
-	            };
-	        } else {
-	            style = {};
-	        }
 
 	        var divStyle = {
 	            fontSize: '10px',
@@ -28606,7 +28713,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/logout', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-off', title: 'Logout' })
+	                    React.createElement('span', { className: 'glyphicon glyphicon-off navbar-icon', title: 'Logout' })
 	                )
 	            );
 	            profile = React.createElement(
@@ -28619,13 +28726,14 @@
 	                )
 	            );
 	            signUp = null;
+
 	            accountSettings = React.createElement(
 	                'li',
 	                null,
 	                React.createElement(
 	                    Link,
 	                    { to: '/accountSettings', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-cog', title: 'Settings' })
+	                    React.createElement('span', { className: 'glyphicon glyphicon-cog navbar-icon', title: 'Settings' })
 	                )
 	            );
 	            requests = React.createElement(
@@ -28634,7 +28742,7 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/requests', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-bell', title: 'Requests', style: style }),
+	                    React.createElement('span', { className: 'glyphicon glyphicon-bell navbar-icon', title: 'Requests' }),
 	                    div
 	                )
 	            );
@@ -28644,14 +28752,15 @@
 	                React.createElement(
 	                    Link,
 	                    { to: '/connections', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-globe', title: 'Connections' })
+	                    React.createElement('span', { className: 'glyphicon glyphicon-globe navbar-icon', title: 'Connections' })
 	                )
 	            );
 	            companies = React.createElement(
 	                Link,
 	                { to: '/companies', className: 'navbar-brand' },
-	                React.createElement('span', { className: 'glyphicon glyphicon-briefcase', title: 'Companies' })
+	                React.createElement('span', { className: 'glyphicon glyphicon-briefcase navbar-icon', title: 'Companies' })
 	            );
+
 	            search = React.createElement(Search, { isRecruiter: this.state.recruiter });
 
 	            //if the user is not logged in, show the login and signup links
@@ -28694,7 +28803,7 @@
 	            null,
 	            React.createElement(
 	                'nav',
-	                { className: navClassName },
+	                { className: 'navbar navbar-default navbar-static-top' },
 	                React.createElement(
 	                    'div',
 	                    { className: 'container' },
@@ -28704,7 +28813,7 @@
 	                        React.createElement(
 	                            Link,
 	                            { to: '/', className: 'navbar-brand' },
-	                            React.createElement('span', { className: 'glyphicon glyphicon-home', title: 'Home' })
+	                            React.createElement('span', { className: 'glyphicon glyphicon-home navbar-icon', title: 'Home' })
 	                        ),
 	                        companies
 	                    ),
@@ -28790,12 +28899,7 @@
 	            React.createElement(
 	                'div',
 	                { className: 'form-group' },
-	                React.createElement('input', { type: 'text', className: 'form-control', ref: 'search', placeholder: 'Search for people' })
-	            ),
-	            React.createElement(
-	                'button',
-	                { className: 'btn btn-default' },
-	                React.createElement('span', { className: 'glyphicon glyphicon-search', title: 'Search' })
+	                React.createElement('input', { type: 'text', className: 'form-control navbar-search', ref: 'search', placeholder: 'Search for people' })
 	            ),
 	            advancedSearch
 	        );
@@ -28915,8 +29019,6 @@
 					'div',
 					null,
 					React.createElement(UpdatePassword, null),
-					React.createElement('br', null),
-					React.createElement(DeleteAccount, null),
 					React.createElement('br', null)
 				);
 			} else {
@@ -29161,8 +29263,6 @@
 	var firebase = __webpack_require__(172);
 	var Link = __webpack_require__(177).Link;
 	var hashHistory = __webpack_require__(177).hashHistory;
-
-	//profile components
 	var Summary = __webpack_require__(252);
 	var Education = __webpack_require__(253);
 	var Projects = __webpack_require__(254);
@@ -29230,42 +29330,42 @@
 					'div',
 					null,
 					React.createElement(Summary, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement('hr', null),
-					React.createElement(JobListings, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement('hr', null)
+					React.createElement(JobListings, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser })
 				);
 			} else {
 				show = React.createElement(
 					'div',
 					null,
 					React.createElement(Summary, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement('hr', null),
 					React.createElement(Experience, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement('hr', null),
 					React.createElement(Projects, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement('hr', null),
 					React.createElement(Education, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement('hr', null),
 					React.createElement(Skills, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement('hr', null),
-					React.createElement(Interests, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement('hr', null)
+					React.createElement(Interests, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser })
 				);
 			}
 
 			return React.createElement(
 				'div',
-				null,
+				{ className: 'profile' },
 				React.createElement(
 					'center',
 					null,
 					React.createElement(
-						'h1',
-						null,
-						this.state.user_name
-					),
-					React.createElement(ProfileImage, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement(Connection, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser, currentUserID: this.state.currentUserID })
+						'div',
+						{ className: 'container profile-container' },
+						React.createElement(
+							'center',
+							null,
+							React.createElement(
+								'h1',
+								null,
+								this.state.user_name
+							),
+							React.createElement(ProfileImage, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+							React.createElement(Connection, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser, currentUserID: this.state.currentUserID })
+						)
+					)
 				),
 				React.createElement('br', null),
 				React.createElement('hr', null),
@@ -29361,16 +29461,17 @@
 				'div',
 				null,
 				React.createElement(
-					'h2',
-					{ style: { color: "#0077B5" } },
+					'h4',
+					{ className: 'profile-heading' },
 					'About ',
 					editButton
 				),
 				React.createElement(
 					'pre',
-					{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", background: "none", whiteSpace: "pre-wrap" } },
+					{ className: 'summary-pre' },
 					this.state.summary
-				)
+				),
+				React.createElement('hr', null)
 			);
 		},
 
@@ -29379,7 +29480,7 @@
 				'div',
 				null,
 				React.createElement(
-					'h3',
+					'h4',
 					null,
 					'About'
 				),
@@ -29589,19 +29690,25 @@
 		educationHeading: function () {
 			if (this.props.isCurrentUser) {
 				return React.createElement(
-					'h2',
-					{ style: { color: "#0077B5" } },
-					'Education ',
+					'div',
+					null,
+					' ',
 					React.createElement(
-						'button',
-						{ className: 'btn btn-default', onClick: this.handleClickAdd },
-						React.createElement('span', { className: 'glyphicon glyphicon-plus', title: 'Add Education' })
-					)
+						'h4',
+						{ className: 'profile-heading' },
+						'Education ',
+						React.createElement(
+							'button',
+							{ className: 'btn btn-default', onClick: this.handleClickAdd },
+							React.createElement('span', { className: 'glyphicon glyphicon-plus', title: 'Add Education' })
+						)
+					),
+					' '
 				);
 			} else {
 				return React.createElement(
-					'h2',
-					{ style: { color: "#0077B5" } },
+					'h4',
+					{ className: 'profile-heading' },
 					'Education'
 				);
 			}
@@ -29797,7 +29904,8 @@
 				'div',
 				null,
 				this.educationHeading(),
-				show
+				show,
+				React.createElement('hr', null)
 			);
 		},
 
@@ -29984,8 +30092,8 @@
 		projectHeading: function () {
 			if (this.props.isCurrentUser) {
 				return React.createElement(
-					'h2',
-					{ style: { color: "#0077B5" } },
+					'h4',
+					{ className: 'profile-heading' },
 					'Projects ',
 					React.createElement(
 						'button',
@@ -29995,8 +30103,8 @@
 				);
 			} else {
 				return React.createElement(
-					'h2',
-					{ style: { color: "#0077B5" } },
+					'h4',
+					{ className: 'profile-heading' },
 					'Projects'
 				);
 			}
@@ -30216,7 +30324,8 @@
 				'div',
 				null,
 				this.projectHeading(),
-				show
+				show,
+				React.createElement('hr', null)
 			);
 		},
 
@@ -30312,14 +30421,14 @@
 				'div',
 				null,
 				React.createElement(
-					'h2',
-					{ style: { color: "#0077B5" } },
+					'h4',
+					{ className: 'profile-heading' },
 					'Interests ',
 					editButton
 				),
 				React.createElement(
 					'pre',
-					{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+					null,
 					this.state.interests
 				)
 			);
@@ -30330,8 +30439,8 @@
 				'div',
 				null,
 				React.createElement(
-					'h3',
-					null,
+					'h4',
+					{ className: 'profile-heading' },
 					'Interests'
 				),
 				React.createElement('textarea', { className: 'form-control', rows: '6', style: { width: '100%' }, ref: 'newInterests', defaultValue: this.state.interests, placeholder: 'Ex. Hiking, singing, cooking' }),
@@ -30368,7 +30477,8 @@
 			return React.createElement(
 				'div',
 				null,
-				partToShow
+				partToShow,
+				React.createElement('hr', null)
 			);
 		}
 	});
@@ -30541,8 +30651,8 @@
 		experienceHeading: function () {
 			if (this.props.isCurrentUser) {
 				return React.createElement(
-					'h2',
-					{ style: { color: "#0077B5" } },
+					'h4',
+					{ className: 'profile-heading' },
 					'Experience ',
 					React.createElement(
 						'button',
@@ -30552,8 +30662,8 @@
 				);
 			} else {
 				return React.createElement(
-					'h2',
-					{ style: { color: "#0077B5" } },
+					'h4',
+					{ className: 'profile-heading' },
 					'Experience'
 				);
 			}
@@ -30765,7 +30875,8 @@
 				'div',
 				null,
 				this.experienceHeading(),
-				show
+				show,
+				React.createElement('hr', null)
 			);
 		},
 
@@ -30863,14 +30974,14 @@
 				'div',
 				null,
 				React.createElement(
-					'h2',
-					{ style: { color: "#0077B5" } },
+					'h4',
+					{ className: 'profile-heading' },
 					'Skills ',
 					editButton
 				),
 				React.createElement(
 					'pre',
-					{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
+					null,
 					this.state.skills
 				)
 			);
@@ -30881,7 +30992,7 @@
 				'div',
 				null,
 				React.createElement(
-					'h3',
+					'h4',
 					null,
 					'Skills'
 				),
@@ -30919,7 +31030,8 @@
 			return React.createElement(
 				'div',
 				null,
-				partToShow
+				partToShow,
+				React.createElement('hr', null)
 			);
 		}
 	});
@@ -30940,7 +31052,21 @@
 	    displayName: 'UploadImage',
 
 	    getInitialState: function () {
-	        return { imgURL: "", userData: {} };
+	        return {
+	            imgURL: "",
+
+	            userData: {},
+
+	            style: { objectFit: 'cover', border: '1px solid #B5A4A4' },
+
+	            divStyle: {
+	                textAlign: 'center',
+	                color: 'white',
+	                position: 'relative',
+	                borderRadius: '5px',
+	                left: '0px',
+	                zIndex: '1'
+	            } };
 	    },
 
 	    componentWillMount: function () {
@@ -30993,6 +31119,30 @@
 	        });
 	    },
 
+	    uploadHover: function () {
+	        this.setState({ style: { objectFit: 'cover', border: '1px solid black', opacity: '0.5' } });
+	        this.setState({ divStyle: {
+	                textAlign: 'center',
+	                color: 'white',
+	                position: 'relative',
+	                borderRadius: '5px',
+	                left: '-100px',
+	                zIndex: '1'
+	            } });
+	    },
+
+	    uploadHoverOff: function () {
+	        this.setState({ style: { objectFit: 'cover', border: '1px solid #B5A4A4' } });
+	        this.setState({ divStyle: {
+	                textAlign: 'center',
+	                color: 'white',
+	                position: 'relative',
+	                borderRadius: '5px',
+	                opacity: '0',
+	                zIndex: '1'
+	            } });
+	    },
+
 	    render: function () {
 	        var showUpload;
 	        //shows an upload image option if currentuser
@@ -31000,18 +31150,23 @@
 	            showUpload = React.createElement(
 	                'label',
 	                { className: 'btn btn-file btn-link' },
-	                React.createElement('span', { className: 'glyphicon glyphicon-paperclip' }),
+	                React.createElement('img', { src: this.state.userData.imageURL, onMouseOver: this.uploadHover, onMouseOut: this.uploadHoverOff, className: '', alt: '', width: '200', height: '200', style: this.state.style }),
+	                React.createElement('span', { className: 'glyphicon glyphicon-camera', style: this.state.divStyle }),
+	                React.createElement('br', null),
 	                React.createElement('input', { type: 'file', accept: 'image/*', onChange: this.handleUploadImage, style: { display: 'none' } })
 	            );
 	        } else {
-	            showUpload = React.createElement('div', null);
+	            showUpload = React.createElement(
+	                'div',
+	                null,
+	                React.createElement('img', { src: this.state.userData.imageURL, className: '', alt: '', width: '200', height: '200', style: this.state.style }),
+	                React.createElement('br', null)
+	            );
 	        }
 
 	        return React.createElement(
 	            'div',
 	            null,
-	            React.createElement('img', { src: this.state.userData.imageURL, className: 'img-circle', alt: '', width: '200', height: '200', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
-	            React.createElement('br', null),
 	            showUpload,
 	            React.createElement('br', null)
 	        );
@@ -31125,7 +31280,7 @@
 		showAccepted: function () {
 			return React.createElement(
 				'button',
-				{ className: 'btn btn-default', onClick: this.handleRemoveConnection },
+				{ className: 'btn btn-danger', onClick: this.handleRemoveConnection },
 				'Remove Connection'
 			);
 		},
@@ -31133,7 +31288,7 @@
 		showRequested: function () {
 			return React.createElement(
 				'button',
-				{ className: 'btn btn-default', onClick: this.handleRemoveConnection },
+				{ className: 'btn btn-danger', onClick: this.handleRemoveConnection },
 				'Undo Request'
 			);
 		},
@@ -31144,12 +31299,12 @@
 				null,
 				React.createElement(
 					'button',
-					{ className: 'btn btn-default', onClick: this.handleAcceptConnection },
+					{ className: 'btn btn-primary', onClick: this.handleAcceptConnection },
 					'Accept Connection'
 				),
 				React.createElement(
 					'button',
-					{ className: 'btn btn-default', onClick: this.handleRemoveConnection },
+					{ className: 'btn btn-danger', onClick: this.handleRemoveConnection },
 					'Delete Request'
 				)
 			);
@@ -31158,7 +31313,7 @@
 		showAdd: function () {
 			return React.createElement(
 				'button',
-				{ className: 'btn btn-default', onClick: this.handleAddConnection },
+				{ className: 'btn btn-primary', onClick: this.handleAddConnection },
 				'Add Connection'
 			);
 		},
@@ -31359,7 +31514,7 @@
 			if (this.props.isCurrentUser) {
 				return React.createElement(
 					'h2',
-					{ style: { color: "#0077B5" } },
+					{ className: 'profile-heading' },
 					'Job Listings ',
 					React.createElement(
 						'button',
@@ -31370,7 +31525,7 @@
 			} else {
 				return React.createElement(
 					'h2',
-					{ style: { color: "#0077B5" } },
+					{ className: 'profile-heading' },
 					'Job Listings'
 				);
 			}
@@ -31488,7 +31643,7 @@
 						'div',
 						{ key: index },
 						React.createElement(
-							'h3',
+							'h4',
 							null,
 							React.createElement(
 								'strong',
@@ -31505,37 +31660,37 @@
 							)
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Industry: ',
 							joblisting.industry
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Employment Type: ',
 							joblisting.employmentType
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Experience Level: ',
 							joblisting.experienceLevel
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Pay Rate: ',
 							joblisting.payrate
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Location: ',
 							joblisting.location
 						),
 						React.createElement(
-							'h4',
+							'h5',
 							null,
 							React.createElement(
 								'strong',
@@ -31544,7 +31699,7 @@
 							)
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							React.createElement(
 								'pre',
@@ -31553,7 +31708,7 @@
 							)
 						),
 						React.createElement(
-							'h4',
+							'h5',
 							null,
 							React.createElement(
 								'strong',
@@ -31562,7 +31717,7 @@
 							)
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							React.createElement(
 								'pre',
@@ -31571,7 +31726,7 @@
 							)
 						),
 						React.createElement(
-							'h4',
+							'h5',
 							null,
 							React.createElement(
 								'strong',
@@ -31580,7 +31735,7 @@
 							)
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							React.createElement(
 								'pre',
@@ -31598,7 +31753,7 @@
 						'div',
 						{ key: index },
 						React.createElement(
-							'h3',
+							'h4',
 							null,
 							React.createElement(
 								'strong',
@@ -31609,37 +31764,37 @@
 							)
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Industry: ',
 							joblisting.industry
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Employment Type: ',
 							joblisting.employmentType
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Experience Level: ',
 							joblisting.experienceLevel
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Pay Rate: ',
 							joblisting.payrate
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							'Location: ',
 							joblisting.location
 						),
 						React.createElement(
-							'h4',
+							'h5',
 							null,
 							React.createElement(
 								'strong',
@@ -31648,7 +31803,7 @@
 							)
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							React.createElement(
 								'pre',
@@ -31657,7 +31812,7 @@
 							)
 						),
 						React.createElement(
-							'h4',
+							'h5',
 							null,
 							React.createElement(
 								'strong',
@@ -31666,7 +31821,7 @@
 							)
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							React.createElement(
 								'pre',
@@ -31675,7 +31830,7 @@
 							)
 						),
 						React.createElement(
-							'h4',
+							'h5',
 							null,
 							React.createElement(
 								'strong',
@@ -31684,14 +31839,15 @@
 							)
 						),
 						React.createElement(
-							'h5',
+							'h6',
 							null,
 							React.createElement(
 								'pre',
 								{ style: { margin: "-10px 0px 0px -10px", fontFamily: "helvetica", border: "none", width: "100%", background: "none", whiteSpace: "pre-wrap" } },
 								joblisting.qualitifications
 							)
-						)
+						),
+						React.createElement('br', null)
 					))
 				);
 			}
@@ -31756,16 +31912,18 @@
 					var requesterRef = firebase.database().ref().child('users/' + requesterID);
 					requesterRef.once("value", snap => {
 						var userData = snap.val();
-						var userInfo = {
-							first: userData.first,
-							last: userData.last,
-							hasProfileImage: userData.hasProfileImage,
-							user_id: snap.ref.key,
-							imageURL: userData.imageURL
-						};
-						var updatedRequesters = that.state.requesters.slice();
-						updatedRequesters.push(userInfo);
-						that.setState({ requesters: updatedRequesters });
+						if (userData) {
+							var userInfo = {
+								first: userData.first,
+								last: userData.last,
+								hasProfileImage: userData.hasProfileImage,
+								user_id: snap.ref.key,
+								imageURL: userData.imageURL
+							};
+							var updatedRequesters = that.state.requesters.slice();
+							updatedRequesters.push(userInfo);
+							that.setState({ requesters: updatedRequesters });
+						}
 					});
 				});
 
@@ -31932,15 +32090,17 @@
 					this.otherConnectionRef = firebase.database().ref().child('users/' + connectionID);
 					this.otherConnectionRef.once("value", snap => {
 						var userData = snap.val();
-						var userInfo = {
-							first: userData.first,
-							last: userData.last,
-							user_id: snap.ref.key,
-							imageURL: userData.imageURL
-						};
-						var updatedConnections = that.state.connections.slice();
-						updatedConnections.push(userInfo);
-						that.setState({ connections: updatedConnections });
+						if (userData) {
+							var userInfo = {
+								first: userData.first,
+								last: userData.last,
+								user_id: snap.ref.key,
+								imageURL: userData.imageURL
+							};
+							var updatedConnections = that.state.connections.slice();
+							updatedConnections.push(userInfo);
+							that.setState({ connections: updatedConnections });
+						}
 					});
 				});
 
