@@ -7,41 +7,36 @@ var endorsement = React.createClass({
 	getInitialState: function(){
 		return{
 			logged_in_user_name: '', 
-			logged_in_user_id: '', 
+			currentUserID: this.props.currentUserID, 
+			pageID: this.props.pageID,
+			isCurrentUser: this.props.isCurrentUser, 
 			isConnected:false, 
-			isCurrentUser: "", 
 			endorsed:false, 
 			editing: false, 
 			endorsements: [], 
-			currentUserID: "",
-			id: this.props.pageID,
-			pageID: "",
-            imgURL: ""};
+			img: "",
+			userData: {}, 
+            };
 	},
 	
 	componentWillMount: function(){
-	
-		this.unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-			this.setState({logged_in_user_id: user.uid});
-			
-			this.userRef = firebase.database().ref().child('users/'+this.state.logged_in_user_id);
-			this.userRef.on("value", snap=>{
-				var user = snap.val();
-				this.setState({logged_in_user_name: user.first + " " + user.last});
-			});
-			
-			this.connectionRef = firebase.database().ref().child('connections/'+this.props.pageID+"/"+user.uid);
-			this.connectionRef.once("value", snap=>{
-				var connection = snap.val();
-				if(connection && connection.status=="accepted"){
-					this.setState({isConnected: true});
-				}
-			});
-        });
 	},
 	
-	componentDidMount: function(){ // can't use will mount, sometimes f5 won't load data. maybe because its the last thing to be rendered and it can't sync fast enough?
-		this.endorsementRef = firebase.database().ref().child('user-endorsement/'+this.props.pageID);
+	componentDidMount: function(){
+	
+	
+		this.userRef = firebase.database().ref().child('users/'+this.props.currentUserID);
+		this.endorsementRef = firebase.database().ref().child('user-endorsement/'+this.state.pageID);
+		this.connectionRef = firebase.database().ref().child('connections/'+this.state.pageID+"/"+this.state.currentUserID);
+		
+		this.userRef.on("value", snap=>{
+			var user = snap.val();
+			this.setState({
+				userData: user,
+				logged_in_user_name: user.first + " " + user.last
+			});
+        });
+		
 		this.endorsementRef.on("child_added", snap => {
         	var endorsement = snap.val();
 			if(endorsement){
@@ -52,9 +47,8 @@ var endorsement = React.createClass({
 			
 			var index; // get index of endorsement by logged in user
 			for(var i = 0; i < this.state.endorsements.length; i++){
-				if(this.state.endorsements[i].endorsedById == this.state.logged_in_user_id){
+				if(this.state.endorsements[i].endorsedById == this.state.currentUserID){
 					index = i;
-					//console.log("match at index: "+i);
 					this.setState({endorsed: true});
 				}
 			}
@@ -77,6 +71,95 @@ var endorsement = React.createClass({
 
         this.endorsementRef.on("child_removed", snap => {
         	var endorsement = snap.val();
+			var match;
+			if(endorsement){
+				endorsement.key = snap.ref.key;
+				var index;
+				for(var i = 0; i < this.state.endorsements.length; i++){
+					if(this.state.endorsements[i].key == endorsement.key){
+						index = i;
+						if(this.state.endorsements[i].endorsedById == this.state.currentUserID){
+							match = true;
+						}
+					}
+				}
+				this.state.endorsements.splice(index, 1);
+				if(!match){
+					this.setState({endorsed: false});
+				}
+			}
+        });
+		
+		this.connectionRef.on("value", snap=>{
+			var connection = snap.val();
+			if(connection && connection.status=="accepted" && !this.state.isCurrentUser){
+				this.setState({isConnected: true});
+			}
+			else{
+				this.setState({isConnected: false});
+				this.setState({endorsed: false});
+			}
+		});
+		
+		this.connectionRef.on("child_changed", snap=>{
+			var connection = snap.val();
+			if(connection && connection.status=="accepted" && !this.state.isCurrentUser){
+				this.setState({isConnected: true});
+			}
+			else{
+				this.setState({isConnected: false});
+				this.setState({endorsed: false});
+			}
+		});
+		
+		this.connectionRef.on("child_removed", snap=>{
+			this.setState({isConnected: false});
+			this.setState({endorsed: false});
+		});
+	},
+	
+	componentWillReceiveProps: function(nextProps){
+	
+		this.userRef.off();	
+		this.endorsementRef.off();	
+		this.connectionRef.off();
+	
+		this.setState({currentUserID: nextProps.currentUserID});
+		this.setState({pageID: nextProps.pageID});
+		this.setState({isCurrentUser: nextProps.isCurrentUser});
+		this.setState({endorsements: []});	
+		
+		this.userRef = firebase.database().ref().child('users/'+nextProps.currentUserID);
+		this.endorsementRef = firebase.database().ref().child('user-endorsement/'+nextProps.pageID);
+		this.connectionRef = firebase.database().ref().child('connections/'+nextProps.pageID+"/"+nextProps.currentUserID);
+		
+		this.userRef.on("value", snap=>{
+			var user = snap.val();
+			this.setState({
+				userData: user,
+				logged_in_user_name: user.first + " " + user.last
+			});
+        });
+		
+		this.endorsementRef.on("child_added", snap => {
+        	var endorsement = snap.val();
+			if(endorsement){
+				endorsement.key = snap.ref.key;
+				this.state.endorsements.push(endorsement);
+				this.setState({endorsements: this.state.endorsements});
+			}
+			
+			var index; // get index of endorsement by logged in user
+			for(var i = 0; i < this.state.endorsements.length; i++){
+				if(this.state.endorsements[i].endorsedById == nextProps.currentUserID){
+					index = i;
+					this.setState({endorsed: true});
+				}
+			}
+        });
+
+        this.endorsementRef.on("child_changed", snap => {
+        	var endorsement = snap.val();
 			if(endorsement){
 				endorsement.key = snap.ref.key;
 				var index;
@@ -85,29 +168,64 @@ var endorsement = React.createClass({
 						index = i;
 					}
 				}
-				this.state.endorsements.splice(index, 1);
-			}
-			
-			var match = false;
-			for(var i = 0; i < this.state.endorsements.length; i++){
-				if(this.state.endorsements[i].endorsedById == this.state.logged_in_user_id){
-					index = i;
-					console.log("match at index: "+i);
-					match = true;
-					//this.setState({endorsed: true});
-				}
-			}
-			if(!match){
-					this.setState({endorsed: false});
-					//console.log("no match");
+				this.state.endorsements.splice(index, 1, endorsement);
+				this.setState({endorsements: this.state.endorsements});
 			}
         });
+
+        this.endorsementRef.on("child_removed", snap => {
+        	var endorsement = snap.val();
+			var match;
+			if(endorsement){
+				endorsement.key = snap.ref.key;
+				var index;
+				for(var i = 0; i < this.state.endorsements.length; i++){
+					if(this.state.endorsements[i].key == endorsement.key){
+						index = i;
+						if(this.state.endorsements[i].endorsedById == nextProps.currentUserID){
+							match = true;
+						}
+					}
+				}
+				this.state.endorsements.splice(index, 1);
+				if(!match){
+					this.setState({endorsed: false});
+				}
+			}
+        });
+		
+		this.connectionRef.on("value", snap=>{
+			var connection = snap.val();
+			if(connection && connection.status=="accepted" && !nextProps.isCurrentUser){
+				this.setState({isConnected: true});
+			}
+			else{
+				this.setState({isConnected: false});
+				this.setState({endorsed: false});
+			}
+		});
+		
+		this.connectionRef.on("child_changed", snap=>{
+			var connection = snap.val();
+			if(connection && connection.status=="accepted" && !nextProps.isCurrentUser){
+				this.setState({isConnected: true});
+			}
+			else{
+				this.setState({isConnected: false});
+				this.setState({endorsed: false});
+			}
+		});
+		
+		this.connectionRef.on("child_removed", snap=>{
+			this.setState({isConnected: false});
+			this.setState({endorsed: false});
+		});
 	},
-
-
 	
-	getIndexOfEndorsement: function(){
-
+	componentWillUnmount: function(){
+		this.userRef.off();	
+		this.endorsementRef.off();	
+		this.connectionRef.off();
 	},
 	
 	handleClickAdd: function(){
@@ -120,19 +238,20 @@ var endorsement = React.createClass({
 	},
 
 	handleClickSave: function(){
-	
+		console.log("this.state.img: " + this.state.userData.imageURL);
 		var endorsementData = {
-			endorsedById: this.state.logged_in_user_id,
+			img: this.state.userData.imageURL,
+			endorsedById: this.state.currentUserID,
 			endorsedBy: this.state.logged_in_user_name,
 			msg: this.refs.msg.value
 		}
 
 		if(this.state.editing){
 			var endorsementUpdate = {};
-			endorsementUpdate['user-endorsement/' + this.props.pageID + '/' + this.state.logged_in_user_id] = endorsementData;
+			endorsementUpdate['user-endorsement/' + this.state.pageID + '/' + this.state.currentUserID] = endorsementData;
 			firebase.database().ref().update(endorsementUpdate);
 		}else{
-			var newendoresement = firebase.database().ref().child('user-endorsement/' + this.props.pageID + '/' + this.state.logged_in_user_id).set(endorsementData);
+			var newendoresement = firebase.database().ref().child('user-endorsement/' + this.state.pageID + '/' + this.state.currentUserID).set(endorsementData);
 
 		}
 		
@@ -143,7 +262,7 @@ var endorsement = React.createClass({
 	},
 
 	handleRemoveExisting: function(){
-		var endorsementRef = firebase.database().ref('user-endorsement/' + this.props.pageID + '/' + this.state.logged_in_user_id);
+		var endorsementRef = firebase.database().ref('user-endorsement/' + this.state.pageID + '/' + this.state.currentUserID);
 		endorsementRef.remove();
 
 		this.setState({endorsed: false});
@@ -157,15 +276,16 @@ var endorsement = React.createClass({
 	},
 
 	endorsementHeading: function(){
-		if(!this.state.isConnected || this.state.endorsed){
-				return <h2 style={{color: "#0077B5"}}>Endorsements</h2>	
-		}else{
-				return <h2 style={{color: "#0077B5"}}>Endorsements 
+		if (this.state.isConnected && !this.state.endorsed && !this.state.isCurrentUser){
+				return <h4 className="profile-heading">Endorsements 
 					<button className="btn btn-default" onClick={this.handleClickAdd}>
 						<span className="glyphicon glyphicon-plus" title="Add endorsement">
 						</span>
 					</button>
-				</h2>
+				</h4>
+		}
+		else{
+				return <h4 className="profile-heading">Endorsements</h4>	
 		}
 	},
 
@@ -206,18 +326,20 @@ var endorsement = React.createClass({
 
 	defaultendorsement: function(){
 	
-		//console.log("this.state.logged_in_user_id: " + this.state.logged_in_user_id);
-		//console.log("this.state.isConnected: " + this.state.isConnected);
-		//console.log("this.state.endorsed: " + this.state.endorsed);
 		if(this.state.isConnected){
 			return(
 				<div>
 					{this.state.endorsements.map((endorsement,index) => (
 			        	<div key={index}>
-							<Link to={"/users/"+ endorsement.endorsedById}>{endorsement.endorsedBy}</Link>
+							<Link to={"/users/"+ endorsement.endorsedById}>
+								<img src={endorsement.img} className="img-circle grid-img" alt="" width="20" height="20" style={{objectFit: 'cover'}}/>
+							</Link>
+							<Link to={"/users/"+ endorsement.endorsedById}>
+								{endorsement.endorsedBy}
+							</Link>
 								<blockquote>
 									"{endorsement.msg}"
-								{ (this.state.endorsed && endorsement.endorsedById==this.state.logged_in_user_id) ? <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}>
+								{ (this.state.endorsed && endorsement.endorsedById==this.state.currentUserID) ? <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}>
 								<span className="glyphicon glyphicon-pencil" title="Edit endorsement"></span>
 								</button> : null }</blockquote>
 			       		</div>
@@ -229,7 +351,12 @@ var endorsement = React.createClass({
 				<div>
 					{this.state.endorsements.map((endorsement,index) => (
 			        	<div key={index}>
-			       			<Link to={"/users/"+ endorsement.endorsedById}>{endorsement.endorsedBy}</Link>
+							<Link to={"/users/"+ endorsement.endorsedById}>
+								<img src={endorsement.img} className="img-circle grid-img" alt="" width="20" height="20" style={{objectFit: 'cover'}}/>
+							</Link>
+			       			<Link to={"/users/"+ endorsement.endorsedById}>
+								{endorsement.endorsedBy}
+							</Link>
 							<blockquote>
 								"{endorsement.msg}"
 							</blockquote>
@@ -257,14 +384,6 @@ var endorsement = React.createClass({
 				{show}
 			</div>
 		)
-	},
-	
-// only need to unmount one ref that is used by multiple handlers
-	componentWillUnmount: function(){
-		this.userRef.off();	
-		this.endorsementRef.off();	
-		this.connectionRef.off();
-        this.unsubscribe();
 	},
 });
 

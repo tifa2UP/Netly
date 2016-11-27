@@ -67,8 +67,7 @@ var Profile = React.createClass({
 			show = 	<div>
 						<Summary pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 						<JobListings pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-
-						<Endorsements pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<Endorsements pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID}/>
 					</div>;
 		}else{
 			show = 	<div>
@@ -78,7 +77,7 @@ var Profile = React.createClass({
 						<Education pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 						<Skills pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
 						<Interests pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
-						<Endorsements pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser}/>
+						<Endorsements pageID={this.state.pageID} isCurrentUser={this.state.isCurrentUser} currentUserID={this.state.currentUserID} />
 					</div>
 		}
 
