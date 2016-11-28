@@ -23,8 +23,6 @@ var endorsement = React.createClass({
 	},
 	
 	componentDidMount: function(){
-	
-	
 		this.userRef = firebase.database().ref().child('users/'+this.props.currentUserID);
 		this.endorsementRef = firebase.database().ref().child('user-endorsement/'+this.state.pageID);
 		this.connectionRef = firebase.database().ref().child('connections/'+this.state.pageID+"/"+this.state.currentUserID);
@@ -119,7 +117,6 @@ var endorsement = React.createClass({
 	},
 	
 	componentWillReceiveProps: function(nextProps){
-	
 		this.userRef.off();	
 		this.endorsementRef.off();	
 		this.connectionRef.off();
@@ -293,7 +290,7 @@ var endorsement = React.createClass({
 		return(
 			<div className="col-md-12">
 				<div className="col-md-8">
-					<input type="text" ref="msg" className="form-control" placeholder="endorsement"/><br />
+					<textarea type="text" ref="msg" className="form-control" row="6" placeholder="Endorse this user!"/><br />
 					<center>
 						<div className="btn btn-toolbar">
 							<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>

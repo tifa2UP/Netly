@@ -282,6 +282,7 @@ var JobListings = React.createClass({
 			<div>
 				{this.joblistingHeading()}
 				{show}
+				<hr />
 			</div>
 		)
 	},

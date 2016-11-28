@@ -27753,13 +27753,13 @@
 	var Layout = __webpack_require__(246);
 	var AccountSettings = __webpack_require__(248);
 	var Profile = __webpack_require__(251);
-	var AwaitingAcceptance = __webpack_require__(261);
-	var Connections = __webpack_require__(262);
-	var SearchResults = __webpack_require__(263);
-	var AdvancedSearch = __webpack_require__(264);
-	var Companies = __webpack_require__(265);
+	var AwaitingAcceptance = __webpack_require__(262);
+	var Connections = __webpack_require__(263);
+	var SearchResults = __webpack_require__(264);
+	var AdvancedSearch = __webpack_require__(265);
+	var Companies = __webpack_require__(266);
 
-	var requireAuth = __webpack_require__(266);
+	var requireAuth = __webpack_require__(267);
 
 	var routes = React.createElement(
 		Router,
@@ -29280,6 +29280,7 @@
 	var ProfileImage = __webpack_require__(258);
 	var Connection = __webpack_require__(259);
 	var JobListings = __webpack_require__(260);
+	var Endorsements = __webpack_require__(261);
 
 	var Profile = React.createClass({
 		displayName: 'Profile',
@@ -29338,7 +29339,8 @@
 					'div',
 					null,
 					React.createElement(Summary, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement(JobListings, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser })
+					React.createElement(JobListings, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement(Endorsements, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser, currentUserID: this.state.currentUserID })
 				);
 			} else {
 				show = React.createElement(
@@ -29349,7 +29351,8 @@
 					React.createElement(Projects, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
 					React.createElement(Education, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
 					React.createElement(Skills, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
-					React.createElement(Interests, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser })
+					React.createElement(Interests, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser }),
+					React.createElement(Endorsements, { pageID: this.state.pageID, isCurrentUser: this.state.isCurrentUser, currentUserID: this.state.currentUserID })
 				);
 			}
 
@@ -31204,7 +31207,7 @@
 			};
 		},
 
-		componentWillMount: function () {
+		componentDidMount: function () {
 			this.setState({ currentUserID: this.props.currentUserID });
 			this.setState({ pageID: this.props.pageID });
 			this.setState({ isCurrentUser: this.props.isCurrentUser });
@@ -31254,6 +31257,9 @@
 
 		componentWillUnmount: function () {
 			this.connectionRef.off();
+			this.connectionOtherRef.off();
+			this.endorsementRef.off();
+			this.endorsementOtherRef.off();
 			this.connectionRefUpdates.off();
 		},
 
@@ -31273,6 +31279,12 @@
 
 			var connectionOtherRef = firebase.database().ref().child('connections/' + this.state.pageID + '/' + this.state.currentUserID);
 			connectionOtherRef.remove();
+
+			var endorsementRef = firebase.database().ref().child('user-endorsement/' + this.state.pageID + '/' + this.state.currentUserID);
+			endorsementRef.remove();
+
+			var endorsementOtherRef = firebase.database().ref().child('user-endorsement/' + this.state.currentUserID + '/' + this.state.pageID);
+			endorsementOtherRef.remove();
 		},
 
 		handleAcceptConnection: function () {
@@ -31876,7 +31888,8 @@
 				'div',
 				null,
 				this.joblistingHeading(),
-				show
+				show,
+				React.createElement('hr', null)
 			);
 		},
 
@@ -31891,6 +31904,455 @@
 
 /***/ },
 /* 261 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var firebase = __webpack_require__(172);
+	var Link = __webpack_require__(177).Link;
+	var hashHistory = __webpack_require__(177).hashHistory;
+
+	var endorsement = React.createClass({
+		displayName: 'endorsement',
+
+		getInitialState: function () {
+			return {
+				logged_in_user_name: '',
+				currentUserID: this.props.currentUserID,
+				pageID: this.props.pageID,
+				isCurrentUser: this.props.isCurrentUser,
+				isConnected: false,
+				endorsed: false,
+				editing: false,
+				endorsements: [],
+				img: "",
+				userData: {}
+			};
+		},
+
+		componentWillMount: function () {},
+
+		componentDidMount: function () {
+			this.userRef = firebase.database().ref().child('users/' + this.props.currentUserID);
+			this.endorsementRef = firebase.database().ref().child('user-endorsement/' + this.state.pageID);
+			this.connectionRef = firebase.database().ref().child('connections/' + this.state.pageID + "/" + this.state.currentUserID);
+
+			this.userRef.on("value", snap => {
+				var user = snap.val();
+				this.setState({
+					userData: user,
+					logged_in_user_name: user.first + " " + user.last
+				});
+			});
+
+			this.endorsementRef.on("child_added", snap => {
+				var endorsement = snap.val();
+				if (endorsement) {
+					endorsement.key = snap.ref.key;
+					this.state.endorsements.push(endorsement);
+					this.setState({ endorsements: this.state.endorsements });
+				}
+
+				var index; // get index of endorsement by logged in user
+				for (var i = 0; i < this.state.endorsements.length; i++) {
+					if (this.state.endorsements[i].endorsedById == this.state.currentUserID) {
+						index = i;
+						this.setState({ endorsed: true });
+					}
+				}
+			});
+
+			this.endorsementRef.on("child_changed", snap => {
+				var endorsement = snap.val();
+				if (endorsement) {
+					endorsement.key = snap.ref.key;
+					var index;
+					for (var i = 0; i < this.state.endorsements.length; i++) {
+						if (this.state.endorsements[i].key == endorsement.key) {
+							index = i;
+						}
+					}
+					this.state.endorsements.splice(index, 1, endorsement);
+					this.setState({ endorsements: this.state.endorsements });
+				}
+			});
+
+			this.endorsementRef.on("child_removed", snap => {
+				var endorsement = snap.val();
+				var match;
+				if (endorsement) {
+					endorsement.key = snap.ref.key;
+					var index;
+					for (var i = 0; i < this.state.endorsements.length; i++) {
+						if (this.state.endorsements[i].key == endorsement.key) {
+							index = i;
+							if (this.state.endorsements[i].endorsedById == this.state.currentUserID) {
+								match = true;
+							}
+						}
+					}
+					this.state.endorsements.splice(index, 1);
+					if (!match) {
+						this.setState({ endorsed: false });
+					}
+				}
+			});
+
+			this.connectionRef.on("value", snap => {
+				var connection = snap.val();
+				if (connection && connection.status == "accepted" && !this.state.isCurrentUser) {
+					this.setState({ isConnected: true });
+				} else {
+					this.setState({ isConnected: false });
+					this.setState({ endorsed: false });
+				}
+			});
+
+			this.connectionRef.on("child_changed", snap => {
+				var connection = snap.val();
+				if (connection && connection.status == "accepted" && !this.state.isCurrentUser) {
+					this.setState({ isConnected: true });
+				} else {
+					this.setState({ isConnected: false });
+					this.setState({ endorsed: false });
+				}
+			});
+
+			this.connectionRef.on("child_removed", snap => {
+				this.setState({ isConnected: false });
+				this.setState({ endorsed: false });
+			});
+		},
+
+		componentWillReceiveProps: function (nextProps) {
+			this.userRef.off();
+			this.endorsementRef.off();
+			this.connectionRef.off();
+
+			this.setState({ currentUserID: nextProps.currentUserID });
+			this.setState({ pageID: nextProps.pageID });
+			this.setState({ isCurrentUser: nextProps.isCurrentUser });
+			this.setState({ endorsements: [] });
+
+			this.userRef = firebase.database().ref().child('users/' + nextProps.currentUserID);
+			this.endorsementRef = firebase.database().ref().child('user-endorsement/' + nextProps.pageID);
+			this.connectionRef = firebase.database().ref().child('connections/' + nextProps.pageID + "/" + nextProps.currentUserID);
+
+			this.userRef.on("value", snap => {
+				var user = snap.val();
+				this.setState({
+					userData: user,
+					logged_in_user_name: user.first + " " + user.last
+				});
+			});
+
+			this.endorsementRef.on("child_added", snap => {
+				var endorsement = snap.val();
+				if (endorsement) {
+					endorsement.key = snap.ref.key;
+					this.state.endorsements.push(endorsement);
+					this.setState({ endorsements: this.state.endorsements });
+				}
+
+				var index; // get index of endorsement by logged in user
+				for (var i = 0; i < this.state.endorsements.length; i++) {
+					if (this.state.endorsements[i].endorsedById == nextProps.currentUserID) {
+						index = i;
+						this.setState({ endorsed: true });
+					}
+				}
+			});
+
+			this.endorsementRef.on("child_changed", snap => {
+				var endorsement = snap.val();
+				if (endorsement) {
+					endorsement.key = snap.ref.key;
+					var index;
+					for (var i = 0; i < this.state.endorsements.length; i++) {
+						if (this.state.endorsements[i].key == endorsement.key) {
+							index = i;
+						}
+					}
+					this.state.endorsements.splice(index, 1, endorsement);
+					this.setState({ endorsements: this.state.endorsements });
+				}
+			});
+
+			this.endorsementRef.on("child_removed", snap => {
+				var endorsement = snap.val();
+				var match;
+				if (endorsement) {
+					endorsement.key = snap.ref.key;
+					var index;
+					for (var i = 0; i < this.state.endorsements.length; i++) {
+						if (this.state.endorsements[i].key == endorsement.key) {
+							index = i;
+							if (this.state.endorsements[i].endorsedById == nextProps.currentUserID) {
+								match = true;
+							}
+						}
+					}
+					this.state.endorsements.splice(index, 1);
+					if (!match) {
+						this.setState({ endorsed: false });
+					}
+				}
+			});
+
+			this.connectionRef.on("value", snap => {
+				var connection = snap.val();
+				if (connection && connection.status == "accepted" && !nextProps.isCurrentUser) {
+					this.setState({ isConnected: true });
+				} else {
+					this.setState({ isConnected: false });
+					this.setState({ endorsed: false });
+				}
+			});
+
+			this.connectionRef.on("child_changed", snap => {
+				var connection = snap.val();
+				if (connection && connection.status == "accepted" && !nextProps.isCurrentUser) {
+					this.setState({ isConnected: true });
+				} else {
+					this.setState({ isConnected: false });
+					this.setState({ endorsed: false });
+				}
+			});
+
+			this.connectionRef.on("child_removed", snap => {
+				this.setState({ isConnected: false });
+				this.setState({ endorsed: false });
+			});
+		},
+
+		componentWillUnmount: function () {
+			this.userRef.off();
+			this.endorsementRef.off();
+			this.connectionRef.off();
+		},
+
+		handleClickAdd: function () {
+			this.setState({ adding: true });
+		},
+
+		handleClickEdit: function (index) {
+			this.setState({ editing: true });
+			this.setState({ indexToEdit: index });
+		},
+
+		handleClickSave: function () {
+			console.log("this.state.img: " + this.state.userData.imageURL);
+			var endorsementData = {
+				img: this.state.userData.imageURL,
+				endorsedById: this.state.currentUserID,
+				endorsedBy: this.state.logged_in_user_name,
+				msg: this.refs.msg.value
+			};
+
+			if (this.state.editing) {
+				var endorsementUpdate = {};
+				endorsementUpdate['user-endorsement/' + this.state.pageID + '/' + this.state.currentUserID] = endorsementData;
+				firebase.database().ref().update(endorsementUpdate);
+			} else {
+				var newendoresement = firebase.database().ref().child('user-endorsement/' + this.state.pageID + '/' + this.state.currentUserID).set(endorsementData);
+			}
+
+			this.setState({ endorsed: true });
+			this.setState({ editing: false });
+			this.setState({ adding: false });
+		},
+
+		handleRemoveExisting: function () {
+			var endorsementRef = firebase.database().ref('user-endorsement/' + this.state.pageID + '/' + this.state.currentUserID);
+			endorsementRef.remove();
+
+			this.setState({ endorsed: false });
+			this.setState({ editing: false });
+			this.setState({ adding: false });
+		},
+
+		handleClickCancel: function () {
+			this.setState({ editing: false });
+			this.setState({ adding: false });
+		},
+
+		endorsementHeading: function () {
+			if (this.state.isConnected && !this.state.endorsed && !this.state.isCurrentUser) {
+				return React.createElement(
+					'h4',
+					{ className: 'profile-heading' },
+					'Endorsements',
+					React.createElement(
+						'button',
+						{ className: 'btn btn-default', onClick: this.handleClickAdd },
+						React.createElement('span', { className: 'glyphicon glyphicon-plus', title: 'Add endorsement' })
+					)
+				);
+			} else {
+				return React.createElement(
+					'h4',
+					{ className: 'profile-heading' },
+					'Endorsements'
+				);
+			}
+		},
+
+		addingendorsement: function () {
+			return React.createElement(
+				'div',
+				{ className: 'col-md-12' },
+				React.createElement(
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('textarea', { type: 'text', ref: 'msg', className: 'form-control', row: '6', placeholder: 'Endorse this user!' }),
+					React.createElement('br', null),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							)
+						)
+					),
+					React.createElement('br', null)
+				)
+			);
+		},
+
+		editingendorsement: function () {
+			var indexedendorsement = this.state.endorsements[this.state.indexToEdit];
+
+			return React.createElement(
+				'div',
+				{ className: 'col-md-12' },
+				React.createElement(
+					'div',
+					{ className: 'col-md-8' },
+					React.createElement('input', { type: 'text', ref: 'msg', className: 'form-control', defaultValue: indexedendorsement.msg }),
+					React.createElement('br', null),
+					React.createElement(
+						'center',
+						null,
+						React.createElement(
+							'div',
+							{ className: 'btn btn-toolbar' },
+							React.createElement(
+								'button',
+								{ className: 'btn btn-primary', onClick: this.handleClickSave },
+								'Save'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickCancel },
+								'Cancel'
+							),
+							React.createElement(
+								'button',
+								{ className: 'btn btn-link', onClick: this.handleRemoveExisting },
+								'Remove this endorsement'
+							)
+						)
+					),
+					React.createElement('br', null)
+				)
+			);
+		},
+
+		defaultendorsement: function () {
+
+			if (this.state.isConnected) {
+				return React.createElement(
+					'div',
+					null,
+					this.state.endorsements.map((endorsement, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							Link,
+							{ to: "/users/" + endorsement.endorsedById },
+							React.createElement('img', { src: endorsement.img, className: 'img-circle grid-img', alt: '', width: '20', height: '20', style: { objectFit: 'cover' } })
+						),
+						React.createElement(
+							Link,
+							{ to: "/users/" + endorsement.endorsedById },
+							endorsement.endorsedBy
+						),
+						React.createElement(
+							'blockquote',
+							null,
+							'"',
+							endorsement.msg,
+							'"',
+							this.state.endorsed && endorsement.endorsedById == this.state.currentUserID ? React.createElement(
+								'button',
+								{ className: 'btn btn-default', onClick: this.handleClickEdit.bind(null, index) },
+								React.createElement('span', { className: 'glyphicon glyphicon-pencil', title: 'Edit endorsement' })
+							) : null
+						)
+					))
+				);
+			} else {
+				return React.createElement(
+					'div',
+					null,
+					this.state.endorsements.map((endorsement, index) => React.createElement(
+						'div',
+						{ key: index },
+						React.createElement(
+							Link,
+							{ to: "/users/" + endorsement.endorsedById },
+							React.createElement('img', { src: endorsement.img, className: 'img-circle grid-img', alt: '', width: '20', height: '20', style: { objectFit: 'cover' } })
+						),
+						React.createElement(
+							Link,
+							{ to: "/users/" + endorsement.endorsedById },
+							endorsement.endorsedBy
+						),
+						React.createElement(
+							'blockquote',
+							null,
+							'"',
+							endorsement.msg,
+							'"'
+						)
+					))
+				);
+			}
+		},
+
+		render: function () {
+			var show;
+
+			if (this.state.adding) {
+				show = this.addingendorsement();
+			} else if (this.state.editing) {
+				show = this.editingendorsement();
+			} else {
+				show = this.defaultendorsement();
+			}
+
+			return React.createElement(
+				'div',
+				null,
+				this.endorsementHeading(),
+				show
+			);
+		}
+	});
+
+	module.exports = endorsement;
+
+/***/ },
+/* 262 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -32069,7 +32531,7 @@
 	module.exports = AwaitingAcceptance;
 
 /***/ },
-/* 262 */
+/* 263 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -32208,7 +32670,7 @@
 	module.exports = AllConnections;
 
 /***/ },
-/* 263 */
+/* 264 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -32306,7 +32768,7 @@
 	module.exports = Results;
 
 /***/ },
-/* 264 */
+/* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -32495,7 +32957,7 @@
 	module.exports = AdvancedSearch;
 
 /***/ },
-/* 265 */
+/* 266 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
@@ -32579,7 +33041,7 @@
 	module.exports = Companies;
 
 /***/ },
-/* 266 */
+/* 267 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var firebase = __webpack_require__(172);
