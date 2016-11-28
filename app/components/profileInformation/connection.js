@@ -13,7 +13,7 @@ var Connection = React.createClass({
 		}
 	},
 
-	componentWillMount: function(){
+	componentDidMount: function(){
 		this.setState({currentUserID: this.props.currentUserID});
 		this.setState({pageID: this.props.pageID});
 		this.setState({isCurrentUser: this.props.isCurrentUser});
@@ -63,6 +63,9 @@ var Connection = React.createClass({
 
 	componentWillUnmount: function(){
 		this.connectionRef.off();
+		this.connectionOtherRef.off();
+		this.endorsementRef.off();
+		this.endorsementOtherRef.off();
 		this.connectionRefUpdates.off();
 	},
 
@@ -82,6 +85,12 @@ var Connection = React.createClass({
 
 		var connectionOtherRef = firebase.database().ref().child('connections/' + this.state.pageID + '/' + this.state.currentUserID);
 		connectionOtherRef.remove();
+		
+		var endorsementRef = firebase.database().ref().child('user-endorsement/' + this.state.pageID + '/' + this.state.currentUserID);
+		endorsementRef.remove();
+		
+		var endorsementOtherRef = firebase.database().ref().child('user-endorsement/' + this.state.currentUserID + '/' + this.state.pageID);
+		endorsementOtherRef.remove();
 	},
 
 
