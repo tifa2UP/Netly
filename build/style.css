@@ -12,7 +12,11 @@
 }
 
 .update-post{
-    margin-top: 20px;
+    width: 95%;
+    margin: auto;
+}
+.update-post-container{
+    text-align: center;
 }
 
 body {
@@ -21,7 +25,8 @@ body {
 .post{
     background-color: white;
     margin: 20px;
-    padding: 10px;
+    padding: 15px;
+    border-radius: 5px;
 }
 
 .replies{
@@ -75,5 +80,46 @@ pre{
 }
 .summary-pre{
     font-size: 14px;
+}
 
+.reply{
+    margin: 10px;
+}
+.post-username{
+    font-size: 150%;
+}
+
+.reply-time {
+    float: right;
+    color: #9f9f9f;
+}
+
+blockquote{
+    padding-left: 90px;
+    border-left: 0px;
+}
+
+.grid-item{
+    background-color: white;
+    border-radius: 5px;
+    text-align: center;
+    margin: 5px;
+    width: 23%;
+}
+
+.grid-img{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.grid-img > h4{
+    margin-bottom: 0px;
+}
+.grid-title{
+    margin-bottom: 30px;
+}
+
+.request-button{
+    margin-top: 7px;
+    width: 80%;
+    font-size: 80%;
 }

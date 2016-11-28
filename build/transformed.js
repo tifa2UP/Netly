@@ -28092,238 +28092,240 @@
 	var Reply = __webpack_require__(244);
 
 	var Home = React.createClass({
-		displayName: 'Home',
+	    displayName: 'Home',
 
 
-		//initializes the postArray
-		getInitialState: function () {
-			return { postArray: [] };
-		},
+	    //initializes the postArray
+	    getInitialState: function () {
+	        return { postArray: [] };
+	    },
 
-		//loading all posts into the state's postArray
-		componentWillMount: function () {
-			var that = this;
-			//gets the post reference
-			this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
-			//for each child added to post, push to postArray
-			this.postsRef.on("child_added", snap => {
-				var post = snap.val();
-				post.post_id = snap.ref.key;
-				post.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+	    //loading all posts into the state's postArray
+	    componentWillMount: function () {
+	        var that = this;
+	        //gets the post reference
+	        this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
+	        //for each child added to post, push to postArray
+	        this.postsRef.on("child_added", snap => {
+	            var post = snap.val();
+	            post.post_id = snap.ref.key;
+	            post.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
 
-				var updatedPostArray = this.state.postArray;
-				updatedPostArray.push(post);
-				this.setState({ postArray: updatedPostArray });
+	            var updatedPostArray = this.state.postArray;
+	            updatedPostArray.push(post);
+	            this.setState({ postArray: updatedPostArray });
 
-				var userRef = firebase.database().ref('users/' + post.user_id);
-				userRef.once('value', snap => {
+	            var userRef = firebase.database().ref('users/' + post.user_id);
+	            userRef.once('value', snap => {
 
-					post.user_imgurl = snap.val().imageURL;
+	                post.user_imgurl = snap.val().imageURL;
 
-					var index = -1;
-					for (var i = 0; i < this.state.postArray.length; i++) {
-						if (this.state.postArray[i].post_id == post.post_id) {
-							index = i;
-						}
-					}
+	                var index = -1;
+	                for (var i = 0; i < this.state.postArray.length; i++) {
+	                    if (this.state.postArray[i].post_id == post.post_id) {
+	                        index = i;
+	                    }
+	                }
 
-					var updatedPostArray = this.state.postArray;
-					updatedPostArray.splice(index, 1, post);
-					this.setState({ postArray: updatedPostArray });
-				});
-			});
+	                var updatedPostArray = this.state.postArray;
+	                updatedPostArray.splice(index, 1, post);
+	                this.setState({ postArray: updatedPostArray });
+	            });
+	        });
 
-			//for each child changed to post, replace that post with the post already in postArray
-			this.postsRef.on("child_changed", snap => {
-				var post = snap.val();
-				post.post_id = snap.ref.key;
+	        //for each child changed to post, replace that post with the post already in postArray
+	        this.postsRef.on("child_changed", snap => {
+	            var post = snap.val();
+	            post.post_id = snap.ref.key;
 
-				var userRef = firebase.database().ref('users/' + post.user_id);
-				userRef.once('value', snap => {
+	            var userRef = firebase.database().ref('users/' + post.user_id);
+	            userRef.once('value', snap => {
 
-					post.user_imgurl = snap.val().imageURL;
+	                post.user_imgurl = snap.val().imageURL;
 
-					var index;
-					for (var i = 0; i < this.state.postArray.length; i++) {
-						if (this.state.postArray[i].post_id == post.post_id) {
-							index = i;
-						}
-					}
+	                var index;
+	                for (var i = 0; i < this.state.postArray.length; i++) {
+	                    if (this.state.postArray[i].post_id == post.post_id) {
+	                        index = i;
+	                    }
+	                }
 
-					var updatedPostArray = this.state.postArray;
-					updatedPostArray.splice(index, 1, post);
-					this.setState({ postArray: updatedPostArray });
-				});
-			});
-		},
+	                var updatedPostArray = this.state.postArray;
+	                updatedPostArray.splice(index, 1, post);
+	                this.setState({ postArray: updatedPostArray });
+	            });
+	        });
+	    },
 
-		componentWillUnmount: function () {
-			this.postsRef.off();
-		},
+	    componentWillUnmount: function () {
+	        this.postsRef.off();
+	    },
 
-		//adds the new post to the database upon clicking Post
-		handlePost: function () {
+	    //adds the new post to the database upon clicking Post
+	    handlePost: function () {
 
-			//only saves data if the post field isn't empty
-			if (this.refs.body.value) {
-				//gathers the data from the post submission
-				var postData = {
-					user_id: firebase.auth().currentUser.uid,
-					user_name: firebase.auth().currentUser.displayName,
-					body: this.refs.body.value,
-					created_at: firebase.database.ServerValue.TIMESTAMP,
-					replies: [],
-					likes: 0
-				};
+	        //only saves data if the post field isn't empty
+	        if (this.refs.body.value) {
+	            //gathers the data from the post submission
+	            var postData = {
+	                user_id: firebase.auth().currentUser.uid,
+	                user_name: firebase.auth().currentUser.displayName,
+	                body: this.refs.body.value,
+	                created_at: firebase.database.ServerValue.TIMESTAMP,
+	                replies: [],
+	                likes: 0
+	            };
 
-				//generate new post reference key
-				var postRefKey = firebase.database().ref().child('posts').push().key;
-				//sets the postData to the post child with the postRefKey
-				firebase.database().ref('posts/' + postRefKey).set(postData);
-				//sets the postData to the user-posts child with the currentUserId & the postRefKey
-				firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
+	            //generate new post reference key
+	            var postRefKey = firebase.database().ref().child('posts').push().key;
+	            //sets the postData to the post child with the postRefKey
+	            firebase.database().ref('posts/' + postRefKey).set(postData);
+	            //sets the postData to the user-posts child with the currentUserId & the postRefKey
+	            firebase.database().ref('/user-posts/' + firebase.auth().currentUser.uid + '/' + postRefKey).set(postData);
 
-				//emptys the post text field
-				this.refs.body.value = "";
-			}
-		},
+	            //emptys the post text field
+	            this.refs.body.value = "";
+	        }
+	    },
 
-		//likes the post if the user hasn't liked it yet, unlikes it if already liked
-		handleLike: function (post) {
-			//gets the ref of the user-likes to see if user has liked this post yet
-			if (post.user_id != firebase.auth().currentUser.uid) {
-				var ref = firebase.database().ref('/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
-				ref.once('value', snap => {
+	    //likes the post if the user hasn't liked it yet, unlikes it if already liked
+	    handleLike: function (post) {
+	        //gets the ref of the user-likes to see if user has liked this post yet
+	        if (post.user_id != firebase.auth().currentUser.uid) {
+	            var ref = firebase.database().ref('/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
+	            ref.once('value', snap => {
 
-					//check if this data exists, and if it does, check if the user liked it
-					if (snap.val() && snap.val().liked) {
+	                //check if this data exists, and if it does, check if the user liked it
+	                if (snap.val() && snap.val().liked) {
 
-						//if user already liked this post, remove the user-likes reference
-						var userLikesRef = firebase.database().ref('user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
-						userLikesRef.remove();
+	                    //if user already liked this post, remove the user-likes reference
+	                    var userLikesRef = firebase.database().ref('user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id);
+	                    userLikesRef.remove();
 
-						//decrementing likes of post
-						post.likes -= 1;
-					} else {
-						//if user hasn't yet liked this post, like it
-						var likeUpdate = {};
-						likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = { liked: true };
-						firebase.database().ref().update(likeUpdate);
+	                    //decrementing likes of post
+	                    post.likes -= 1;
+	                } else {
+	                    //if user hasn't yet liked this post, like it
+	                    var likeUpdate = {};
+	                    likeUpdate['/user-likes/' + firebase.auth().currentUser.uid + '/' + post.post_id] = { liked: true };
+	                    firebase.database().ref().update(likeUpdate);
 
-						//incrementing likes of post
-						post.likes += 1;
-					}
+	                    //incrementing likes of post
+	                    post.likes += 1;
+	                }
 
-					var anotherPost = JSON.parse(JSON.stringify(post)); //copies contents of post into anotherPost
-					delete anotherPost.post_id; //remove the post_id property in anotherPost -- we don't want to create an unnecessary post_id property in the post database
+	                var anotherPost = JSON.parse(JSON.stringify(post)); //copies contents of post into anotherPost
+	                delete anotherPost.post_id; //remove the post_id property in anotherPost -- we don't want to create an unnecessary post_id property in the post database
 
-					//updates all the data in the posts ref and user-post ref
-					var updates = {};
-					updates['/posts/' + post.post_id] = anotherPost;
-					updates['/user-posts/' + post.user_id + '/' + post.post_id] = anotherPost;
-					firebase.database().ref().update(updates);
-				});
-			}
-		},
+	                //updates all the data in the posts ref and user-post ref
+	                var updates = {};
+	                updates['/posts/' + post.post_id] = anotherPost;
+	                updates['/user-posts/' + post.user_id + '/' + post.post_id] = anotherPost;
+	                firebase.database().ref().update(updates);
+	            });
+	        }
+	    },
 
-		//just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"
-		handleKeyPress: function (e) {
-			if (e.key == 'Enter') {
-				try {
-					this.handlePost();
-				} catch (e) {};
-			}
-		},
+	    //just to check if the user presses "Enter" while typing in a text field so that it acts as if he/she clicked "Post"
+	    handleKeyPress: function (e) {
+	        if (e.key == 'Enter') {
+	            try {
+	                this.handlePost();
+	            } catch (e) {};
+	        }
+	    },
 
-		render: function () {
-			//reverse the order so that the newest posts are at the top of the array
-			var reversedPost = Array.prototype.slice.call(this.state.postArray);
-			reversedPost.reverse();
+	    render: function () {
+	        //reverse the order so that the newest posts are at the top of the array
+	        var reversedPost = Array.prototype.slice.call(this.state.postArray);
+	        reversedPost.reverse();
 
-			//customize date for rendering
-			var dateTimeCustomization = {
-				year: "numeric", month: "short",
-				day: "numeric", hour: "2-digit", minute: "2-digit"
-			};
+	        //customize date for rendering
+	        var dateTimeCustomization = {
+	            year: "numeric", month: "short",
+	            day: "numeric", hour: "2-digit", minute: "2-digit"
+	        };
 
-			return React.createElement(
-				'div',
-				null,
-				React.createElement(
-					'center',
-					null,
-					React.createElement(
-						'h1',
-						null,
-						'Connection Feed'
-					)
-				),
-				React.createElement('br', null),
-				React.createElement('input', { type: 'text', ref: 'body', placeholder: 'What are you thinking about?', onKeyPress: this.handleKeyPress, className: 'form-control update-post' }),
-				React.createElement('br', null),
-				reversedPost.map((post, index) => React.createElement(
-					'div',
-					{ key: index, className: 'post' },
-					React.createElement(
-						'table',
-						null,
-						React.createElement(
-							'tbody',
-							null,
-							React.createElement(
-								'tr',
-								null,
-								React.createElement(
-									'td',
-									{ rowSpan: '2', style: { padding: '0 5px 0 0' } },
-									React.createElement(
-										Link,
-										{ to: "/users/" + post.user_id },
-										React.createElement('img', { src: post.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
-									)
-								),
-								React.createElement(
-									'td',
-									{ style: { padding: '0 0 0 5px' } },
-									React.createElement(
-										Link,
-										{ to: "/users/" + post.user_id },
-										post.user_name
-									)
-								)
-							),
-							React.createElement(
-								'tr',
-								null,
-								React.createElement(
-									'td',
-									{ style: { padding: '0 0 0 5px' } },
-									new Date(post.created_at).toLocaleTimeString("en-US", dateTimeCustomization)
-								)
-							)
-						)
-					),
-					React.createElement(
-						'blockquote',
-						null,
-						'"',
-						post.body,
-						'"',
-						React.createElement('br', null),
-						React.createElement(
-							'button',
-							{ className: 'btn btn-default', onClick: this.handleLike.bind(null, post) },
-							React.createElement('span', { className: 'glyphicon glyphicon-thumbs-up' }),
-							' (',
-							post.likes,
-							')'
-						)
-					),
-					React.createElement('hr', null),
-					React.createElement(Reply, { post_id: post.post_id })
-				))
-			);
-		}
+	        return React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	                'center',
+	                null,
+	                React.createElement(
+	                    'h1',
+	                    null,
+	                    'Connection Feed'
+	                )
+	            ),
+	            React.createElement('br', null),
+	            React.createElement(
+	                'div',
+	                { className: 'update-post-container' },
+	                React.createElement('input', { type: 'text', ref: 'body', placeholder: 'What are you thinking about?', onKeyPress: this.handleKeyPress, className: 'form-control update-post' }),
+	                React.createElement('br', null)
+	            ),
+	            reversedPost.map((post, index) => React.createElement(
+	                'div',
+	                { key: index, className: 'post' },
+	                React.createElement(
+	                    'table',
+	                    null,
+	                    React.createElement(
+	                        'tbody',
+	                        null,
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'td',
+	                                { rowSpan: '2', style: { padding: '0 5px 0 0' } },
+	                                React.createElement(
+	                                    Link,
+	                                    { to: "/users/" + post.user_id },
+	                                    React.createElement('img', { src: post.user_imgurl, width: '80', height: '80', style: { objectFit: 'cover' } })
+	                                )
+	                            ),
+	                            React.createElement(
+	                                'td',
+	                                { className: 'post-username', style: { padding: '0 0 0 5px' } },
+	                                React.createElement(
+	                                    Link,
+	                                    { to: "/users/" + post.user_id },
+	                                    post.user_name
+	                                )
+	                            )
+	                        ),
+	                        React.createElement(
+	                            'tr',
+	                            null,
+	                            React.createElement(
+	                                'td',
+	                                { style: { padding: '0 0 0 5px' } },
+	                                new Date(post.created_at).toLocaleTimeString("en-US", dateTimeCustomization)
+	                            )
+	                        )
+	                    )
+	                ),
+	                React.createElement(
+	                    'blockquote',
+	                    null,
+	                    post.body,
+	                    React.createElement('br', null),
+	                    React.createElement(
+	                        'button',
+	                        { className: 'btn btn-default', onClick: this.handleLike.bind(null, post) },
+	                        React.createElement('span', { className: 'glyphicon glyphicon-thumbs-up' }),
+	                        ' (',
+	                        post.likes,
+	                        ')'
+	                    )
+	                ),
+	                React.createElement('hr', null),
+	                React.createElement(Reply, { post_id: post.post_id })
+	            ))
+	        );
+	    }
 	});
 
 	module.exports = Home;
@@ -28417,18 +28419,20 @@
 	    },
 
 	    handlePostReply: function () {
-	        var postReplyKey = firebase.database().ref().child('reply').push().key;
-	        var reply = {
-	            post_id: this.props.post_id,
-	            user_name: firebase.auth().currentUser.displayName,
-	            user_id: firebase.auth().currentUser.uid,
-	            body: this.refs.theReply.value,
-	            post_time: firebase.database.ServerValue.TIMESTAMP
-	        };
+	        if (this.refs.theReply.value) {
+	            var postReplyKey = firebase.database().ref().child('reply').push().key;
+	            var reply = {
+	                post_id: this.props.post_id,
+	                user_name: firebase.auth().currentUser.displayName,
+	                user_id: firebase.auth().currentUser.uid,
+	                body: this.refs.theReply.value,
+	                post_time: firebase.database.ServerValue.TIMESTAMP
+	            };
 
-	        firebase.database().ref('post-reply/' + this.props.post_id + "/" + postReplyKey).set(reply);
+	            firebase.database().ref('post-reply/' + this.props.post_id + "/" + postReplyKey).set(reply);
 
-	        this.refs.theReply.value = "";
+	            this.refs.theReply.value = "";
+	        }
 	    },
 
 	    render: function () {
@@ -28439,52 +28443,56 @@
 	                'div',
 	                { key: index },
 	                React.createElement(
-	                    'table',
-	                    null,
+	                    'div',
+	                    { className: 'reply' },
 	                    React.createElement(
-	                        'tbody',
+	                        'table',
 	                        null,
 	                        React.createElement(
-	                            'tr',
+	                            'tbody',
 	                            null,
 	                            React.createElement(
-	                                'td',
-	                                { rowSpan: '2', style: { padding: '0 5px 0 0' } },
+	                                'tr',
+	                                null,
 	                                React.createElement(
-	                                    Link,
-	                                    { to: "/users/" + reply.user_id },
-	                                    React.createElement('img', { src: reply.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
+	                                    'td',
+	                                    { rowSpan: '2', style: { padding: '0 5px 0 0' } },
+	                                    React.createElement(
+	                                        Link,
+	                                        { to: "/users/" + reply.user_id },
+	                                        React.createElement('img', { src: reply.user_imgurl, width: '50', height: '50', style: { objectFit: 'cover' } })
+	                                    )
+	                                ),
+	                                React.createElement(
+	                                    'td',
+	                                    { style: { padding: '0 0 0 5px' } },
+	                                    React.createElement(
+	                                        Link,
+	                                        { to: "/users/" + reply.user_id },
+	                                        ' ',
+	                                        reply.user_name
+	                                    )
 	                                )
 	                            ),
 	                            React.createElement(
-	                                'td',
-	                                { style: { padding: '0 0 0 5px' } },
+	                                'tr',
+	                                null,
 	                                React.createElement(
-	                                    Link,
-	                                    { to: "/users/" + reply.user_id },
+	                                    'td',
+	                                    { width: '95%', style: { padding: '0 0 0 5px' } },
+	                                    reply.body,
 	                                    ' ',
-	                                    reply.user_name
+	                                    React.createElement(
+	                                        'span',
+	                                        { className: 'reply-time' },
+	                                        ' ',
+	                                        new Date(reply.post_time).toLocaleTimeString("en-US", dateTimeCustomization),
+	                                        ' '
+	                                    )
 	                                )
-	                            )
-	                        ),
-	                        React.createElement(
-	                            'tr',
-	                            null,
-	                            React.createElement(
-	                                'td',
-	                                { style: { padding: '0 0 0 5px' } },
-	                                new Date(reply.post_time).toLocaleTimeString("en-US", dateTimeCustomization)
 	                            )
 	                        )
 	                    )
-	                ),
-	                React.createElement(
-	                    'blockquote',
-	                    null,
-	                    '"',
-	                    reply.body,
-	                    '"',
-	                    React.createElement('br', null)
 	                )
 	            )),
 	            React.createElement('input', { type: 'text', onKeyPress: this.handleKeyPress, ref: 'theReply', className: 'form-control', placeholder: 'Reply to post...', id: 'reply' })
@@ -31998,12 +32006,12 @@
 				null,
 				React.createElement(
 					'button',
-					{ className: 'btn btn-default', onClick: this.handleAcceptConnection.bind(null, user) },
+					{ className: 'btn btn-primary request-button', onClick: this.handleAcceptConnection.bind(null, user) },
 					'Accept Connection'
 				),
 				React.createElement(
 					'button',
-					{ className: 'btn btn-default', onClick: this.handleRemoveConnection.bind(null, user) },
+					{ className: 'btn btn-default request-button', onClick: this.handleRemoveConnection.bind(null, user) },
 					'Delete Request'
 				)
 			);
@@ -32024,14 +32032,15 @@
 			} else {
 				showRequests = this.state.requesters.map((user, index) => React.createElement(
 					'div',
-					{ key: index },
+					{ className: 'grid-item col-md-3', key: index },
 					React.createElement(
 						Link,
 						{ to: "users/" + user.user_id },
 						React.createElement(
 							'h4',
 							null,
-							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
+							React.createElement('img', { src: user.imageURL, className: 'grid-img img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover' } }),
+							React.createElement('br', null),
 							user.first + " " + user.last
 						)
 					),
@@ -32048,7 +32057,7 @@
 					null,
 					React.createElement(
 						'h1',
-						null,
+						{ className: 'grid-title' },
 						'Requests'
 					)
 				),
@@ -32162,14 +32171,15 @@
 			} else {
 				showConnections = this.state.connections.map((user, index) => React.createElement(
 					'div',
-					{ key: index },
+					{ className: 'col-md-3 grid-item', key: index },
 					React.createElement(
 						Link,
 						{ to: "users/" + user.user_id },
 						React.createElement(
 							'h4',
 							null,
-							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
+							React.createElement('img', { src: user.imageURL, className: 'grid-img img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover' } }),
+							React.createElement('br', null),
 							user.first + " " + user.last
 						)
 					),
@@ -32186,7 +32196,7 @@
 					null,
 					React.createElement(
 						'h1',
-						null,
+						{ className: 'grid-title' },
 						'Connections'
 					)
 				),
@@ -32259,7 +32269,7 @@
 					null,
 					React.createElement(
 						'h1',
-						null,
+						{ className: 'grid-title' },
 						'Showing results for "',
 						this.state.prop_name,
 						'"'
@@ -32274,14 +32284,15 @@
 				),
 				this.state.users.map((user, index) => React.createElement(
 					'div',
-					{ key: index },
+					{ className: 'grid-item col-md-3', clkey: index },
 					React.createElement(
 						Link,
 						{ to: "users/" + user.id },
 						React.createElement(
 							'h4',
 							null,
-							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
+							React.createElement('img', { src: user.imageURL, className: 'img-circle grid-img', alt: '', width: '100', height: '100', style: { objectFit: 'cover' } }),
+							React.createElement('br', null),
 							user.first + " " + user.last
 						)
 					),
@@ -32531,14 +32542,15 @@
 			} else {
 				showCompanies = this.state.companies.map((user, index) => React.createElement(
 					'div',
-					{ key: index },
+					{ className: 'col-md-3 grid-item', key: index },
 					React.createElement(
 						Link,
 						{ to: "users/" + user.user_id },
 						React.createElement(
 							'h4',
 							null,
-							React.createElement('img', { src: user.imageURL, className: 'img-circle', alt: '', width: '100', height: '100', style: { objectFit: 'cover', border: "1px solid #B5A4A4" } }),
+							React.createElement('img', { src: user.imageURL, className: 'grid-img img-circle', alt: '', width: '150', height: '150', style: { objectFit: 'cover' } }),
+							React.createElement('br', null),
 							user.first + " " + user.last
 						)
 					),
@@ -32555,7 +32567,7 @@
 					null,
 					React.createElement(
 						'h1',
-						null,
+						{ className: 'grid-title' },
 						'Companies'
 					)
 				),

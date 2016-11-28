@@ -120,7 +120,7 @@ var AwaitingAcceptance = React.createClass({
 			showRequests = 
 				this.state.requesters.map((user,index) => (
         			<div className="grid-item col-md-3" key={index}>
-       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="grid-img img-circle" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> <br/>
+       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="grid-img img-circle" alt="" width="100" height="100" style={{objectFit: 'cover'}}/><br/>
        					{user.first + " " + user.last}</h4></Link>
         				{this.showAwaitingAcceptance(user)}
         				<br />

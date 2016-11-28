@@ -33,7 +33,7 @@ var Companies = React.createClass({
 			showCompanies = 
 				this.state.companies.map((user,index) => (
         			<div className="col-md-3 grid-item" key={index}>
-       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="grid-img img-circle" alt="" width="150" height="150" style={{objectFit: 'cover'}}/> <br/>
+       					<Link to={"users/" + user.user_id}><h4><img src={user.imageURL} className="grid-img img-circle" alt="" width="150" height="150" style={{objectFit: 'cover'}}/><br/>
        					{user.first + " " + user.last}</h4></Link>
         				<br /><br />
         			</div>

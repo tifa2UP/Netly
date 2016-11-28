@@ -54,7 +54,7 @@ var Results = React.createClass({
 				</center>
 				{this.state.users.map((user,index) => (
         			<div className="grid-item col-md-3" clkey={index}>
-       					<Link to={"users/" + user.id}><h4><img src={user.imageURL} className="img-circle grid-img" alt="" width="100" height="100" style={{objectFit: 'cover'}}/> <br/>
+       					<Link to={"users/" + user.id}><h4><img src={user.imageURL} className="img-circle grid-img" alt="" width="100" height="100" style={{objectFit: 'cover'}}/><br/>
        					{user.first + " " + user.last}</h4></Link>
         				<br /><br />
         			</div>

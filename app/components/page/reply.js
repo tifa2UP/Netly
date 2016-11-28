@@ -82,18 +82,20 @@ var Reply = React.createClass({
     },
 
     handlePostReply: function(){
-        var postReplyKey = firebase.database().ref().child('reply').push().key;
-        var reply = {
-            post_id: this.props.post_id,
-            user_name: firebase.auth().currentUser.displayName,
-            user_id: firebase.auth().currentUser.uid,
-            body: this.refs.theReply.value,
-            post_time: firebase.database.ServerValue.TIMESTAMP
-        };
+        if(this.refs.theReply.value){
+            var postReplyKey = firebase.database().ref().child('reply').push().key;
+            var reply = {
+                post_id: this.props.post_id,
+                user_name: firebase.auth().currentUser.displayName,
+                user_id: firebase.auth().currentUser.uid,
+                body: this.refs.theReply.value,
+                post_time: firebase.database.ServerValue.TIMESTAMP
+            };
 
-        firebase.database().ref('post-reply/' + this.props.post_id + "/" + postReplyKey).set(reply);
+            firebase.database().ref('post-reply/' + this.props.post_id + "/" + postReplyKey).set(reply);
 
-        this.refs.theReply.value ="";
+            this.refs.theReply.value ="";
+        }
     },
 
     render: function(){
