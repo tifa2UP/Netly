@@ -32180,18 +32180,18 @@
 				return React.createElement(
 					'h4',
 					{ className: 'profile-heading' },
-					'Endorsements',
+					'Recommendations',
 					React.createElement(
 						'button',
 						{ className: 'btn btn-default', onClick: this.handleClickAdd },
-						React.createElement('span', { className: 'glyphicon glyphicon-plus', title: 'Add endorsement' })
+						React.createElement('span', { className: 'glyphicon glyphicon-plus', title: 'Add Recommendation' })
 					)
 				);
 			} else {
 				return React.createElement(
 					'h4',
 					{ className: 'profile-heading' },
-					'Endorsements'
+					'Recommendations'
 				);
 			}
 		},
@@ -32203,7 +32203,7 @@
 				React.createElement(
 					'div',
 					{ className: 'col-md-8' },
-					React.createElement('textarea', { type: 'text', ref: 'msg', className: 'form-control', row: '6', placeholder: 'Endorse this user!' }),
+					React.createElement('textarea', { ref: 'msg', className: 'form-control', rows: '6', placeholder: 'Recommend this user!' }),
 					React.createElement('br', null),
 					React.createElement(
 						'center',
@@ -32237,7 +32237,7 @@
 				React.createElement(
 					'div',
 					{ className: 'col-md-8' },
-					React.createElement('input', { type: 'text', ref: 'msg', className: 'form-control', defaultValue: indexedendorsement.msg }),
+					React.createElement('textarea', { ref: 'msg', className: 'form-control', rows: '6', defaultValue: indexedendorsement.msg }),
 					React.createElement('br', null),
 					React.createElement(
 						'center',

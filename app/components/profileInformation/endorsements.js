@@ -274,15 +274,15 @@ var endorsement = React.createClass({
 
 	endorsementHeading: function(){
 		if (this.state.isConnected && !this.state.endorsed && !this.state.isCurrentUser){
-				return <h4 className="profile-heading">Endorsements 
+				return <h4 className="profile-heading">Recommendations  
 					<button className="btn btn-default" onClick={this.handleClickAdd}>
-						<span className="glyphicon glyphicon-plus" title="Add endorsement">
+						<span className="glyphicon glyphicon-plus" title="Add Recommendation">
 						</span>
 					</button>
 				</h4>
 		}
 		else{
-				return <h4 className="profile-heading">Endorsements</h4>	
+				return <h4 className="profile-heading">Recommendations</h4>	
 		}
 	},
 
@@ -290,7 +290,7 @@ var endorsement = React.createClass({
 		return(
 			<div className="col-md-12">
 				<div className="col-md-8">
-					<textarea type="text" ref="msg" className="form-control" row="6" placeholder="Endorse this user!"/><br />
+					<textarea ref="msg" className="form-control" rows="6" placeholder="Recommend this user!"/><br />
 					<center>
 						<div className="btn btn-toolbar">
 							<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
@@ -308,7 +308,7 @@ var endorsement = React.createClass({
 		return(
 			<div className="col-md-12">
 				<div className="col-md-8">
-					<input type="text" ref="msg" className="form-control" defaultValue={indexedendorsement.msg} /><br />
+					<textarea ref="msg" className="form-control" rows="6" defaultValue={indexedendorsement.msg} /><br />
 					<center>
 						<div className="btn btn-toolbar">
 							<button className="btn btn-primary" onClick={this.handleClickSave}>Save</button>
