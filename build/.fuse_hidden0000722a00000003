@@ -29450,8 +29450,6 @@
 				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
-
-			this.setState({ summary: newSummary });
 		},
 
 		handleClickCancel: function () {
@@ -30412,8 +30410,6 @@
 				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
-
-			this.setState({ interests: newInterests });
 		},
 
 		handleClickCancel: function () {
@@ -30963,8 +30959,6 @@
 				updates['users/' + this.props.pageID] = userInfo;
 				firebase.database().ref().update(updates);
 			});
-
-			this.setState({ skills: newSkills });
 		},
 
 		componentWillUnmount: function () {
