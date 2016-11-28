@@ -53,6 +53,8 @@ var Interests = React.createClass({
 			updates['users/' + this.props.pageID] = userInfo;
 			firebase.database().ref().update(updates);
         });
+
+        this.setState({interests: newInterests});
 	},
 
 	handleClickCancel: function(){

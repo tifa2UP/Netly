@@ -55,6 +55,8 @@ var Summary = React.createClass({
 			updates['users/' + this.props.pageID] = userInfo;
 			firebase.database().ref().update(updates);
         });
+
+        this.setState({summary: newSummary});
 	},
 
 	handleClickCancel: function(){

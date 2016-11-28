@@ -51,6 +51,8 @@ var Skills = React.createClass({
 			updates['users/' + this.props.pageID] = userInfo;
 			firebase.database().ref().update(updates);
         });
+
+        this.setState({skills: newSkills});
     },
 
     componentWillUnmount: function(){
