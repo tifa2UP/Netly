@@ -25,6 +25,7 @@ var Reply = React.createClass({
     },
 
     componentWillMount: function(){
+        this.setState({post_id: this.props.post_id});
         this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id).orderByChild("post_time");
         this.postReplyRef.on('child_added', snap=>{
             var replyInfo = snap.val();
@@ -52,33 +53,37 @@ var Reply = React.createClass({
     },
 
     componentWillReceiveProps: function(nextProps){
-        this.postReplyRef.off();
-        this.state.replies.splice(0, this.state.replies.length);
+        if(this.state.post_id != nextProps.post_id){
+            
+            this.setState({post_id: nextProps.post_id});
+            this.postReplyRef.off();
+            this.state.replies.splice(0, this.state.replies.length);
 
-        this.postReplyRef = firebase.database().ref('post-reply').child(nextProps.post_id);
-        this.postReplyRef.on('child_added', snap=>{
-            var replyInfo = snap.val();
-            replyInfo.reply_id = snap.ref.key;
-            replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+            this.postReplyRef = firebase.database().ref('post-reply').child(nextProps.post_id).orderByChild("post_time");
+            this.postReplyRef.on('child_added', snap=>{
+                var replyInfo = snap.val();
+                replyInfo.reply_id = snap.ref.key;
+                replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
 
-            this.state.replies.push(replyInfo);
-            this.setState({replies: this.state.replies});
-
-            var userRef = firebase.database().ref('users/'+ replyInfo.user_id);
-            userRef.once('value', snap=>{
-                replyInfo.user_imgurl = snap.val().imageURL;
-
-                var index = -1;
-                for(var i = 0; i < this.state.replies.length; i++){
-                    if(this.state.replies[i].reply_id == replyInfo.reply_id){
-                        index = i;
-                    }
-                }
-
-                this.state.replies.splice(index, 1, replyInfo);
+                this.state.replies.push(replyInfo);
                 this.setState({replies: this.state.replies});
+
+                var userRef = firebase.database().ref('users/'+ replyInfo.user_id);
+                userRef.once('value', snap=>{
+                    replyInfo.user_imgurl = snap.val().imageURL;
+
+                    var index = -1;
+                    for(var i = 0; i < this.state.replies.length; i++){
+                        if(this.state.replies[i].reply_id == replyInfo.reply_id){
+                            index = i;
+                        }
+                    }
+
+                    this.state.replies.splice(index, 1, replyInfo);
+                    this.setState({replies: this.state.replies});
+                });
             });
-        });
+        }
     },
 
     handlePostReply: function(){
@@ -96,6 +101,10 @@ var Reply = React.createClass({
 
             this.refs.theReply.value ="";
         }
+    },
+
+    componentWillUnmount: function(){
+        this.postReplyRef.off();
     },
 
     render: function(){
