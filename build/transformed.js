@@ -27905,7 +27905,7 @@
 				React.createElement('div', { className: 'col-md-4' }),
 				React.createElement(
 					'div',
-					{ className: 'col-md-4' },
+					{ className: 'col-md-4 margin-top-30' },
 					React.createElement(
 						'center',
 						null,
@@ -27917,41 +27917,45 @@
 						React.createElement('br', null),
 						React.createElement(
 							'div',
-							{ className: 'sign-up-type' },
-							React.createElement('input', { type: 'radio', name: 'recruiter', value: 'false', onChange: this.accountChange, className: 'radio-icon' }),
+							{ className: 'sign-up-form' },
 							React.createElement(
-								'span',
-								{ className: 'radio-icon' },
-								'Job Seeker'
+								'div',
+								{ className: 'sign-up-type' },
+								React.createElement('input', { type: 'radio', name: 'recruiter', value: 'false', onChange: this.accountChange, className: 'radio-icon' }),
+								React.createElement(
+									'span',
+									{ className: 'radio-icon' },
+									'Job Seeker'
+								),
+								React.createElement('input', { type: 'radio', name: 'recruiter', value: 'true', onChange: this.accountChange, className: 'radio-icon' }),
+								React.createElement(
+									'span',
+									{ className: 'radio-icon' },
+									'Company'
+								)
 							),
-							React.createElement('input', { type: 'radio', name: 'recruiter', value: 'true', onChange: this.accountChange, className: 'radio-icon' }),
+							React.createElement('input', { type: 'text', ref: 'firstName', placeholder: 'First Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
+							React.createElement('input', { type: 'text', ref: 'lastName', placeholder: 'Last Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
+							React.createElement('input', { type: 'email', ref: 'email', placeholder: 'Email Address', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
+							React.createElement('input', { type: 'password', ref: 'password', placeholder: 'Password', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
+							React.createElement('input', { type: 'password', ref: 'password_confirmation', placeholder: 'Password Confirmation', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
 							React.createElement(
-								'span',
-								{ className: 'radio-icon' },
-								'Company'
+								'button',
+								{ onClick: this.handleSignUp, className: 'btn btn-primary margin-bottom-10' },
+								'Create Account'
+							),
+							React.createElement('br', null),
+							'Have an account? ',
+							React.createElement(
+								Link,
+								{ to: '/login' },
+								'Login!'
 							)
-						),
-						React.createElement('input', { type: 'text', ref: 'firstName', placeholder: 'First Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement('input', { type: 'text', ref: 'lastName', placeholder: 'Last Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement('input', { type: 'email', ref: 'email', placeholder: 'Email Address', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement('input', { type: 'password', ref: 'password', placeholder: 'Password', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement('input', { type: 'password', ref: 'password_confirmation', placeholder: 'Password Confirmation', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement(
-							'button',
-							{ onClick: this.handleSignUp, className: 'btn btn-primary margin-bottom-10' },
-							'Create Account'
-						),
-						React.createElement('br', null),
-						'Have an account? ',
-						React.createElement(
-							Link,
-							{ to: '/login' },
-							'Login!'
 						)
 					)
 				),
@@ -28062,7 +28066,7 @@
 						null,
 						React.createElement(
 							'h1',
-							null,
+							{ className: 'margin-top-30' },
 							'Log In'
 						),
 						React.createElement('br', null),
@@ -28072,7 +28076,7 @@
 						React.createElement('br', null),
 						React.createElement(
 							'button',
-							{ className: 'btn btn-primary', onClick: this.handleLogIn },
+							{ className: 'btn btn-primary margin-bottom-10', onClick: this.handleLogIn },
 							'Login'
 						),
 						React.createElement('br', null),
