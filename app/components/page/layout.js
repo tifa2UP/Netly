@@ -182,7 +182,7 @@ var Layout = React.createClass({
             accountSettings = <li><Link to="/accountSettings" className="navbar-brand"><span className="glyphicon glyphicon-cog navbar-icon" title="Settings"></span></Link></li>;
             requests = <li><Link to="/requests" className="navbar-brand"><span className='glyphicon glyphicon-bell navbar-icon' title="Requests"></span>{div}</Link></li>;
             connections = <li><Link to="/connections" className="navbar-brand"><span className='glyphicon glyphicon-globe navbar-icon' title="Connections"></span></Link></li>;
-            companies = <Link to="/companies" className="navbar-brand"><span className='glyphicon glyphicon-briefcase navbar-icon' title="Companies"></span></Link>;
+            companies = <Link to="/companies" className="navbar-brand briefcase"><span className='glyphicon glyphicon-briefcase navbar-icon' title="Companies"></span></Link>;
 
             search = <Search isRecruiter={this.state.recruiter}/>
 
@@ -211,7 +211,8 @@ var Layout = React.createClass({
                     <div className="container">
                         <div className="navbar-header">
                             <Link to="/" className="navbar-brand">
-                                <span className="glyphicon glyphicon-home navbar-icon" title="Home"></span>
+                                {/*<span className="glyphicon glyphicon-home navbar-icon" title="Home"></span>*/}
+                                <img src="logo.png" alt="logo" height={35}/>
                             </Link>
                             {companies}
                         </div>
