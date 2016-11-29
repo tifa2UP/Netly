@@ -149,3 +149,10 @@ blockquote{
 .margin-top-30{
     margin-top: 30px;
 }
+.navbar-brand{
+    padding-top: 8px;
+}
+
+.briefcase{
+   padding-top: 15px !important;
+}
