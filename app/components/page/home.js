@@ -18,6 +18,7 @@ var Home = React.createClass({
         //gets the post reference
         this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
         //for each child added to post, push to postArray
+
         this.postsRef.on("child_added", snap => {
             var post = snap.val();
             post.post_id = snap.ref.key;
@@ -173,13 +174,13 @@ var Home = React.createClass({
                                 <td rowSpan='2' style={{padding: '0 5px 0 0'}}>
                                     <Link to={"/users/"+post.user_id}><img src={post.user_imgurl} width="80" height="80" style={{objectFit: 'cover'}}/></Link>
                                 </td>
-                                <td className="post-username" style={{padding: '0 0 0 5px'}}>
+                                <td className="post-username" style={{padding: '0 0 0 5px', verticalAlign: 'bottom'}}>
                                     <Link to={"/users/"+post.user_id}>{post.user_name}</Link>
                                 </td>
                             </tr>
 
                             <tr>
-                                <td style={{padding: '0 0 0 5px'}}>
+                                <td style={{padding: '0 0 0 5px', color: '#9f9f9f', verticalAlign: 'top'}}>
                                     {(new Date(post.created_at)).toLocaleTimeString("en-US", dateTimeCustomization)}
                                 </td>
                             </tr>
