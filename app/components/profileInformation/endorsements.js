@@ -329,12 +329,12 @@ var endorsement = React.createClass({
 					{this.state.endorsements.map((endorsement,index) => (
 			        	<div key={index}>
 							<Link to={"/users/"+ endorsement.endorsedById}>
-								<img src={endorsement.img} className="img-circle grid-img" alt="" width="20" height="20" style={{objectFit: 'cover'}}/>
+								<img src={endorsement.img} className="img-circle grid-img recommendation-img"  alt="" width="40" height="40" style={{objectFit: 'cover'}}/>
 							</Link>
 							<Link to={"/users/"+ endorsement.endorsedById}>
 								{endorsement.endorsedBy}
 							</Link>
-								<blockquote>
+								<blockquote className="recommendation-quote">
 									"{endorsement.msg}"
 								{ (this.state.endorsed && endorsement.endorsedById==this.state.currentUserID) ? <button className="btn btn-default" onClick={this.handleClickEdit.bind(null, index)}>
 								<span className="glyphicon glyphicon-pencil" title="Edit endorsement"></span>
