@@ -27915,11 +27915,22 @@
 							'Sign Up'
 						),
 						React.createElement('br', null),
-						React.createElement('input', { type: 'radio', name: 'recruiter', value: 'false', onChange: this.accountChange }),
-						'Job Seeker',
-						React.createElement('input', { type: 'radio', name: 'recruiter', value: 'true', onChange: this.accountChange }),
-						'Recruiter',
-						React.createElement('br', null),
+						React.createElement(
+							'div',
+							{ className: 'sign-up-type' },
+							React.createElement('input', { type: 'radio', name: 'recruiter', value: 'false', onChange: this.accountChange, className: 'radio-icon' }),
+							React.createElement(
+								'span',
+								{ className: 'radio-icon' },
+								'Job Seeker'
+							),
+							React.createElement('input', { type: 'radio', name: 'recruiter', value: 'true', onChange: this.accountChange, className: 'radio-icon' }),
+							React.createElement(
+								'span',
+								{ className: 'radio-icon' },
+								'Company'
+							)
+						),
 						React.createElement('input', { type: 'text', ref: 'firstName', placeholder: 'First Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
 						React.createElement('br', null),
 						React.createElement('input', { type: 'text', ref: 'lastName', placeholder: 'Last Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
@@ -27932,7 +27943,7 @@
 						React.createElement('br', null),
 						React.createElement(
 							'button',
-							{ onClick: this.handleSignUp, className: 'btn btn-primary' },
+							{ onClick: this.handleSignUp, className: 'btn btn-primary margin-bottom-10' },
 							'Create Account'
 						),
 						React.createElement('br', null),
@@ -28362,6 +28373,7 @@
 	    },
 
 	    componentWillMount: function () {
+	        this.setState({ post_id: this.props.post_id });
 	        this.postReplyRef = firebase.database().ref('post-reply').child(this.props.post_id).orderByChild("post_time");
 	        this.postReplyRef.on('child_added', snap => {
 	            var replyInfo = snap.val();
@@ -28389,33 +28401,37 @@
 	    },
 
 	    componentWillReceiveProps: function (nextProps) {
-	        this.postReplyRef.off();
-	        this.state.replies.splice(0, this.state.replies.length);
+	        if (this.state.post_id != nextProps.post_id) {
 
-	        this.postReplyRef = firebase.database().ref('post-reply').child(nextProps.post_id);
-	        this.postReplyRef.on('child_added', snap => {
-	            var replyInfo = snap.val();
-	            replyInfo.reply_id = snap.ref.key;
-	            replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
+	            this.setState({ post_id: nextProps.post_id });
+	            this.postReplyRef.off();
+	            this.state.replies.splice(0, this.state.replies.length);
 
-	            this.state.replies.push(replyInfo);
-	            this.setState({ replies: this.state.replies });
+	            this.postReplyRef = firebase.database().ref('post-reply').child(nextProps.post_id).orderByChild("post_time");
+	            this.postReplyRef.on('child_added', snap => {
+	                var replyInfo = snap.val();
+	                replyInfo.reply_id = snap.ref.key;
+	                replyInfo.user_imgurl = "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7";
 
-	            var userRef = firebase.database().ref('users/' + replyInfo.user_id);
-	            userRef.once('value', snap => {
-	                replyInfo.user_imgurl = snap.val().imageURL;
-
-	                var index = -1;
-	                for (var i = 0; i < this.state.replies.length; i++) {
-	                    if (this.state.replies[i].reply_id == replyInfo.reply_id) {
-	                        index = i;
-	                    }
-	                }
-
-	                this.state.replies.splice(index, 1, replyInfo);
+	                this.state.replies.push(replyInfo);
 	                this.setState({ replies: this.state.replies });
+
+	                var userRef = firebase.database().ref('users/' + replyInfo.user_id);
+	                userRef.once('value', snap => {
+	                    replyInfo.user_imgurl = snap.val().imageURL;
+
+	                    var index = -1;
+	                    for (var i = 0; i < this.state.replies.length; i++) {
+	                        if (this.state.replies[i].reply_id == replyInfo.reply_id) {
+	                            index = i;
+	                        }
+	                    }
+
+	                    this.state.replies.splice(index, 1, replyInfo);
+	                    this.setState({ replies: this.state.replies });
+	                });
 	            });
-	        });
+	        }
 	    },
 
 	    handlePostReply: function () {
@@ -28433,6 +28449,10 @@
 
 	            this.refs.theReply.value = "";
 	        }
+	    },
+
+	    componentWillUnmount: function () {
+	        this.postReplyRef.off();
 	    },
 
 	    render: function () {
