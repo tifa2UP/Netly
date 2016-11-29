@@ -20,7 +20,7 @@ var SignUpForm = React.createClass({
 		var email = this.refs.email.value;
 		var password = this.refs.password.value;
 		var password_confirmation = this.refs.password_confirmation.value;
-		
+
 		if(firstName && lastName){
 			//creates the user on firebase
 			firebase.auth().createUserWithEmailAndPassword(email, password == password_confirmation ? password : "nil").catch(function(error) {
@@ -36,33 +36,33 @@ var SignUpForm = React.createClass({
 
 		//if successfully logged in, add the user child to the database with the name and email.
 		this.unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
-  			if (user) {
-  				var userData = {
-  					email: email,
-  					first: firstName,
-  					last: lastName,
-  					recruiter: recruiter,
-  					imageURL: "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7",
-  					interests: "",
-  					skills: ""
-  				};
+			if (user) {
+				var userData = {
+					email: email,
+					first: firstName,
+					last: lastName,
+					recruiter: recruiter,
+					imageURL: "https://firebasestorage.googleapis.com/v0/b/testingproject-cd660.appspot.com/o/images%2Fdefault.jpg?alt=media&token=23d9c5ea-1380-4bd2-94bc-1166a83953b7",
+					interests: "",
+					skills: ""
+				};
 
-  				firebase.database().ref('users/' + firebase.auth().currentUser.uid).set(userData);
+				firebase.database().ref('users/' + firebase.auth().currentUser.uid).set(userData);
 
-  				//update display name for user
+				//update display name for user
 				user.updateProfile({
 					displayName: firstName + " " + lastName,
 				});
 
 				hashHistory.push("/");
-  			}
+			}
 		});
 	},
 
 	componentWillUnmount: function(){
 		if (typeof this.unsubscribe == 'function')
 		{
-			this.unsubscribe(); 
+			this.unsubscribe();
 		}
 	},
 
@@ -110,17 +110,17 @@ var SignUpForm = React.createClass({
 				<div className="col-md-4">
 					<center>
 						<h1>Sign Up</h1><br />
-						
-						<input type="radio" name="recruiter" value="false" onChange={this.accountChange}/>Job Seeker
-						<input type="radio" name="recruiter" value="true" onChange={this.accountChange} />Recruiter
-						<br />
-						<input type="text" ref="firstName" placeholder="First Name" className="form-control" onKeyPress={this.handleKeyPress} /><br /> 
+						<div className="sign-up-type">
+							<input type="radio" name="recruiter" value="false" onChange={this.accountChange} className="radio-icon"/><span className="radio-icon">Job Seeker</span>
+							<input type="radio" name="recruiter" value="true" onChange={this.accountChange} className="radio-icon"/><span className="radio-icon">Company</span>
+						</div>
+						<input type="text" ref="firstName" placeholder="First Name" className="form-control" onKeyPress={this.handleKeyPress} /><br />
 						<input type="text" ref="lastName" placeholder="Last Name" className="form-control" onKeyPress={this.handleKeyPress} /><br />
 						<input type="email" ref="email" placeholder="Email Address" className="form-control" onKeyPress={this.handleKeyPress} /><br />
 						<input type="password" ref="password" placeholder="Password" className="form-control" onKeyPress={this.handleKeyPress} /><br />
 						<input type="password" ref="password_confirmation" placeholder="Password Confirmation" className="form-control" onKeyPress={this.handleKeyPress} /><br />
-						
-						<button onClick={this.handleSignUp} className="btn btn-primary">Create Account</button><br />
+
+						<button onClick={this.handleSignUp} className="btn btn-primary margin-bottom-10">Create Account</button><br />
 						Have an account? <Link to="/login">Login!</Link>
 					</center>
 				</div>

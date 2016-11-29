@@ -123,3 +123,19 @@ blockquote{
     width: 80%;
     font-size: 80%;
 }
+
+.navbar-default .navbar-nav>li>a {
+    color: white;
+}
+
+.radio-icon{
+    margin-right: 20px;
+    margin-left: 5px;
+}
+.sign-up-type{
+    margin: 20px;
+    margin-top: 0px;
+}
+.margin-bottom-10{
+    margin-bottom: 10px;
+}
