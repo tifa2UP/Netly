@@ -107,21 +107,23 @@ var SignUpForm = React.createClass({
 				<div className="col-md-4">
 				</div>
 
-				<div className="col-md-4">
+				<div className="col-md-4 margin-top-30">
 					<center>
 						<h1>Sign Up</h1><br />
-						<div className="sign-up-type">
-							<input type="radio" name="recruiter" value="false" onChange={this.accountChange} className="radio-icon"/><span className="radio-icon">Job Seeker</span>
-							<input type="radio" name="recruiter" value="true" onChange={this.accountChange} className="radio-icon"/><span className="radio-icon">Company</span>
-						</div>
-						<input type="text" ref="firstName" placeholder="First Name" className="form-control" onKeyPress={this.handleKeyPress} /><br />
-						<input type="text" ref="lastName" placeholder="Last Name" className="form-control" onKeyPress={this.handleKeyPress} /><br />
-						<input type="email" ref="email" placeholder="Email Address" className="form-control" onKeyPress={this.handleKeyPress} /><br />
-						<input type="password" ref="password" placeholder="Password" className="form-control" onKeyPress={this.handleKeyPress} /><br />
-						<input type="password" ref="password_confirmation" placeholder="Password Confirmation" className="form-control" onKeyPress={this.handleKeyPress} /><br />
+						<div className="sign-up-form">
+							<div className="sign-up-type">
+								<input type="radio" name="recruiter" value="false" onChange={this.accountChange} className="radio-icon"/><span className="radio-icon">Job Seeker</span>
+								<input type="radio" name="recruiter" value="true" onChange={this.accountChange} className="radio-icon"/><span className="radio-icon">Company</span>
+							</div>
+							<input type="text" ref="firstName" placeholder="First Name" className="form-control" onKeyPress={this.handleKeyPress} /><br />
+							<input type="text" ref="lastName" placeholder="Last Name" className="form-control" onKeyPress={this.handleKeyPress} /><br />
+							<input type="email" ref="email" placeholder="Email Address" className="form-control" onKeyPress={this.handleKeyPress} /><br />
+							<input type="password" ref="password" placeholder="Password" className="form-control" onKeyPress={this.handleKeyPress} /><br />
+							<input type="password" ref="password_confirmation" placeholder="Password Confirmation" className="form-control" onKeyPress={this.handleKeyPress} /><br />
 
-						<button onClick={this.handleSignUp} className="btn btn-primary margin-bottom-10">Create Account</button><br />
-						Have an account? <Link to="/login">Login!</Link>
+							<button onClick={this.handleSignUp} className="btn btn-primary margin-bottom-10">Create Account</button><br />
+							Have an account? <Link to="/login">Login!</Link>
+						</div>
 					</center>
 				</div>
 				<div className="col-md-4">
