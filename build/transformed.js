@@ -28117,6 +28117,7 @@
 	        //gets the post reference
 	        this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
 	        //for each child added to post, push to postArray
+
 	        this.postsRef.on("child_added", snap => {
 	            var post = snap.val();
 	            post.post_id = snap.ref.key;
@@ -28299,7 +28300,7 @@
 	                            ),
 	                            React.createElement(
 	                                'td',
-	                                { className: 'post-username', style: { padding: '0 0 0 5px' } },
+	                                { className: 'post-username', style: { padding: '0 0 0 5px', verticalAlign: 'bottom' } },
 	                                React.createElement(
 	                                    Link,
 	                                    { to: "/users/" + post.user_id },
@@ -28312,7 +28313,7 @@
 	                            null,
 	                            React.createElement(
 	                                'td',
-	                                { style: { padding: '0 0 0 5px' } },
+	                                { style: { padding: '0 0 0 5px', color: '#9f9f9f', verticalAlign: 'top' } },
 	                                new Date(post.created_at).toLocaleTimeString("en-US", dateTimeCustomization)
 	                            )
 	                        )
