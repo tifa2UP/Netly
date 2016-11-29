@@ -24,7 +24,6 @@ var Home = React.createClass({
                 this.userRef = firebase.database().ref('users').child(firebase.auth().currentUser.uid);
                 this.userRef.on("value", snap=>{
                     this.setState({username: snap.val().first + " " + snap.val().last});
-                    console.log(this.state.username);
                 });
             }
         });

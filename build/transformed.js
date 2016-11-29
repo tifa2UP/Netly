@@ -28127,7 +28127,6 @@
 	                this.userRef = firebase.database().ref('users').child(firebase.auth().currentUser.uid);
 	                this.userRef.on("value", snap => {
 	                    this.setState({ username: snap.val().first + " " + snap.val().last });
-	                    console.log(this.state.username);
 	                });
 	            }
 	        });
@@ -28800,7 +28799,7 @@
 	            );
 	            companies = React.createElement(
 	                Link,
-	                { to: '/companies', className: 'navbar-brand' },
+	                { to: '/companies', className: 'navbar-brand briefcase' },
 	                React.createElement('span', { className: 'glyphicon glyphicon-briefcase navbar-icon', title: 'Companies' })
 	            );
 
@@ -28856,7 +28855,7 @@
 	                        React.createElement(
 	                            Link,
 	                            { to: '/', className: 'navbar-brand' },
-	                            React.createElement('span', { className: 'glyphicon glyphicon-home navbar-icon', title: 'Home' })
+	                            React.createElement('img', { src: 'logo.png', alt: 'logo', height: 35 })
 	                        ),
 	                        companies
 	                    ),
