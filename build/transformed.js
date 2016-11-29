@@ -28108,7 +28108,7 @@
 
 	    //initializes the postArray
 	    getInitialState: function () {
-	        return { postArray: [] };
+	        return { postArray: [], username: "" };
 	    },
 
 	    //loading all posts into the state's postArray
@@ -28117,6 +28117,16 @@
 	        //gets the post reference
 	        this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
 	        //for each child added to post, push to postArray
+
+	        this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
+	            if (user) {
+	                this.userRef = firebase.database().ref('users').child(firebase.auth().currentUser.uid);
+	                this.userRef.on("value", snap => {
+	                    this.setState({ username: snap.val().first + " " + snap.val().last });
+	                    console.log(this.state.username);
+	                });
+	            }
+	        });
 
 	        this.postsRef.on("child_added", snap => {
 	            var post = snap.val();
@@ -28181,7 +28191,7 @@
 	            //gathers the data from the post submission
 	            var postData = {
 	                user_id: firebase.auth().currentUser.uid,
-	                user_name: firebase.auth().currentUser.displayName,
+	                user_name: this.state.username,
 	                body: this.refs.body.value,
 	                created_at: firebase.database.ServerValue.TIMESTAMP,
 	                replies: [],
@@ -28334,7 +28344,7 @@
 	                    )
 	                ),
 	                React.createElement('hr', null),
-	                React.createElement(Reply, { post_id: post.post_id })
+	                React.createElement(Reply, { post_id: post.post_id, username: this.state.username })
 	            ))
 	        );
 	    }
@@ -28440,7 +28450,7 @@
 	            var postReplyKey = firebase.database().ref().child('reply').push().key;
 	            var reply = {
 	                post_id: this.props.post_id,
-	                user_name: firebase.auth().currentUser.displayName,
+	                user_name: this.props.username,
 	                user_id: firebase.auth().currentUser.uid,
 	                body: this.refs.theReply.value,
 	                post_time: firebase.database.ServerValue.TIMESTAMP
