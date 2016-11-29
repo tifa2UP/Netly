@@ -28793,8 +28793,8 @@
 	                null,
 	                React.createElement(
 	                    Link,
-	                    { to: '/connections', className: 'navbar-brand' },
-	                    React.createElement('span', { className: 'glyphicon glyphicon-globe navbar-icon', title: 'Connections' })
+	                    { to: '/connections', className: 'navbar-brand connections-icon' },
+	                    React.createElement('span', { className: 'ionicons ion-ios-people navbar-icon', title: 'Connections' })
 	                )
 	            );
 	            companies = React.createElement(
@@ -32319,7 +32319,7 @@
 						React.createElement(
 							Link,
 							{ to: "/users/" + endorsement.endorsedById },
-							React.createElement('img', { src: endorsement.img, className: 'img-circle grid-img', alt: '', width: '20', height: '20', style: { objectFit: 'cover' } })
+							React.createElement('img', { src: endorsement.img, className: 'img-circle grid-img recommendation-img', alt: '', width: '40', height: '40', style: { objectFit: 'cover' } })
 						),
 						React.createElement(
 							Link,
@@ -32328,7 +32328,7 @@
 						),
 						React.createElement(
 							'blockquote',
-							null,
+							{ className: 'recommendation-quote' },
 							'"',
 							endorsement.msg,
 							'"',
@@ -32350,7 +32350,7 @@
 						React.createElement(
 							Link,
 							{ to: "/users/" + endorsement.endorsedById },
-							React.createElement('img', { src: endorsement.img, className: 'img-circle grid-img', alt: '', width: '20', height: '20', style: { objectFit: 'cover' } })
+							React.createElement('img', { src: endorsement.img, className: 'img-circle grid-img recommendation-img', alt: '', width: '40', height: '40', style: { objectFit: 'cover' } })
 						),
 						React.createElement(
 							Link,
@@ -32359,7 +32359,7 @@
 						),
 						React.createElement(
 							'blockquote',
-							null,
+							{ className: 'recommendation-quote' },
 							'"',
 							endorsement.msg,
 							'"'

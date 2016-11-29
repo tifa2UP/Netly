@@ -156,3 +156,19 @@ blockquote{
 .briefcase{
    padding-top: 15px !important;
 }
+.recommendation-img{
+    margin-right: 10px;
+}
+
+.recommendation-quote{
+    padding-left: 20px;
+}
+.connections-icon{
+    padding-top: 12px !important;
+}
+.ionicons{
+    font-size: 130%;
+}
+.glyphicon-bell{
+    font-size: 90%;
+}
