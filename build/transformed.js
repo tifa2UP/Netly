@@ -27905,7 +27905,7 @@
 				React.createElement('div', { className: 'col-md-4' }),
 				React.createElement(
 					'div',
-					{ className: 'col-md-4' },
+					{ className: 'col-md-4 margin-top-30' },
 					React.createElement(
 						'center',
 						null,
@@ -27917,41 +27917,45 @@
 						React.createElement('br', null),
 						React.createElement(
 							'div',
-							{ className: 'sign-up-type' },
-							React.createElement('input', { type: 'radio', name: 'recruiter', value: 'false', onChange: this.accountChange, className: 'radio-icon' }),
+							{ className: 'sign-up-form' },
 							React.createElement(
-								'span',
-								{ className: 'radio-icon' },
-								'Job Seeker'
+								'div',
+								{ className: 'sign-up-type' },
+								React.createElement('input', { type: 'radio', name: 'recruiter', value: 'false', onChange: this.accountChange, className: 'radio-icon' }),
+								React.createElement(
+									'span',
+									{ className: 'radio-icon' },
+									'Job Seeker'
+								),
+								React.createElement('input', { type: 'radio', name: 'recruiter', value: 'true', onChange: this.accountChange, className: 'radio-icon' }),
+								React.createElement(
+									'span',
+									{ className: 'radio-icon' },
+									'Company'
+								)
 							),
-							React.createElement('input', { type: 'radio', name: 'recruiter', value: 'true', onChange: this.accountChange, className: 'radio-icon' }),
+							React.createElement('input', { type: 'text', ref: 'firstName', placeholder: 'First Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
+							React.createElement('input', { type: 'text', ref: 'lastName', placeholder: 'Last Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
+							React.createElement('input', { type: 'email', ref: 'email', placeholder: 'Email Address', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
+							React.createElement('input', { type: 'password', ref: 'password', placeholder: 'Password', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
+							React.createElement('input', { type: 'password', ref: 'password_confirmation', placeholder: 'Password Confirmation', className: 'form-control', onKeyPress: this.handleKeyPress }),
+							React.createElement('br', null),
 							React.createElement(
-								'span',
-								{ className: 'radio-icon' },
-								'Company'
+								'button',
+								{ onClick: this.handleSignUp, className: 'btn btn-primary margin-bottom-10' },
+								'Create Account'
+							),
+							React.createElement('br', null),
+							'Have an account? ',
+							React.createElement(
+								Link,
+								{ to: '/login' },
+								'Login!'
 							)
-						),
-						React.createElement('input', { type: 'text', ref: 'firstName', placeholder: 'First Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement('input', { type: 'text', ref: 'lastName', placeholder: 'Last Name', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement('input', { type: 'email', ref: 'email', placeholder: 'Email Address', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement('input', { type: 'password', ref: 'password', placeholder: 'Password', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement('input', { type: 'password', ref: 'password_confirmation', placeholder: 'Password Confirmation', className: 'form-control', onKeyPress: this.handleKeyPress }),
-						React.createElement('br', null),
-						React.createElement(
-							'button',
-							{ onClick: this.handleSignUp, className: 'btn btn-primary margin-bottom-10' },
-							'Create Account'
-						),
-						React.createElement('br', null),
-						'Have an account? ',
-						React.createElement(
-							Link,
-							{ to: '/login' },
-							'Login!'
 						)
 					)
 				),
@@ -28062,7 +28066,7 @@
 						null,
 						React.createElement(
 							'h1',
-							null,
+							{ className: 'margin-top-30' },
 							'Log In'
 						),
 						React.createElement('br', null),
@@ -28072,7 +28076,7 @@
 						React.createElement('br', null),
 						React.createElement(
 							'button',
-							{ className: 'btn btn-primary', onClick: this.handleLogIn },
+							{ className: 'btn btn-primary margin-bottom-10', onClick: this.handleLogIn },
 							'Login'
 						),
 						React.createElement('br', null),
@@ -28108,7 +28112,7 @@
 
 	    //initializes the postArray
 	    getInitialState: function () {
-	        return { postArray: [] };
+	        return { postArray: [], username: "" };
 	    },
 
 	    //loading all posts into the state's postArray
@@ -28117,6 +28121,15 @@
 	        //gets the post reference
 	        this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
 	        //for each child added to post, push to postArray
+
+	        this.unsubscribe = firebase.auth().onAuthStateChanged(user => {
+	            if (user) {
+	                this.userRef = firebase.database().ref('users').child(firebase.auth().currentUser.uid);
+	                this.userRef.on("value", snap => {
+	                    this.setState({ username: snap.val().first + " " + snap.val().last });
+	                });
+	            }
+	        });
 
 	        this.postsRef.on("child_added", snap => {
 	            var post = snap.val();
@@ -28181,7 +28194,7 @@
 	            //gathers the data from the post submission
 	            var postData = {
 	                user_id: firebase.auth().currentUser.uid,
-	                user_name: firebase.auth().currentUser.displayName,
+	                user_name: this.state.username,
 	                body: this.refs.body.value,
 	                created_at: firebase.database.ServerValue.TIMESTAMP,
 	                replies: [],
@@ -28334,7 +28347,7 @@
 	                    )
 	                ),
 	                React.createElement('hr', null),
-	                React.createElement(Reply, { post_id: post.post_id })
+	                React.createElement(Reply, { post_id: post.post_id, username: this.state.username })
 	            ))
 	        );
 	    }
@@ -28440,7 +28453,7 @@
 	            var postReplyKey = firebase.database().ref().child('reply').push().key;
 	            var reply = {
 	                post_id: this.props.post_id,
-	                user_name: firebase.auth().currentUser.displayName,
+	                user_name: this.props.username,
 	                user_id: firebase.auth().currentUser.uid,
 	                body: this.refs.theReply.value,
 	                post_time: firebase.database.ServerValue.TIMESTAMP
@@ -28786,7 +28799,7 @@
 	            );
 	            companies = React.createElement(
 	                Link,
-	                { to: '/companies', className: 'navbar-brand' },
+	                { to: '/companies', className: 'navbar-brand briefcase' },
 	                React.createElement('span', { className: 'glyphicon glyphicon-briefcase navbar-icon', title: 'Companies' })
 	            );
 
@@ -28842,7 +28855,7 @@
 	                        React.createElement(
 	                            Link,
 	                            { to: '/', className: 'navbar-brand' },
-	                            React.createElement('span', { className: 'glyphicon glyphicon-home navbar-icon', title: 'Home' })
+	                            React.createElement('img', { src: 'logo.png', alt: 'logo', height: 35 })
 	                        ),
 	                        companies
 	                    ),

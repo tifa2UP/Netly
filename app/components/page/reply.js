@@ -91,7 +91,7 @@ var Reply = React.createClass({
             var postReplyKey = firebase.database().ref().child('reply').push().key;
             var reply = {
                 post_id: this.props.post_id,
-                user_name: firebase.auth().currentUser.displayName,
+                user_name: this.props.username,
                 user_id: firebase.auth().currentUser.uid,
                 body: this.refs.theReply.value,
                 post_time: firebase.database.ServerValue.TIMESTAMP

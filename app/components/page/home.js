@@ -9,7 +9,7 @@ var Home = React.createClass({
 
     //initializes the postArray
     getInitialState: function(){
-        return {postArray: []};
+        return {postArray: [], username: ""};
     },
 
     //loading all posts into the state's postArray
@@ -18,6 +18,15 @@ var Home = React.createClass({
         //gets the post reference
         this.postsRef = firebase.database().ref().child('posts').orderByChild("created_at");
         //for each child added to post, push to postArray
+
+        this.unsubscribe = firebase.auth().onAuthStateChanged(user =>{
+            if(user){
+                this.userRef = firebase.database().ref('users').child(firebase.auth().currentUser.uid);
+                this.userRef.on("value", snap=>{
+                    this.setState({username: snap.val().first + " " + snap.val().last});
+                });
+            }
+        });
 
         this.postsRef.on("child_added", snap => {
             var post = snap.val();
@@ -82,7 +91,7 @@ var Home = React.createClass({
             //gathers the data from the post submission
             var postData = {
                 user_id: firebase.auth().currentUser.uid,
-                user_name: firebase.auth().currentUser.displayName,
+                user_name: this.state.username,
                 body: this.refs.body.value,
                 created_at: firebase.database.ServerValue.TIMESTAMP,
                 replies: [],
@@ -191,7 +200,7 @@ var Home = React.createClass({
                             <button className="btn btn-default" onClick={this.handleLike.bind(null, post)}><span className="glyphicon glyphicon-thumbs-up"></span> ({post.likes})</button>
                         </blockquote>
                         <hr/>
-                        <Reply post_id={post.post_id}/>
+                        <Reply post_id={post.post_id} username={this.state.username}/>
                     </div>
                 ))}
             </div>
