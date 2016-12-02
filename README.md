@@ -10,4 +10,19 @@
 * Webpack & Babel -v
 * Bootstrap -v
 
+###Architecture
+
+TODO: Seling
+
+###Team
+Abdellatif Abdelfattah <br>
+Ahmad Abdeljabbar <br>
+Alexandr Buga <br>
+Atef Alrwashdeh <br>
+Chris Van Horn <br>
+Parviz Latipov <br>
+Seling Chen <br>
+
+###Screenshots
+
 
