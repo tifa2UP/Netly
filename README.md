@@ -14,14 +14,18 @@
 
 TODO: Seling
 
+###Installation instructions
+
+TODO: Seling
+
 ###Team
-Abdellatif Abdelfattah <br>
+[Abdellatif Abdelfattah](http://aabdelfattah.com/) <br>
 Ahmad Abdeljabbar <br>
 Alexandr Buga <br>
 Atef Alrwashdeh <br>
 Chris Van Horn <br>
 Parviz Latipov <br>
-Seling Chen <br>
+Seling Chen - Team lead <br>
 
 ###Screenshots
 
