@@ -21,10 +21,10 @@
 TODO: Seling
 
 ###Installation instructions
-Followed the [CodeAcademy React Setup](https://www.codecademy.com/articles/react-setup-v) to set up React.JS <br>
-Followed the [Firebase Get Started Guide](https://firebase.google.com/docs/web/setup) to set up Firebase <br>
-Followed the [Firebase Hosting](https://firebase.google.com/docs/hosting/) to deploy application but changed firebase.json public node to point to <i>build</i> folder<br>
-Followed the [React Router Tutorial](https://github.com/reactjs/react-router-tutorial) to set up React Router <br>
+1. Followed the [CodeAcademy React Setup](https://www.codecademy.com/articles/react-setup-v) to set up React.JS <br>
+2. Followed the [Firebase Get Started Guide](https://firebase.google.com/docs/web/setup) to set up Firebase <br>
+3. Followed the [Firebase Hosting](https://firebase.google.com/docs/hosting/) to deploy application but changed firebase.json public node to point to <i>build</i> folder<br>
+4. Followed the [React Router Tutorial](https://github.com/reactjs/react-router-tutorial) to set up React Router <br>
 
 ###Team
 [Abdellatif Abdelfattah](http://aabdelfattah.com/) <br>
