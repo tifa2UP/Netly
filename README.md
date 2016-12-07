@@ -22,7 +22,7 @@ We wanted to build a multi-page website instead of the typical one-page websites
 ###Installation instructions
 1. Setting up React.JS - [Link](https://www.codecademy.com/articles/react-setup-v) <br>
 2. Setting up Firebase - [Link](https://firebase.google.com/docs/web/setup) <br>
-3. Deploy Application - [Link](https://firebase.google.com/docs/hosting/) <br>
+3. Deploying Application - [Link](https://firebase.google.com/docs/hosting/) <br>
 	* Changed firebase.json's public node to point to <i>build</i> <br>
 
 ###Team
