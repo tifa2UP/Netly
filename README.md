@@ -36,4 +36,9 @@ Seling Chen - Team lead <br>
 
 ###Screenshots
 
-
+####Live Feed
+<img src="Feed.PNG" />
+####Customizable Profile
+<img src="Profile.PNG" />
+####Real-time search
+<img src="Search.PNG" />
