@@ -26,7 +26,7 @@ We wanted to build a multi-page website instead of the typical one-page websites
 	* Change firebase.json's public node to point to <i>build</i> <br>
 
 ###Team
-[Abdellatif Abdelfattah](http://aabdelfattah.com/) <br>
+Abdellatif Abdelfattah <br>
 Ahmad Abdeljabbar <br>
 Alexandr Buga <br>
 Atef Alrwashdeh <br>
