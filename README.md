@@ -17,14 +17,12 @@
 * Bootstrap -v "3.3.7"
 
 ###Architecture
-
-TODO: Seling
+We wanted to build a multi-page website instead of the typical one-page websites supported by React.JS, so we followed the [React Router Tutorial](https://github.com/reactjs/react-router-tutorial) to integrate it into our application. Learning from [example](https://github.com/tylermcginnis/react-router-firebase-auth/tree/8558713f7ff1e17b7acc3e2e2946377152b1c043), we figured out how to have a fixed navbar at the top of every page in the application but have changing child components upon path changes. Learning from the CodeAcademy React.JS tutorials [1](https://www.codecademy.com/learn/react-101)&[2](https://www.codecademy.com/learn/react-102), the [Firebase Docs](https://firebase.google.com/docs/web/setup), and trial/error, we have created our own version of Linked In, [Netly](netly.online).
 
 ###Installation instructions
 1. Followed the [CodeAcademy React Setup](https://www.codecademy.com/articles/react-setup-v) to set up React.JS <br>
 2. Followed the [Firebase Get Started Guide](https://firebase.google.com/docs/web/setup) to set up Firebase <br>
-3. Followed the [Firebase Hosting](https://firebase.google.com/docs/hosting/) to deploy application but changed firebase.json public node to point to <i>build</i> folder<br>
-4. Followed the [React Router Tutorial](https://github.com/reactjs/react-router-tutorial) to set up React Router <br>
+3. Followed the [Firebase Hosting](https://firebase.google.com/docs/hosting/) to deploy application but changed firebase.json public node to point to <i>build</i> <br>
 
 ###Team
 [Abdellatif Abdelfattah](http://aabdelfattah.com/) <br>
