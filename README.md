@@ -20,6 +20,7 @@
 We wanted to build a multi-page website instead of the typical one-page websites supported by React.JS, so we followed the [React Router Tutorial](https://github.com/reactjs/react-router-tutorial) to integrate React Router into our application. Learning from [example](https://github.com/tylermcginnis/react-router-firebase-auth/tree/8558713f7ff1e17b7acc3e2e2946377152b1c043), we figured out how to have a fixed navbar at the top of every page in the application but have changing child components upon path changes. Through the CodeAcademy React.JS tutorials [1](https://www.codecademy.com/learn/react-101)+[2](https://www.codecademy.com/learn/react-102), the [Firebase Docs](https://firebase.google.com/docs/web/setup), and trial/error, we have created our own version of Linkedin, [Netly](https://netly.online).
 
 ###Installation instructions
+0. In *App.js* input your firebase API Keys
 1. Set up React.JS - [Link](https://www.codecademy.com/articles/react-setup-v) <br>
 2. Set up Firebase - [Link](https://firebase.google.com/docs/web/setup) <br>
 3. Deploy the Application - [Link](https://firebase.google.com/docs/hosting/) <br>
