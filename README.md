@@ -1,6 +1,6 @@
 # Netly
 
-### The website is deployed at https://testingproject-cd660.firebaseapp.com/#/login?_k=zxbtha
+### The website is deployed at https://testingproject-cd660.firebaseapp.com/
 
 ##### We decided to rebuild Linkedin.com using React.js due to its rising popularity putting in mind the latest trends applied in the framework
 
